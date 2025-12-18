@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server'
+import axios from 'axios'
+import https from 'https'
 import { AUTH_CONFIG } from '@/utils/constants/authConfig'
 import { extractUserInfo } from '@/lib/auth/jwtUtils'
 import { createSession } from '@/lib/auth/sessionManager'
@@ -30,57 +32,56 @@ export async function POST() {
     // Call OAuth token endpoint
     const credentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
 
-    // For development with self-signed certificates, disable SSL verification
-    // @ts-expect-error - Node.js global for disabling SSL verification
-    if (process.env.NODE_ENV === 'development' && global.fetch) {
-      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
-    }
+    // Prepare HTTPS agent for development (self-signed certs)
+    const httpsAgent = process.env.NODE_ENV === 'development'
+      ? new https.Agent({ rejectUnauthorized: false })
+      : undefined
 
-    const response = await fetch(`${baseUrl}/oauth2/rest/token`, {
-      method: 'POST',
-      headers: {
-        'X-OAUTH-IDENTITY-DOMAIN-NAME': domain,
-        'Content-Type': 'application/x-www-form-urlencoded',
-        Authorization: `Basic ${credentials}`,
-      },
-      body: new URLSearchParams({
-        grant_type: 'CLIENT_CREDENTIALS',
-        scope,
-      }),
-    })
-
-    // Re-enable SSL verification after request
-    if (process.env.NODE_ENV === 'development') {
-      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '1'
-    }
-
-    if (!response.ok) {
-      const error = await response.text()
-      console.error('Token request failed:', error)
-      return NextResponse.json(
-        { error: `Authentication failed: ${error}` },
-        { status: response.status }
+    try {
+      const response = await axios.post<TokenResponse>(
+        `${baseUrl}/oauth2/rest/token`,
+        new URLSearchParams({
+          grant_type: 'CLIENT_CREDENTIALS',
+          scope,
+        }),
+        {
+          headers: {
+            'X-OAUTH-IDENTITY-DOMAIN-NAME': domain,
+            'Content-Type': 'application/x-www-form-urlencoded',
+            Authorization: `Basic ${credentials}`,
+          },
+          httpsAgent,
+        }
       )
+
+      const tokenData = response.data
+
+      // Extract user info from JWT
+      const user = extractUserInfo(tokenData.access_token)
+
+      // Create server-side session
+      const expiresAt = Date.now() + tokenData.expires_in * 1000
+      await createSession({
+        user,
+        accessToken: tokenData.access_token,
+        expiresAt,
+      })
+
+      // Return success (no sensitive data in response)
+      return NextResponse.json({
+        success: true,
+        user,
+      })
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error('Token request failed:', error.response?.data || error.message)
+        return NextResponse.json(
+          { error: `Authentication failed: ${error.response?.data || error.message}` },
+          { status: error.response?.status || 500 }
+        )
+      }
+      throw error
     }
-
-    const tokenData: TokenResponse = await response.json()
-
-    // Extract user info from JWT
-    const user = extractUserInfo(tokenData.access_token)
-
-    // Create server-side session
-    const expiresAt = Date.now() + tokenData.expires_in * 1000
-    await createSession({
-      user,
-      accessToken: tokenData.access_token,
-      expiresAt,
-    })
-
-    // Return success (no sensitive data in response)
-    return NextResponse.json({
-      success: true,
-      user,
-    })
   } catch (error) {
     console.error('Token API error:', error)
     return NextResponse.json(
