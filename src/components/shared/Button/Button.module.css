@@ -1,0 +1,307 @@
+/* Base button reset and common styles */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  user-select: none;
+  text-decoration: none;
+}
+
+.button:focus {
+  outline: none;
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--button-focus-ring-primary);
+  outline-offset: var(--button-focus-ring-offset);
+}
+
+.button.focusError:focus-visible {
+  outline-color: var(--button-focus-ring-error);
+}
+
+/* Icon-only specific styles */
+.iconOnly {
+  gap: 0;
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* ===== Hierarchy Variants ===== */
+
+/* Primary Button */
+.primary {
+  background-color: var(--button-primary-bg-default);
+  color: var(--button-primary-text-default);
+  box-shadow: var(--button-shadow-default);
+}
+
+.primary:hover:not(:disabled) {
+  background-color: var(--button-primary-bg-hover);
+  box-shadow: var(--button-shadow-hover);
+}
+
+.primary:active:not(:disabled) {
+  background-color: var(--button-primary-bg-active);
+  box-shadow: var(--button-shadow-active);
+  transform: scale(0.98);
+}
+
+.primary:disabled {
+  background-color: var(--button-primary-bg-disabled);
+  color: var(--button-primary-text-disabled);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Primary Destructive */
+.primary.destructive {
+  background-color: var(--button-destructive-bg-default);
+  color: var(--button-primary-text-default);
+}
+
+.primary.destructive:hover:not(:disabled) {
+  background-color: var(--button-destructive-bg-hover);
+}
+
+.primary.destructive:active:not(:disabled) {
+  background-color: var(--button-destructive-bg-active);
+}
+
+.primary.destructive:disabled {
+  background-color: var(--button-destructive-bg-disabled);
+  color: var(--button-destructive-text-disabled);
+}
+
+/* Secondary Button */
+.secondary {
+  background-color: var(--button-secondary-bg-default);
+  color: var(--button-secondary-text-default);
+  border: 1px solid var(--button-secondary-border-default);
+  box-shadow: var(--button-shadow-default);
+}
+
+.secondary:hover:not(:disabled) {
+  background-color: var(--button-secondary-bg-hover);
+  border-color: var(--button-secondary-border-hover);
+  box-shadow: var(--button-shadow-hover);
+}
+
+.secondary:active:not(:disabled) {
+  background-color: var(--button-secondary-bg-active);
+  box-shadow: var(--button-shadow-active);
+  transform: scale(0.98);
+}
+
+.secondary:disabled {
+  background-color: var(--button-secondary-bg-default);
+  color: var(--button-secondary-text-disabled);
+  border-color: var(--button-secondary-border-disabled);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Secondary Destructive */
+.secondary.destructive {
+  color: var(--button-destructive-bg-default);
+  border-color: var(--button-destructive-border);
+}
+
+.secondary.destructive:hover:not(:disabled) {
+  background-color: var(--button-destructive-surface);
+  border-color: var(--button-destructive-bg-hover);
+}
+
+.secondary.destructive:active:not(:disabled) {
+  background-color: var(--button-destructive-surface);
+}
+
+.secondary.destructive:disabled {
+  color: var(--button-destructive-text-disabled);
+  border-color: var(--button-secondary-border-disabled);
+  background-color: var(--button-secondary-bg-default);
+}
+
+/* Tertiary Button */
+.tertiary {
+  background-color: transparent;
+  color: var(--button-tertiary-text-default);
+  box-shadow: none;
+}
+
+.tertiary:hover:not(:disabled) {
+  background-color: var(--button-tertiary-bg-hover);
+  color: var(--button-tertiary-text-hover);
+}
+
+.tertiary:active:not(:disabled) {
+  background-color: var(--button-tertiary-bg-hover);
+  transform: scale(0.98);
+}
+
+.tertiary:disabled {
+  color: var(--button-tertiary-text-disabled);
+  cursor: not-allowed;
+  background-color: transparent;
+}
+
+/* Tertiary Destructive */
+.tertiary.destructive {
+  color: var(--button-destructive-bg-default);
+}
+
+.tertiary.destructive:hover:not(:disabled) {
+  background-color: var(--button-destructive-surface);
+}
+
+.tertiary.destructive:active:not(:disabled) {
+  background-color: var(--button-destructive-surface);
+}
+
+.tertiary.destructive:disabled {
+  color: var(--button-destructive-text-disabled);
+  background-color: transparent;
+}
+
+/* ===== Size Variants ===== */
+
+/* Small - Text buttons */
+.sm {
+  height: 36px;
+  padding: 8px 12px;
+  font-size: var(--font-size-text-sm);
+  line-height: var(--line-height-text-sm);
+}
+
+/* Small - Icon only */
+.sm.iconOnly {
+  width: 32px;
+  height: 32px;
+  padding: 8px;
+}
+
+/* Medium - Text buttons */
+.md {
+  height: 40px;
+  padding: 10px 14px;
+  font-size: var(--font-size-text-sm);
+  line-height: var(--line-height-text-sm);
+}
+
+/* Medium - Icon only */
+.md.iconOnly {
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+}
+
+/* Large - Text buttons */
+.lg {
+  height: 44px;
+  padding: 10px 16px;
+  font-size: var(--font-size-text-md);
+  line-height: var(--line-height-text-md);
+}
+
+/* Large - Icon only */
+.lg.iconOnly {
+  width: 44px;
+  height: 44px;
+  padding: 12px;
+}
+
+/* ===== Icon Spacing in Text Buttons ===== */
+
+.iconBefore {
+  font-size: inherit;
+  flex-shrink: 0;
+}
+
+.iconAfter {
+  font-size: inherit;
+  flex-shrink: 0;
+}
+
+.label {
+  flex-shrink: 0;
+}
+
+/* ===== Icon in Icon-Only Buttons ===== */
+
+.icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.sm .icon {
+  font-size: 16px;
+}
+
+.md .icon {
+  font-size: 20px;
+}
+
+.lg .icon {
+  font-size: 24px;
+}
+
+/* ===== Badge for Icon-Only Buttons ===== */
+
+.badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9px;
+  font-size: 11px;
+  font-weight: var(--font-weight-semibold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  border: 2px solid var(--color-background);
+  line-height: 1;
+}
+
+.badgeError {
+  background-color: var(--color-error-700);
+  color: var(--color-white);
+}
+
+.badgeWarning {
+  background-color: var(--color-warning-500);
+  color: var(--color-gray-900);
+}
+
+.badgeInfo {
+  background-color: var(--color-informative-500);
+  color: var(--color-white);
+}
+
+/* ===== Full Width Modifier ===== */
+
+.fullWidth {
+  width: 100%;
+}
+
+/* ===== Loading State ===== */
+
+.button[data-loading='true'] {
+  pointer-events: none;
+  position: relative;
+}
+
+/* Disabled pointer events on children when loading */
+.button[data-loading='true'] > * {
+  pointer-events: none;
+}

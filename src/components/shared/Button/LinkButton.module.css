@@ -1,0 +1,156 @@
+/* Base link button reset and common styles */
+.linkButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  border: none;
+  background-color: transparent;
+  padding: 0;
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  user-select: none;
+  text-decoration: none;
+  position: relative;
+}
+
+.linkButton:focus {
+  outline: none;
+}
+
+.linkButton:focus-visible {
+  outline: 2px solid var(--button-focus-ring-primary);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Icon-only specific styles */
+.iconOnly {
+  gap: 0;
+  padding: 4px;
+}
+
+/* ===== Variant Styles ===== */
+
+/* Primary Link Button */
+.primary {
+  color: var(--button-link-primary-default);
+}
+
+.primary:hover:not(:disabled) {
+  color: var(--button-link-primary-hover);
+}
+
+.primary:hover:not(:disabled) .label {
+  text-decoration: underline;
+}
+
+.primary:active:not(:disabled) {
+  color: var(--button-link-primary-hover);
+}
+
+.primary:disabled {
+  color: var(--button-link-primary-disabled);
+  cursor: not-allowed;
+}
+
+/* Secondary Link Button */
+.secondary {
+  color: var(--button-link-secondary-default);
+}
+
+.secondary:hover:not(:disabled) {
+  color: var(--button-link-secondary-hover);
+}
+
+.secondary:hover:not(:disabled) .label {
+  text-decoration: underline;
+}
+
+.secondary:active:not(:disabled) {
+  color: var(--button-link-secondary-hover);
+}
+
+.secondary:disabled {
+  color: var(--button-link-secondary-disabled);
+  cursor: not-allowed;
+}
+
+/* Destructive Link Button */
+.destructive {
+  color: var(--button-destructive-bg-default);
+}
+
+.destructive:hover:not(:disabled) {
+  color: var(--button-destructive-bg-hover);
+}
+
+.destructive:hover:not(:disabled) .label {
+  text-decoration: underline;
+}
+
+.destructive:active:not(:disabled) {
+  color: var(--button-destructive-bg-hover);
+}
+
+.destructive:disabled {
+  color: var(--button-destructive-text-disabled);
+}
+
+/* ===== Size Variants ===== */
+
+.sm {
+  font-size: var(--font-size-text-sm);
+  line-height: var(--line-height-text-sm);
+}
+
+.md {
+  font-size: var(--font-size-text-sm);
+  line-height: var(--line-height-text-sm);
+}
+
+.lg {
+  font-size: var(--font-size-text-md);
+  line-height: var(--line-height-text-md);
+}
+
+/* ===== Icon Styles ===== */
+
+.iconBefore {
+  font-size: inherit;
+  flex-shrink: 0;
+}
+
+.iconAfter {
+  font-size: inherit;
+  flex-shrink: 0;
+}
+
+.label {
+  flex-shrink: 0;
+}
+
+/* Icon in icon-only buttons */
+.icon {
+  flex-shrink: 0;
+}
+
+.sm .icon {
+  font-size: 16px;
+}
+
+.md .icon {
+  font-size: 20px;
+}
+
+.lg .icon {
+  font-size: 24px;
+}
+
+/* Icon-only hover effect */
+.iconOnly:hover:not(:disabled) {
+  opacity: 0.8;
+}

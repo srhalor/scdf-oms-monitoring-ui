@@ -1,0 +1,23 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  width: 100%;
+  max-width: 400px;
+}
+
+.error {
+  padding: var(--spacing-md);
+  background-color: var(--color-error-50);
+  border: 1px solid var(--color-error-300);
+  border-radius: var(--radius-md);
+  color: var(--color-error-700);
+  font-size: var(--text-sm-size);
+}
+
+.note {
+  margin: 0;
+  text-align: center;
+  font-size: var(--text-sm-size);
+  color: var(--color-gray-600);
+}

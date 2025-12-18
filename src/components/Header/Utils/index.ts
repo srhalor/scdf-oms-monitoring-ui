@@ -1,0 +1,1 @@
+export { sanitizeSvgPath } from './sanitizeSvgPath'

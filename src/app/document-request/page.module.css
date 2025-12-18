@@ -1,0 +1,17 @@
+.container {
+  padding: var(--spacing-lg);
+  background-color: transparent;
+}
+
+.heading {
+  font-size: var(--font-size-display-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.description {
+  font-size: var(--font-size-text-lg);
+  color: var(--color-text-secondary);
+  margin: 0;
+}

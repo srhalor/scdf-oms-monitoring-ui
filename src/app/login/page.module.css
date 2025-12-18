@@ -1,0 +1,50 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--color-gray-50) 0%, var(--color-gray-100) 100%);
+  padding: var(--spacing-xl);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xl);
+  background: var(--color-white);
+  padding: var(--spacing-2xl);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  width: 100%;
+  max-width: 480px;
+}
+
+.logoSection {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: var(--spacing-md);
+}
+
+.logoText {
+  font-size: var(--text-xl-size);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white);
+  letter-spacing: 2px;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--text-2xl-size);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-gray-900);
+  text-align: center;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: var(--text-md-size);
+  color: var(--color-gray-600);
+  text-align: center;
+}

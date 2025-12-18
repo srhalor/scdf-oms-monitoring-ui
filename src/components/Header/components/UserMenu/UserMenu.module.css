@@ -1,0 +1,56 @@
+.container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.avatarButton {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+/* Avatar and initials handled by global utilities */
+
+/* Dropdown handled by global utilities, position set inline */
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+}
+
+/* Avatar and initials handled by global utilities */
+
+.userDetails {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  height: 40px;
+}
+
+.userName {
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-sm-size);
+  line-height: var(--text-sm-line-height);
+  color: var(--color-gray-900);
+  /* text-ellipsis utility applied in JSX */
+}
+
+.userEmail {
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-sm-size);
+  line-height: var(--text-sm-line-height);
+  color: var(--color-gray-600);
+  /* text-ellipsis utility applied in JSX */
+}

@@ -1,0 +1,123 @@
+/* 
+ * Shared Utility Classes
+ * Common UI patterns used across multiple components
+ */
+
+/* ===== Icon Utilities ===== */
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  font-size: 20px;
+  color: var(--color-gray-400);
+  transition: color var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.icon--active {
+  color: var(--color-gray-900);
+}
+
+.icon--hover:hover {
+  color: var(--color-gray-600);
+}
+
+/* ===== Avatar Utilities ===== */
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 200px;
+  background: linear-gradient(135deg, var(--color-brand-400) 0%, var(--color-brand-600) 100%);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+  transition: opacity 0.2s ease;
+}
+
+.avatar--interactive:hover {
+  opacity: 0.9;
+}
+
+.avatar--interactive:active {
+  opacity: 0.8;
+}
+
+.avatar--40 {
+  width: 40px;
+  height: 40px;
+}
+
+.avatar--32 {
+  width: 32px;
+  height: 32px;
+}
+
+.avatar-initials {
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-sm-size);
+  line-height: var(--text-sm-line-height);
+  color: var(--color-white);
+  user-select: none;
+}
+
+.avatar-initials--sm {
+  font-size: var(--text-xs-size);
+  line-height: var(--text-xs-line-height);
+}
+
+/* ===== Dropdown Utilities ===== */
+.dropdown {
+  position: absolute;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: var(--z-index-dropdown);
+}
+
+.dropdown--right {
+  right: 0;
+}
+
+.dropdown--left {
+  left: 0;
+}
+
+/* ===== Text Utilities ===== */
+.text-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.text-no-wrap {
+  white-space: nowrap;
+}
+
+/* ===== Container Utilities ===== */
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-gap-xs {
+  gap: var(--spacing-xs);
+}
+
+.flex-gap-sm {
+  gap: var(--spacing-sm);
+}
+
+.flex-gap-md {
+  gap: var(--spacing-md);
+}

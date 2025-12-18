@@ -1,0 +1,128 @@
+.card {
+  background: transparent;
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  min-width: 280px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+}
+
+.title {
+  font-size: var(--text-lg-size);
+  font-weight: var(--text-weight-semibold);
+  color: var(--color-gray-900);
+  margin: 0;
+}
+
+.refreshButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--color-gray-600);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  padding: 0;
+}
+
+.refreshButton:hover {
+  background: var(--color-gray-100);
+  color: var(--color-gray-900);
+}
+
+.refreshButton:active {
+  transform: scale(0.95);
+}
+
+.refreshButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.refreshing {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl);
+  color: var(--color-gray-500);
+  font-size: var(--text-sm-size);
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-weight: var(--text-weight-semibold);
+}
+
+.statusIcon {
+  font-size: var(--text-xl-size);
+}
+
+.statusText {
+  font-size: var(--text-md-size);
+}
+
+.statusUp {
+  background: var(--color-positive-50);
+  color: var(--color-positive-700);
+}
+
+.statusUp .statusIcon {
+  color: var(--color-positive-700);
+}
+
+.statusDown {
+  background: var(--color-error-50);
+  color: var(--color-error-700);
+}
+
+.statusDown .statusIcon {
+  color: var(--color-error-700);
+}
+
+.statusDegraded {
+  background: var(--color-warning-50);
+  color: var(--color-warning-700);
+}
+
+.statusDegraded .statusIcon {
+  color: var(--color-warning-500);
+}
+
+.lastChecked {
+  font-size: var(--text-sm-size);
+  color: var(--color-gray-600);
+  text-align: center;
+}

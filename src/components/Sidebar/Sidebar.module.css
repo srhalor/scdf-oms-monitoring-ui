@@ -1,0 +1,196 @@
+/* Sidebar component styles */
+
+.sidebar {
+  flex-shrink: 0;
+  height: 100vh;
+  padding: var(--spacing-md);
+  background-color: transparent;
+  border-right: 1px solid var(--color-gray-100);
+  transition: width var(--transition-slow);
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.sidebar.closed {
+  width: var(--nav-width-collapsed);
+}
+
+.sidebar.open {
+  width: var(--nav-width-expanded);
+}
+
+/* Navigation */
+.nav {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0;
+}
+
+.navList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.navItem {
+  padding: 2px 0;
+}
+
+.navLink {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 10px;
+  gap: 12px;
+  height: 40px;
+  color: var(--color-gray-600);
+  text-decoration: none;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+  white-space: nowrap;
+  border-radius: 6px;
+  margin: 0;
+  justify-content: flex-start;
+}
+
+/* Hover state - inactive items (opened sidebar) */
+.navLink:hover {
+  background-color: transparent;
+  color: var(--color-gray-900);
+}
+
+.navLink:hover :global(.icon) {
+  color: var(--color-gray-600);
+}
+
+/* Hover state - collapsed sidebar (icon only) */
+.sidebar.closed .navLink:hover {
+  background-color: var(--color-gray-50);
+}
+
+.sidebar.closed .navLink:hover :global(.icon) {
+  color: var(--color-gray-600);
+}
+
+/* Active state - opened sidebar */
+.navLink.active {
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-900);
+  font-weight: var(--font-weight-medium);
+}
+
+.navLink.active :global(.icon) {
+  color: var(--color-gray-900);
+}
+
+/* Active hover state - opened sidebar */
+.navLink.active:hover {
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-900);
+}
+
+.navLink.active:hover :global(.icon) {
+  color: var(--color-gray-600);
+}
+
+/* Active state - collapsed sidebar (icon only) */
+.sidebar.closed .navLink.active {
+  background: var(--color-gray-100);
+}
+
+.sidebar.closed .navLink.active :global(.icon) {
+  color: var(--color-gray-900);
+}
+
+/* Active hover state - collapsed sidebar */
+.sidebar.closed .navLink.active:hover {
+  background: var(--color-gray-100);
+}
+
+.sidebar.closed .navLink.active:hover :global(.icon) {
+  color: var(--color-gray-600);
+}
+
+/* Focused state */
+.navLink:focus-visible {
+  outline: none;
+  box-shadow: 0px 0px 0px 2px #FFFFFF, 0px 0px 0px 4px rgba(50, 150, 250, 0.5);
+  background-color: transparent;
+}
+
+.navLink.active:focus-visible {
+  background-color: var(--color-gray-100);
+}
+
+.sidebar.closed .navLink:focus-visible {
+  background-color: transparent;
+}
+
+.label {
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-text-sm);
+  line-height: var(--line-height-text-sm);
+  opacity: 1;
+  transition: opacity var(--transition-fast), width var(--transition-fast);
+  white-space: nowrap;
+  overflow: hidden;
+  display: inline-block;
+}
+
+/* Hide label in closed state */
+.sidebar.closed .label {
+  opacity: 0;
+  width: 0;
+  transition: opacity var(--transition-fast) 0ms, width var(--transition-slow) 0ms;
+}
+
+/* Scrollbar styling */
+.nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+.nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.nav::-webkit-scrollbar-thumb {
+  background: var(--color-gray-300);
+  border-radius: 2px;
+}
+
+.nav::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gray-400);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: var(--z-index-fixed);
+    box-shadow: var(--shadow-lg);
+    background-color: var(--color-white);
+    transition: transform var(--transition-base), width var(--transition-slow);
+  }
+
+  .sidebar.closed {
+    transform: translateX(-100%);
+    width: var(--nav-width-expanded);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+    width: var(--nav-width-expanded);
+  }
+
+  /* Always show labels on mobile */
+  .sidebar.closed .label {
+    opacity: 1;
+    width: auto;
+  }
+}

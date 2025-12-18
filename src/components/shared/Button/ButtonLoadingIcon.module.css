@@ -1,0 +1,75 @@
+/* Loading Spinner Styles */
+.spinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.circle {
+  width: 16px;
+  height: 16px;
+}
+
+/* Size variants */
+.sm .circle {
+  width: 16px;
+  height: 16px;
+}
+
+.md .circle {
+  width: 16px;
+  height: 16px;
+}
+
+.lg .circle {
+  width: 18px;
+  height: 18px;
+}
+
+/* Background circle - 30% opacity */
+.circleBackground {
+  stroke: currentColor;
+  opacity: 0.3;
+}
+
+/* Foreground circle - rotating arc */
+.circleForeground {
+  stroke: currentColor;
+  animation: spin 600ms linear infinite;
+  transform-origin: center;
+}
+
+/* Rotation animation */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Hierarchy color variants */
+.primary {
+  color: var(--button-primary-text-default);
+}
+
+.primary.destructive {
+  color: var(--color-white);
+}
+
+.secondary {
+  color: var(--button-secondary-text-default);
+}
+
+.secondary.destructive {
+  color: var(--button-destructive-bg-default);
+}
+
+.tertiary {
+  color: var(--button-tertiary-text-default);
+}
+
+.tertiary.destructive {
+  color: var(--button-destructive-bg-default);
+}
