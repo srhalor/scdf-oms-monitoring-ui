@@ -1,12 +1,15 @@
-import styles from './page.module.css'
+import { PageLayout } from '@/components/shared/PageLayout/PageLayout'
+import { Card } from '@/components/shared/Card/Card'
 
 export default function ReferenceDataPage() {
   return (
-    <div className={styles.container}>
-      <h1 className={styles.heading}>Reference Data</h1>
-      <p className={styles.description}>
-        Manage and configure reference data for the application.
-      </p>
-    </div>
+    <PageLayout
+      title="Reference Data"
+      description="Manage and configure reference data for the application."
+    >
+        <Card title="Data Sets">
+            <p>Reference data filtering and configuration controls will appear here.</p>
+        </Card>
+    </PageLayout>
   )
 }

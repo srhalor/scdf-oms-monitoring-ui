@@ -1,0 +1,64 @@
+/* PageLayout component styles */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg) 0;
+  width: 100%;
+  max-width: 1600px; /* Optional: limit max width for very large screens */
+  margin: 0 auto;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-lg);
+}
+
+.titleSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.title {
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-display-xs);
+  line-height: var(--line-height-display-xs);
+  color: var(--color-gray-900);
+  margin: 0;
+}
+
+.label {
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-700);
+  font-size: var(--font-size-text-xs);
+  font-weight: var(--font-weight-medium);
+  padding: 2px 8px;
+  border-radius: 16px; /* Pill shape */
+  line-height: 1.5;
+}
+
+.description {
+  font-family: var(--font-family);
+  font-size: var(--font-size-text-md);
+  color: var(--color-gray-500);
+  margin: 0;
+}
+
+/* Content */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}

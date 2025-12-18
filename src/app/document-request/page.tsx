@@ -1,12 +1,15 @@
-import styles from './page.module.css'
+import { PageLayout } from '@/components/shared/PageLayout/PageLayout'
+import { Card } from '@/components/shared/Card/Card'
 
 export default function DocumentRequestPage() {
   return (
-    <div className={styles.container}>
-      <h1 className={styles.heading}>Document Request</h1>
-      <p className={styles.description}>
-        Track and manage document requests with advanced filtering, sorting, and status monitoring.
-      </p>
-    </div>
+    <PageLayout
+      title="Document Request"
+      description="Track and manage document requests with advanced filtering, sorting, and status monitoring."
+    >
+      <Card title="Requests">
+        <p>No document requests found.</p>
+      </Card>
+    </PageLayout>
   )
 }
