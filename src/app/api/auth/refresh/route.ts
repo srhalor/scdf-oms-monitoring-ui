@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
+import { getServerCookie } from '@/utils/cookieUtils'
 import { AUTH_CONFIG } from '@/utils/constants/authConfig'
 import { updateSession } from '@/lib/auth/sessionManager'
 import { exchangeClientCredentials, exchangeJwtBearer } from '@/lib/auth/tokenService'
@@ -11,8 +11,7 @@ export async function POST() {
 
     if (isProduction) {
       // Production: Refresh using SSO Cookie (JWT Bearer Flow)
-      const ssoCookie = (await cookies()).get(AUTH_CONFIG.sso.cookieName)
-      const assertion = ssoCookie?.value
+      const assertion = await getServerCookie(AUTH_CONFIG.sso.cookieName)
 
       if (!assertion) {
         return NextResponse.json({ error: 'SSO cookie missing' }, { status: 401 })

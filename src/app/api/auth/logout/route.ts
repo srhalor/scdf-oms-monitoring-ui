@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
+import { deleteServerCookie } from '@/utils/cookieUtils'
 import { deleteSession } from '@/lib/auth/sessionManager'
 import { AUTH_CONFIG } from '@/utils/constants/authConfig'
 
@@ -11,11 +11,9 @@ export async function POST() {
   try {
     // Delete session
     await deleteSession()
-    
+
     // Clear SSO cookie in production
-    if (!AUTH_CONFIG.isDevelopment) {
-      (await cookies()).delete(AUTH_CONFIG.sso.cookieName)
-    }
+    await deleteServerCookie(AUTH_CONFIG.sso.cookieName)
 
     // Return success
     return NextResponse.json({

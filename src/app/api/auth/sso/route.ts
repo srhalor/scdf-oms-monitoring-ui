@@ -4,23 +4,17 @@ import { AUTH_CONFIG } from '@/utils/constants/authConfig'
 import { extractUserInfo } from '@/lib/auth/jwtUtils'
 import { createSession } from '@/lib/auth/sessionManager'
 import { exchangeJwtBearer } from '@/lib/auth/tokenService'
-import { cookies } from 'next/headers'
+import { getServerCookie } from '@/utils/cookieUtils'
 
-/**
- * SSO Production Auth Handler
- * Exchanges OAUTH_TOKEN (Assertion) for Access Token via JWT_BEARER flow
- */
+// ...
 export async function GET(request: NextRequest) {
   try {
-    const ssoCookie = (await cookies()).get(AUTH_CONFIG.sso.cookieName)
-    const assertion = ssoCookie?.value
-    const nextUrl = request.nextUrl.searchParams.get('next') || '/dashboard'
+    const assertion = await getServerCookie(AUTH_CONFIG.sso.cookieName)
 
     if (!assertion) {
-      return NextResponse.redirect(new URL(AUTH_CONFIG.sso.loginUrl)) // Fallback to SSO login
+      // Fallback to SSO login
+      return NextResponse.redirect(new URL(AUTH_CONFIG.sso.loginUrl))
     }
-
-
 
     try {
       // Exchange Assertion for Access Token
@@ -37,6 +31,7 @@ export async function GET(request: NextRequest) {
         expiresAt: expiresAt,
       })
 
+      const nextUrl = request.nextUrl.searchParams.get('next') || '/'
       // Redirect to original destination
       return NextResponse.redirect(new URL(nextUrl, request.url))
 

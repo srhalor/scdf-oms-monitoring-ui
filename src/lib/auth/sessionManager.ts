@@ -1,6 +1,6 @@
 import { SignJWT, jwtVerify } from 'jose'
-import { cookies } from 'next/headers'
 import { AUTH_CONFIG } from '@/utils/constants/authConfig'
+import { getServerCookie, setServerCookie, deleteServerCookie } from '@/utils/cookieUtils'
 import type { SessionData } from '@/types/auth'
 
 const secret = new TextEncoder().encode(AUTH_CONFIG.session.secret)
@@ -34,22 +34,9 @@ export async function decryptSession(token: string): Promise<SessionData | null>
  * Server-side only - never exposed to client
  */
 export async function getSession(): Promise<SessionData | null> {
-  const cookieStore = await cookies()
-  const sessionCookie = cookieStore.get(AUTH_CONFIG.session.cookieName)
-
-  if (!sessionCookie?.value) {
-    return null
-  }
-
-  const session = await decryptSession(sessionCookie.value)
-
-  // Check if session is expired
-  if (session && session.expiresAt < Date.now()) {
-    await deleteSession()
-    return null
-  }
-
-  return session
+  const sessionToken = await getServerCookie(AUTH_CONFIG.session.cookieName)
+  if (!sessionToken) return null
+  return await decryptSession(sessionToken)
 }
 
 /**
@@ -57,12 +44,11 @@ export async function getSession(): Promise<SessionData | null> {
  * Secure, SameSite=Lax for AKS deployment
  */
 export async function createSession(data: SessionData): Promise<void> {
-  const cookieStore = await cookies()
   const sessionToken = await encryptSession(data)
 
-  cookieStore.set(AUTH_CONFIG.session.cookieName, sessionToken, {
+  await setServerCookie(AUTH_CONFIG.session.cookieName, sessionToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: !AUTH_CONFIG.isDevelopment,
     sameSite: 'lax',
     maxAge: AUTH_CONFIG.session.maxAge,
     path: '/',
@@ -73,8 +59,7 @@ export async function createSession(data: SessionData): Promise<void> {
  * Delete session cookie
  */
 export async function deleteSession(): Promise<void> {
-  const cookieStore = await cookies()
-  cookieStore.delete(AUTH_CONFIG.session.cookieName)
+  await deleteServerCookie(AUTH_CONFIG.session.cookieName)
 }
 
 /**
