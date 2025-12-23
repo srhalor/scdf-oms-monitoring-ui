@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { ENV_CONFIG } from '@/config/env.config'
 
 interface SessionResponse {
   authenticated: boolean
@@ -10,8 +11,8 @@ interface RefreshResponse {
   expiresIn: number
 }
 
-// Temporary constant since I can't easily import from server-utils in client
-const AUTH_CONFIG_BUFFER_SECONDS = 90
+// Refresh buffer in milliseconds, converted from seconds
+const REFRESH_BUFFER = ENV_CONFIG.refresh.bufferSeconds * 1000
 
 export function TokenRefresher() {
   // Use ref to track timeout to prevent cleanup issues
@@ -21,10 +22,8 @@ export function TokenRefresher() {
   const scheduleRefresh = (expiresAt: number) => {
     const now = Date.now()
     
-    const REFRESH_BUFFER = AUTH_CONFIG_BUFFER_SECONDS * 1000 // 90 seconds
-    
     // Calculate delay
-    // If expiresAt is 3600s from now, delay is 3600 - 90 = 3510s.
+    // If expiresAt is 3600s from now, delay is 3600 - REFRESH_BUFFER
     const delay = expiresAt - now - REFRESH_BUFFER
     
     if (delay <= 0) {

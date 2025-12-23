@@ -1,9 +1,9 @@
 import { SignJWT, jwtVerify } from 'jose'
-import { AUTH_CONFIG } from '@/utils/constants/authConfig'
+import { ENV_CONFIG } from '@/config/env.config'
 import { getServerCookie, setServerCookie, deleteServerCookie } from '@/utils/cookieUtils'
 import type { SessionData } from '@/types/auth'
 
-const secret = new TextEncoder().encode(AUTH_CONFIG.session.secret)
+const secret = new TextEncoder().encode(ENV_CONFIG.session.secret)
 
 /**
  * Encrypt session data into JWT token
@@ -13,7 +13,7 @@ export async function encryptSession(data: SessionData): Promise<string> {
   return await new SignJWT(data as unknown as Record<string, unknown>)
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
-    .setExpirationTime(`${AUTH_CONFIG.session.maxAge}s`)
+    .setExpirationTime(`${ENV_CONFIG.session.maxAge}s`)
     .sign(secret)
 }
 
@@ -34,7 +34,7 @@ export async function decryptSession(token: string): Promise<SessionData | null>
  * Server-side only - never exposed to client
  */
 export async function getSession(): Promise<SessionData | null> {
-  const sessionToken = await getServerCookie(AUTH_CONFIG.session.cookieName)
+  const sessionToken = await getServerCookie(ENV_CONFIG.session.cookieName)
   if (!sessionToken) return null
   return await decryptSession(sessionToken)
 }
@@ -46,11 +46,11 @@ export async function getSession(): Promise<SessionData | null> {
 export async function createSession(data: SessionData): Promise<void> {
   const sessionToken = await encryptSession(data)
 
-  await setServerCookie(AUTH_CONFIG.session.cookieName, sessionToken, {
+  await setServerCookie(ENV_CONFIG.session.cookieName, sessionToken, {
     httpOnly: true,
-    secure: !AUTH_CONFIG.isDevelopment,
+    secure: !ENV_CONFIG.isDevelopment,
     sameSite: 'lax',
-    maxAge: AUTH_CONFIG.session.maxAge,
+    maxAge: ENV_CONFIG.session.maxAge,
     path: '/',
   })
 }
@@ -59,7 +59,7 @@ export async function createSession(data: SessionData): Promise<void> {
  * Delete session cookie
  */
 export async function deleteSession(): Promise<void> {
-  await deleteServerCookie(AUTH_CONFIG.session.cookieName)
+  await deleteServerCookie(ENV_CONFIG.session.cookieName)
 }
 
 /**

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { AUTH_CONFIG } from '@/utils/constants/authConfig'
+import { ENV_CONFIG } from '@/config/env.config'
 import { extractUserInfo } from '@/lib/auth/jwtUtils'
 import { createSession } from '@/lib/auth/sessionManager'
 import { exchangeJwtBearer } from '@/lib/auth/tokenService'
@@ -9,11 +9,11 @@ import { getServerCookie } from '@/utils/cookieUtils'
 // ...
 export async function GET(request: NextRequest) {
   try {
-    const assertion = await getServerCookie(AUTH_CONFIG.sso.cookieName)
+    const assertion = await getServerCookie(ENV_CONFIG.sso.cookieName)
 
     if (!assertion) {
       // Fallback to SSO login
-      return NextResponse.redirect(new URL(AUTH_CONFIG.sso.loginUrl))
+      return NextResponse.redirect(new URL(ENV_CONFIG.sso.loginUrl))
     }
 
     try {
@@ -34,15 +34,13 @@ export async function GET(request: NextRequest) {
       const nextUrl = request.nextUrl.searchParams.get('next') || '/'
       // Redirect to original destination
       return NextResponse.redirect(new URL(nextUrl, request.url))
-
     } catch (error) {
-       console.error('SSO Token Exchange Failed:', error)
-       // If exchange fails, redirect to SSO login to get a fresh assertion
-       return NextResponse.redirect(new URL(AUTH_CONFIG.sso.loginUrl))
+      console.error('SSO Token Exchange Failed:', error)
+      // If exchange fails, redirect to SSO login to get a fresh assertion
+      return NextResponse.redirect(new URL(ENV_CONFIG.sso.loginUrl))
     }
-
   } catch (error) {
     console.error('SSO Route Error:', error)
-    return NextResponse.redirect(new URL(AUTH_CONFIG.sso.loginUrl))
+    return NextResponse.redirect(new URL(ENV_CONFIG.sso.loginUrl))
   }
 }

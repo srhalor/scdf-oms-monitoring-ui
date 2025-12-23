@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { deleteServerCookie } from '@/utils/cookieUtils'
 import { deleteSession } from '@/lib/auth/sessionManager'
-import { AUTH_CONFIG } from '@/utils/constants/authConfig'
+import { ENV_CONFIG } from '@/config/env.config'
 
 /**
  * Logout API
@@ -13,12 +13,12 @@ export async function POST() {
     await deleteSession()
 
     // Clear SSO cookie in production
-    await deleteServerCookie(AUTH_CONFIG.sso.cookieName)
+    await deleteServerCookie(ENV_CONFIG.sso.cookieName)
 
     // Return success
     return NextResponse.json({
       success: true,
-      redirectUrl: AUTH_CONFIG.isDevelopment ? '/login' : AUTH_CONFIG.sso.logoutUrl,
+      redirectUrl: ENV_CONFIG.isDevelopment ? '/login' : ENV_CONFIG.sso.logoutUrl,
     })
   } catch (error) {
     console.error('Logout error:', error)

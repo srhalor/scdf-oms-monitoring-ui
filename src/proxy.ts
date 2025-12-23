@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { AUTH_CONFIG } from '@/utils/constants/authConfig'
+import { ENV_CONFIG } from '@/config/env.config'
 import { getServerCookie } from '@/utils/cookieUtils'
 
 export async function proxy(request: NextRequest) {
   let { pathname } = request.nextUrl
 
   // If Production and /login -> Redirect to / as SSO will handle login
-  if (pathname === '/login' && !AUTH_CONFIG.isDevelopment) {
+  if (pathname === '/login' && !ENV_CONFIG.isDevelopment) {
     pathname = '/'
   }
 
@@ -19,7 +19,7 @@ export async function proxy(request: NextRequest) {
   const publicPaths = ['/login', '/_next', '/static', '/favicon.ico', '/api/auth']
   const isPublic = publicPaths.some(path => pathname.startsWith(path))
   // Check if session exists
-  const session = await getServerCookie(AUTH_CONFIG.session.cookieName)
+  const session = await getServerCookie(ENV_CONFIG.session.cookieName)
 
   // Allow if Authenticated OR Public
   if (session || isPublic) {
@@ -29,13 +29,13 @@ export async function proxy(request: NextRequest) {
   }
 
   // Handle Unauthenticated Private Access
-  if (AUTH_CONFIG.isDevelopment) {
+  if (ENV_CONFIG.isDevelopment) {
     // Development: Redirect to local login
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
   // If production and no session, check for SSO Cookie for seamless exchange
-  const assertion = await getServerCookie(AUTH_CONFIG.sso.cookieName)
+  const assertion = await getServerCookie(ENV_CONFIG.sso.cookieName)
 
   if (assertion) {
     const ssoUrl = new URL('/api/auth/sso', request.url)
@@ -44,7 +44,7 @@ export async function proxy(request: NextRequest) {
   }
 
   // If production and no session, no assertion -> Redirect to SSO login page
-  return NextResponse.redirect(AUTH_CONFIG.sso.loginUrl)
+  return NextResponse.redirect(ENV_CONFIG.sso.loginUrl)
 }
 
 // Run proxy on all routes

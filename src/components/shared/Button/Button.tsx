@@ -93,12 +93,12 @@ export function Button({
   const iconToUse = icon || iconBefore || iconAfter
 
   // Validate: icon-only buttons require label for accessibility
-  if (isIconOnly && !label && process.env.NODE_ENV === 'development') {
+  if (isIconOnly && !label) {
     console.warn('Button: icon-only buttons require a label prop for accessibility')
   }
 
   // Validate: conflicting icon props
-  if (icon && (iconBefore || iconAfter) && process.env.NODE_ENV === 'development') {
+  if (icon && (iconBefore || iconAfter)) {
     console.warn(
       'Button: icon prop is for icon-only buttons. Use iconBefore/iconAfter for text buttons with icons.'
     )
