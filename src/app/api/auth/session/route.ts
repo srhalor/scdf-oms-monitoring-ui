@@ -18,6 +18,7 @@ export async function GET() {
     return NextResponse.json({
       authenticated: true,
       user: session.user,
+      expiresAt: session.expiresAt,
     })
   } catch (error) {
     console.error('Session check error:', error)

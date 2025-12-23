@@ -7,6 +7,8 @@ import { Header } from '@components/Header'
 import type { User } from '@/types/auth'
 import styles from './LayoutWrapper.module.css'
 
+import { TokenRefresher } from '@/components/auth/TokenRefresher'
+
 // Prevent FontAwesome from auto-adding CSS
 config.autoAddCss = false
 
@@ -25,6 +27,7 @@ export function LayoutWrapper({ children, user }: Readonly<LayoutWrapperProps>) 
 
   return (
     <div className={styles.layoutContainer}>
+      <TokenRefresher />
       <Sidebar isOpen={sidebarOpen} onToggle={setSidebarOpen} />
       <div className={styles.contentArea}>
         <Header user={user} />

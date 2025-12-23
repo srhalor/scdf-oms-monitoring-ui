@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server'
 import axios from 'axios'
-import https from 'https'
 import { AUTH_CONFIG } from '@/utils/constants/authConfig'
 import { extractUserInfo } from '@/lib/auth/jwtUtils'
 import { createSession } from '@/lib/auth/sessionManager'
-import type { TokenResponse } from '@/types/auth'
+import { exchangeClientCredentials } from '@/lib/auth/tokenService'
 
 /**
  * Development Mode Token API
@@ -16,7 +15,7 @@ export async function POST() {
     // Get server-side credentials
     const clientId = process.env.OAUTH_CLIENT_ID
     const clientSecret = process.env.OAUTH_CLIENT_SECRET
-    const { baseUrl, domain, scope } = AUTH_CONFIG.oidm
+    const { baseUrl } = AUTH_CONFIG.oidm
 
     if (!clientId || !clientSecret) {
       return NextResponse.json(
@@ -30,31 +29,9 @@ export async function POST() {
     }
 
     // Call OAuth token endpoint
-    const credentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
-
-    // Prepare HTTPS agent for development (self-signed certs)
-    const httpsAgent = process.env.NODE_ENV === 'development'
-      ? new https.Agent({ rejectUnauthorized: false })
-      : undefined
-
     try {
-      const response = await axios.post<TokenResponse>(
-        `${baseUrl}/oauth2/rest/token`,
-        new URLSearchParams({
-          grant_type: 'CLIENT_CREDENTIALS',
-          scope,
-        }),
-        {
-          headers: {
-            'X-OAUTH-IDENTITY-DOMAIN-NAME': domain,
-            'Content-Type': 'application/x-www-form-urlencoded',
-            Authorization: `Basic ${credentials}`,
-          },
-          httpsAgent,
-        }
-      )
-
-      const tokenData = response.data
+      // Exchange credentials for token
+      const tokenData = await exchangeClientCredentials()
 
       // Extract user info from JWT
       const user = extractUserInfo(tokenData.access_token)

@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
 import { Button } from '@/components/shared/Button'
 import type { User } from '@/types/auth'
@@ -12,7 +11,6 @@ interface UserMenuProps {
 }
 
 export function UserMenu({ user }: UserMenuProps) {
-  const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -30,8 +28,8 @@ export function UserMenu({ user }: UserMenuProps) {
 
       if (response.ok) {
         const data = await response.json()
-        router.push(data.redirectUrl || '/login')
-        router.refresh()
+        // Use window.location for hard redirect (important for SSO logout)
+        window.location.href = data.redirectUrl || '/login'
       }
     } catch (error) {
       console.error('Logout failed:', error)

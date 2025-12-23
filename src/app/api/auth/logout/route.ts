@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import { deleteSession } from '@/lib/auth/sessionManager'
 import { AUTH_CONFIG } from '@/utils/constants/authConfig'
 
@@ -10,11 +11,16 @@ export async function POST() {
   try {
     // Delete session
     await deleteSession()
+    
+    // Clear SSO cookie in production
+    if (!AUTH_CONFIG.isDevelopment) {
+      (await cookies()).delete(AUTH_CONFIG.sso.cookieName)
+    }
 
     // Return success
     return NextResponse.json({
       success: true,
-      redirectUrl: AUTH_CONFIG.mode === 'production' ? AUTH_CONFIG.sso.logoutUrl : '/login',
+      redirectUrl: AUTH_CONFIG.isDevelopment ? '/login' : AUTH_CONFIG.sso.logoutUrl,
     })
   } catch (error) {
     console.error('Logout error:', error)

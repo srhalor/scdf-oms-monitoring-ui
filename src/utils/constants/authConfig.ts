@@ -1,7 +1,6 @@
-import type { AuthMode } from '@/types/auth'
 
 export const AUTH_CONFIG = {
-  mode: (process.env.NEXT_PUBLIC_AUTH_MODE || 'development') as AuthMode,
+  isDevelopment: process.env.NEXT_PUBLIC_AUTH_MODE === 'development',
 
   oidm: {
     baseUrl: process.env.NEXT_PUBLIC_OIDM_BASE_URL || '',
