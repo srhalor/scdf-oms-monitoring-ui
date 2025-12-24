@@ -1,0 +1,13 @@
+apiVersion: v2
+name: oms-monitoring-ui
+description: SCDF OMS Monitoring UI - Next.js Application
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - oms
+  - monitoring
+  - nextjs
+  - react
+maintainers:
+  - name: OMS Team

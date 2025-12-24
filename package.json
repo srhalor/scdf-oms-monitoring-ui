@@ -12,7 +12,11 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "format": "prettier --write \"src/**/*.{ts,tsx,css}\""
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
+    "docker:build": "docker build -t oms-monitoring-ui:latest .",
+    "docker:run": "docker run -p 3000:3000 --env-file .env.local oms-monitoring-ui:latest",
+    "helm:lint": "helm lint ./helm",
+    "helm:template": "helm template oms-monitoring-ui ./helm"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.1.0",
