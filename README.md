@@ -55,6 +55,62 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - `pnpm test:watch` - Run tests in watch mode
 - `pnpm test:coverage` - Generate coverage report
 - `pnpm format` - Format code with Prettier
+- `pnpm docker:build` - Build Docker image
+- `pnpm helm:lint` - Validate Helm chart
+
+## Container Testing (Podman/Docker)
+
+### Build & Run Locally
+
+```bash
+# 1. Setup environment and build
+cp .env.local.example .env.local
+# Edit .env.local with your values
+pnpm build
+
+# 2. Build container image
+podman build -t oms-monitoring-ui:latest .
+
+# 3. Run container (uses same .env.local file)
+podman run -p 3000:3000 --env-file .env.local oms-monitoring-ui:latest
+```
+
+> **Note:** `NEXT_PUBLIC_*` vars are baked into the build. Server-side vars (e.g., `SESSION_SECRET`) are read at container runtime.
+
+### Podman Desktop UI
+
+1. **Images** → Select image → **Run**
+2. Set port mapping: `3000:3000`
+3. Add environment variables in **Environment** tab
+4. Click **Start**
+
+Open [http://localhost:3000](http://localhost:3000) to verify.
+
+## Kubernetes Deployment
+
+### Helm Chart
+
+```bash
+# Validate chart
+helm lint ./helm
+
+# Preview manifests
+helm template oms-monitoring-ui ./helm
+
+# Deploy
+helm upgrade --install oms-monitoring-ui ./helm \
+  --namespace oms \
+  --set image.repository=your-registry/oms-monitoring-ui \
+  --set image.tag=0.1.0
+```
+
+### Health Probes
+
+| Endpoint | Purpose |
+|----------|---------|
+| `/api/probe/live` | Liveness - is app running? |
+| `/api/probe/ready` | Readiness - can accept traffic? |
+| `/api/probe/startup` | Startup - finished initializing? |
 
 ### Code Quality
 
@@ -125,3 +181,6 @@ All design tokens are available in `src/styles/tokens.css`.
 - **Code Quality**: ESLint 9 (flat config) + TypeScript ESLint 8
 - **Formatting**: Prettier
 - **Package Manager**: pnpm 10.25.0
+- **Container**: Docker/Podman with Node 22 Alpine
+- **Orchestration**: Kubernetes with Helm charts
+- **Logging**: Structured JSON for ELK integration

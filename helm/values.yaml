@@ -1,6 +1,32 @@
 # =============================================================================
 # OMS Monitoring UI - Helm Values
 # =============================================================================
+#
+# IMPORTANT: Build-time vs Runtime Environment Variables
+# -------------------------------------------------------
+# NEXT_PUBLIC_* variables are embedded into the Next.js build at compile time
+# by Azure Pipeline. They CANNOT be changed at runtime via Helm.
+#
+# Azure Pipeline handles (build-time, baked into image):
+#   - NEXT_PUBLIC_API_BASE_URL
+#   - NEXT_PUBLIC_SSO_LOGIN_URL
+#   - NEXT_PUBLIC_SSO_LOGOUT_URL
+#   - NEXT_PUBLIC_LOG_FORMAT
+#   - NEXT_PUBLIC_ENABLE_LOGGING
+#   - NEXT_PUBLIC_LOG_LEVEL
+#   - NEXT_PUBLIC_ORIGIN_SERVICE
+#   - NEXT_PUBLIC_ORIGIN_APPLICATION
+#
+# Helm handles (runtime, via secrets/env):
+#   - SESSION_SECRET (secret)
+#   - NODE_ENV
+#   - NEXT_TELEMETRY_DISABLED
+#
+# Development only (not deployed via Helm):
+#   - OAUTH_CLIENT_ID
+#   - OAUTH_CLIENT_SECRET
+#
+# =============================================================================
 
 # -----------------------------------------------------------------------------
 # Replica Configuration
@@ -164,45 +190,35 @@ affinity:
           topologyKey: kubernetes.io/hostname
 
 # -----------------------------------------------------------------------------
-# Environment Variables (Non-sensitive)
+# Environment Variables (Runtime - Server-side only)
+# Note: NEXT_PUBLIC_* variables are baked into the build by Azure Pipeline
 # -----------------------------------------------------------------------------
 env:
   NODE_ENV: production
   NEXT_TELEMETRY_DISABLED: "1"
-  # Logging configuration for ELK
-  NEXT_PUBLIC_ENABLE_LOGGING: "true"
-  NEXT_PUBLIC_LOG_FORMAT: "json"
-  NEXT_PUBLIC_LOG_LEVEL: "info"
 
 # -----------------------------------------------------------------------------
-# Environment Variables from ConfigMap
-# -----------------------------------------------------------------------------
-envFrom:
-  configMapRef: oms-monitoring-config
-
-# -----------------------------------------------------------------------------
-# Secrets (Reference existing secrets)
+# Secrets (Reference existing secrets for server-side runtime vars)
+# These are NOT baked into the build and are read at runtime
 # -----------------------------------------------------------------------------
 secrets:
   # Reference to existing secret containing sensitive env vars
   existingSecret: oms-monitoring-secrets
-  # Keys to mount from the secret
+  # Keys to mount from the secret (server-side only, not NEXT_PUBLIC_*)
   keys:
-    - OAUTH_CLIENT_ID
-    - OAUTH_CLIENT_SECRET
     - SESSION_SECRET
 
 # -----------------------------------------------------------------------------
-# ConfigMap Data (Non-sensitive configuration)
+# ConfigMap Data (Runtime server-side configuration)
+# Note: NEXT_PUBLIC_* vars are compile-time only and set by Azure Pipeline
+# Only include server-side runtime variables here
 # -----------------------------------------------------------------------------
 configMap:
-  enabled: true
-  data:
-    NEXT_PUBLIC_API_BASE_URL: "http://oms-backend-service:8080"
-    NEXT_PUBLIC_SSO_LOGIN_URL: "https://sso.example.com/login"
-    NEXT_PUBLIC_SSO_LOGOUT_URL: "https://sso.example.com/logout"
-    NEXT_PUBLIC_ORIGIN_SERVICE: "oms-monitoring-ui"
-    NEXT_PUBLIC_ORIGIN_APPLICATION: "OMS-Monitoring-Tool"
+  enabled: false
+  # Uncomment if you have server-side runtime config not in secrets
+  # data:
+  #   SESSION_COOKIE_NAME: "oms-session"
+  #   REFRESH_BUFFER_SECONDS: "60"
 
 # -----------------------------------------------------------------------------
 # Network Policy
