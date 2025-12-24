@@ -38,6 +38,9 @@ export async function GET(request: NextRequest) {
         accessToken: tokenData.access_token,
         expiresAt: expiresAt,
       })
+      
+      // Set user context for logging
+      logger.setUser({ name: user.name, email: user.email })
       logger.info('SSOAPI', 'SSO session created successfully', { userName: user.name, nextUrl })
 
       // Redirect to original destination

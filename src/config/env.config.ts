@@ -3,6 +3,8 @@ export const ENV_CONFIG = {
     enabled: process.env.NODE_ENV === 'development' || process.env.NEXT_PUBLIC_ENABLE_LOGGING === 'true',
     minLevel: (process.env.NEXT_PUBLIC_LOG_LEVEL as 'debug' | 'info' | 'warn' | 'error') || 'debug',
     includeTimestamp: process.env.NODE_ENV === 'development',
+    // JSON format for ELK/structured logging - enable in production for log aggregation
+    jsonFormat: process.env.NEXT_PUBLIC_LOG_FORMAT === 'json',
   },
 
   oidm: {

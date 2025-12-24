@@ -12,6 +12,9 @@ export async function POST() {
   logger.info('LogoutAPI', 'Logout request received')
   
   try {
+    // Clear logger user context
+    logger.clearUser()
+    
     // Delete session
     await deleteSession()
     logger.debug('LogoutAPI', 'Session deleted')

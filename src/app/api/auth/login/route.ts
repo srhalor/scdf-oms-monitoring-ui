@@ -30,6 +30,9 @@ export async function POST() {
       accessToken: tokenData.access_token,
       expiresAt,
     })
+    
+    // Set user context for logging
+    logger.setUser({ name: user.name, email: user.email })
     logger.info('LoginAPI', 'Session created successfully', { userName: user.name, expiresIn: tokenData.expires_in })
 
     // Return success (no sensitive data in response)
