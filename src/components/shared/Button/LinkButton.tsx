@@ -3,6 +3,7 @@
 import { ReactNode } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core'
+import { logger } from '@/lib/logger'
 import styles from './LinkButton.module.css'
 
 export interface LinkButtonProps {
@@ -56,21 +57,25 @@ export function LinkButton({
   label,
   className,
   showTooltip = true,
-}: LinkButtonProps) {
+}: Readonly<LinkButtonProps>) {
   // Detect button type
   const isIconOnly = !children && (icon || iconBefore || iconAfter)
   const iconToUse = icon || iconBefore || iconAfter
 
-  // Validate: icon-only buttons require label
-  if (isIconOnly && !label) {
-    console.warn('LinkButton: icon-only buttons require a label prop for accessibility')
-  }
+  // Development validation (stripped in production)
+  if (process.env.NODE_ENV === 'development') {
+    // Validate: icon-only buttons require label
+    if (isIconOnly && !label) {
+      logger.warn('LinkButton', 'icon-only buttons require a label prop for accessibility')
+    }
 
-  // Validate: conflicting icon props
-  if (icon && (iconBefore || iconAfter)) {
-    console.warn(
-      'LinkButton: icon prop is for icon-only buttons. Use iconBefore/iconAfter for text buttons with icons.'
-    )
+    // Validate: conflicting icon props
+    if (icon && (iconBefore || iconAfter)) {
+      logger.warn(
+        'LinkButton',
+        'icon prop is for icon-only buttons. Use iconBefore/iconAfter for text buttons with icons.'
+      )
+    }
   }
 
   const classNames = [

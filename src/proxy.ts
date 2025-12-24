@@ -6,8 +6,10 @@ import { getServerCookie } from '@/utils/cookieUtils'
 export async function proxy(request: NextRequest) {
   let { pathname } = request.nextUrl
 
+  const isDevelopment = process.env.NODE_ENV === 'development'
+
   // If Production and /login -> Redirect to / as SSO will handle login
-  if (pathname === '/login' && !ENV_CONFIG.isDevelopment) {
+  if (pathname === '/login' && !isDevelopment) {
     pathname = '/'
   }
 
@@ -29,7 +31,7 @@ export async function proxy(request: NextRequest) {
   }
 
   // Handle Unauthenticated Private Access
-  if (ENV_CONFIG.isDevelopment) {
+  if (isDevelopment) {
     // Development: Redirect to local login
     return NextResponse.redirect(new URL('/login', request.url))
   }

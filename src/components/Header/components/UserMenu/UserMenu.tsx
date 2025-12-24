@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
 import { Button } from '@/components/shared/Button'
+import { logger } from '@/lib/logger'
 import type { User } from '@/types/auth'
 import styles from './UserMenu.module.css'
 
@@ -10,7 +11,7 @@ interface UserMenuProps {
   user: User
 }
 
-export function UserMenu({ user }: UserMenuProps) {
+export function UserMenu({ user }: Readonly<UserMenuProps>) {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -28,11 +29,11 @@ export function UserMenu({ user }: UserMenuProps) {
 
       if (response.ok) {
         const data = await response.json()
-        // Use window.location for hard redirect (important for SSO logout)
-        window.location.href = data.redirectUrl || '/login'
+        // Use globalThis.location for hard redirect (important for SSO logout)
+        globalThis.location.href = data.redirectUrl || '/login'
       }
     } catch (error) {
-      console.error('Logout failed:', error)
+      logger.error('UserMenu', 'Logout failed', error)
       setIsLoggingOut(false)
     }
   }

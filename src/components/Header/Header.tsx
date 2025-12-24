@@ -11,7 +11,7 @@ interface HeaderProps {
   user: User
 }
 
-export function Header({ user }: HeaderProps) {
+export function Header({ user }: Readonly<HeaderProps>) {
   return (
     <header className={styles.header}>
       <div className={styles.leftSection}>

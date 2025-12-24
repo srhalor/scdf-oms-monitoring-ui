@@ -1,11 +1,58 @@
 /* Tooltip component styles */
 
+/* Wrapper for interactive children - uses CSS-only hover (no JS events) */
+.tooltipWrapperCssOnly {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Hide tooltip by default, show on hover/focus-within */
+.tooltipWrapperCssOnly .tooltip {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity var(--transition-fast), visibility var(--transition-fast);
+}
+
+.tooltipWrapperCssOnly:hover .tooltip,
+.tooltipWrapperCssOnly:focus-within .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Legacy wrapper - kept for backward compatibility */
 .tooltipWrapper {
   position: relative;
   display: inline-flex;
   align-items: center;
   /* Ensure tooltip can break out of parent stacking context */
   isolation: auto;
+}
+
+/* Button-based trigger for non-interactive content - fully accessible */
+.tooltipTrigger {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  /* Reset button styles */
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: inherit;
+  text-align: inherit;
+}
+
+.tooltipTrigger:focus {
+  outline: none;
+}
+
+.tooltipTrigger:focus-visible {
+  outline: 2px solid var(--color-informative-600);
+  outline-offset: 2px;
+  border-radius: var(--border-radius-sm);
 }
 
 .tooltip {

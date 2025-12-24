@@ -5,8 +5,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core'
 import { Tooltip } from '@/components/shared/Tooltip'
 import type { TooltipPosition } from '@/components/shared/Tooltip'
+import { logger } from '@/lib/logger'
 import styles from './Button.module.css'
 import { ButtonLoadingIcon } from './ButtonLoadingIcon'
+
+/** Badge variant type */
+type BadgeVariant = 'error' | 'warning' | 'info'
 
 export interface ButtonProps {
   /** Button visual hierarchy */
@@ -58,13 +62,75 @@ export interface ButtonProps {
   badge?: number | string
 
   /** Badge variant */
-  badgeVariant?: 'error' | 'warning' | 'info'
+  badgeVariant?: BadgeVariant
 
   /** Show tooltip on hover (icon-only buttons) */
   showTooltip?: boolean
 
   /** Tooltip position (only for icon-only buttons) */
   tooltipPosition?: TooltipPosition
+}
+
+/** Maps badge variant to CSS class name */
+const BADGE_CLASS_MAP: Record<BadgeVariant, string> = {
+  error: styles.badgeError,
+  warning: styles.badgeWarning,
+  info: styles.badgeInfo,
+}
+
+interface ButtonBadgeProps {
+  badge: number | string
+  badgeVariant: BadgeVariant
+}
+
+/** Renders badge for icon-only buttons */
+function ButtonBadge({ badge, badgeVariant }: Readonly<ButtonBadgeProps>) {
+  const displayValue = typeof badge === 'number' && badge > 99 ? '99+' : badge
+  return (
+    <span
+      className={`${styles.badge} ${BADGE_CLASS_MAP[badgeVariant]}`}
+      aria-label={`${badge} notifications`}
+    >
+      {displayValue}
+    </span>
+  )
+}
+
+interface IconOnlyContentProps {
+  icon: IconDefinition
+  badge?: number | string
+  badgeVariant: BadgeVariant
+}
+
+/** Renders icon-only button content */
+function IconOnlyContent({ icon, badge, badgeVariant }: Readonly<IconOnlyContentProps>) {
+  return (
+    <>
+      <FontAwesomeIcon icon={icon} className={styles.icon} />
+      {badge !== undefined && <ButtonBadge badge={badge} badgeVariant={badgeVariant} />}
+    </>
+  )
+}
+
+interface TextButtonContentProps {
+  iconBefore?: IconDefinition
+  iconAfter?: IconDefinition
+  children?: ReactNode
+}
+
+/** Renders text button content with optional icons */
+function TextButtonContent({ 
+  iconBefore, 
+  iconAfter, 
+  children 
+}: Readonly<TextButtonContentProps>) {
+  return (
+    <>
+      {iconBefore && <FontAwesomeIcon icon={iconBefore} className={styles.iconBefore} />}
+      {children && <span className={styles.label}>{children}</span>}
+      {iconAfter && <FontAwesomeIcon icon={iconAfter} className={styles.iconAfter} />}
+    </>
+  )
 }
 
 export function Button({
@@ -87,21 +153,19 @@ export function Button({
   badgeVariant = 'error',
   showTooltip = true,
   tooltipPosition = 'bottom',
-}: ButtonProps) {
+}: Readonly<ButtonProps>) {
   // Detect button type based on content
-  const isIconOnly = !children && (icon || iconBefore || iconAfter)
-  const iconToUse = icon || iconBefore || iconAfter
+  const isIconOnly = !children && Boolean(icon ?? iconBefore ?? iconAfter)
+  const iconToUse = icon ?? iconBefore ?? iconAfter
 
-  // Validate: icon-only buttons require label for accessibility
-  if (isIconOnly && !label) {
-    console.warn('Button: icon-only buttons require a label prop for accessibility')
-  }
-
-  // Validate: conflicting icon props
-  if (icon && (iconBefore || iconAfter)) {
-    console.warn(
-      'Button: icon prop is for icon-only buttons. Use iconBefore/iconAfter for text buttons with icons.'
-    )
+  // Development validation (stripped in production)
+  if (process.env.NODE_ENV === 'development') {
+    if (isIconOnly && !label) {
+      logger.warn('Button', 'icon-only buttons require a label prop for accessibility')
+    }
+    if (icon && (iconBefore || iconAfter)) {
+      logger.warn('Button', 'icon prop is for icon-only buttons. Use iconBefore/iconAfter for text buttons.')
+    }
   }
 
   const classNames = [
@@ -117,6 +181,16 @@ export function Button({
     .filter(Boolean)
     .join(' ')
 
+  const renderContent = () => {
+    if (loading) {
+      return <ButtonLoadingIcon hierarchy={hierarchy} variant={variant} size={size} />
+    }
+    if (isIconOnly && iconToUse) {
+      return <IconOnlyContent icon={iconToUse} badge={badge} badgeVariant={badgeVariant} />
+    }
+    return <TextButtonContent iconBefore={iconBefore} iconAfter={iconAfter}>{children}</TextButtonContent>
+  }
+
   const buttonElement = (
     <button
       type={type}
@@ -127,38 +201,14 @@ export function Button({
       aria-busy={loading}
       aria-label={isIconOnly ? label : undefined}
     >
-      {loading ? (
-        <ButtonLoadingIcon hierarchy={hierarchy} variant={variant} size={size} />
-      ) : isIconOnly ? (
-        // Icon-only rendering
-        <>
-          <FontAwesomeIcon icon={iconToUse!} className={styles.icon} />
-          {badge !== undefined && (
-            <span
-              className={`${styles.badge} ${styles[`badge${badgeVariant.charAt(0).toUpperCase()}${badgeVariant.slice(1)}`]}`}
-              aria-label={`${badge} notifications`}
-            >
-              {typeof badge === 'number' && badge > 99 ? '99+' : badge}
-            </span>
-          )}
-        </>
-      ) : (
-        // Text or icon+text rendering
-        <>
-          {iconBefore && (
-            <FontAwesomeIcon icon={iconBefore} className={styles.iconBefore} />
-          )}
-          {children && <span className={styles.label}>{children}</span>}
-          {iconAfter && <FontAwesomeIcon icon={iconAfter} className={styles.iconAfter} />}
-        </>
-      )}
+      {renderContent()}
     </button>
   )
 
   // Wrap icon-only buttons with Tooltip if showTooltip is enabled
   if (isIconOnly && showTooltip && label) {
     return (
-      <Tooltip message={label} position={tooltipPosition}>
+      <Tooltip message={label} position={tooltipPosition} hasInteractiveChild>
         {buttonElement}
       </Tooltip>
     )

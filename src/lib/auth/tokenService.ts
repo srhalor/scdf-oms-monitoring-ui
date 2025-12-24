@@ -1,19 +1,24 @@
 import axios from 'axios'
-import https from 'https'
+import https from 'node:https'
 import { ENV_CONFIG } from '@/config/env.config'
+import { logger } from '@/lib/logger'
 import type { TokenResponse } from '@/types/auth'
 
 const { clientId, clientSecret, baseUrl, domain, scope } = ENV_CONFIG.oidm
 
-const httpsAgent = ENV_CONFIG.isDevelopment
-  ? new https.Agent({ rejectUnauthorized: false })
-  : undefined
+const httpsAgent =
+  process.env.NODE_ENV === 'development'
+    ? new https.Agent({ rejectUnauthorized: false })
+    : undefined
 
 /**
  * Exchange Client Credentials for Token (Development)
  */
 export async function exchangeClientCredentials(): Promise<TokenResponse> {
+  logger.debug('TokenService', 'Exchanging client credentials')
+  
   if (!clientId || !clientSecret) {
+    logger.error('TokenService', 'Missing client credentials configuration')
     throw new Error('Server configuration missing: Client ID or Secret')
   }
 
@@ -42,7 +47,10 @@ export async function exchangeClientCredentials(): Promise<TokenResponse> {
  * Exchange Assertion for Token (Production/SSO)
  */
 export async function exchangeJwtBearer(assertion: string): Promise<TokenResponse> {
+  logger.debug('TokenService', 'Exchanging JWT bearer assertion')
+  
   if (!baseUrl) {
+    logger.error('TokenService', 'OIDM URL not configured')
     throw new Error('OIDM URL not configured')
   }
 

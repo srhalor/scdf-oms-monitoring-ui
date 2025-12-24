@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth/sessionManager'
+import { logger } from '@/lib/logger'
 
 /**
  * Session Status API
@@ -7,12 +8,23 @@ import { getSession } from '@/lib/auth/sessionManager'
  * Used by client components to check auth status
  */
 export async function GET() {
+  logger.debug('SessionAPI', 'Session check request')
+  
   try {
     const session = await getSession()
 
     if (!session) {
+      logger.debug('SessionAPI', 'No active session found')
       return NextResponse.json({ authenticated: false }, { status: 401 })
     }
+
+    const isExpired = session.expiresAt < Date.now()
+    if (isExpired) {
+      logger.debug('SessionAPI', 'Session expired')
+      return NextResponse.json({ authenticated: false }, { status: 401 })
+    }
+
+    logger.debug('SessionAPI', 'Valid session found', { userName: session.user?.name })
 
     // Return user info (no access token)
     return NextResponse.json({
@@ -21,7 +33,7 @@ export async function GET() {
       expiresAt: session.expiresAt,
     })
   } catch (error) {
-    console.error('Session check error:', error)
+    logger.error('SessionAPI', 'Session check error', error)
     return NextResponse.json({ authenticated: false }, { status: 500 })
   }
 }

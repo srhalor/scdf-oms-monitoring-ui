@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAccessToken, getCurrentUser } from '@/lib/auth/authHelpers'
 import { createAuthenticatedClient } from '@/lib/api/apiClient'
+import { logger } from '@/lib/logger'
 import type { AxiosInstance } from 'axios'
 
 /**
@@ -45,7 +46,7 @@ export function withAuth(handler: AuthenticatedRouteHandler) {
       // Call the actual handler with the authenticated client
       return await handler(request, client)
     } catch (error) {
-      console.error('API route error:', error)
+      logger.error('API', 'Route handler error', error)
 
       // Handle authentication errors
       if (error instanceof Error && error.message.includes('Unauthorized')) {

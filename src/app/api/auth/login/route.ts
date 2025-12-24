@@ -3,6 +3,7 @@ import axios from 'axios'
 import { extractUserInfo } from '@/lib/auth/jwtUtils'
 import { createSession } from '@/lib/auth/sessionManager'
 import { exchangeClientCredentials } from '@/lib/auth/tokenService'
+import { logger } from '@/lib/logger'
 
 /**
  * Development Mode Token API
@@ -10,13 +11,17 @@ import { exchangeClientCredentials } from '@/lib/auth/tokenService'
  * Client credentials never exposed to browser
  */
 export async function POST() {
+  logger.info('LoginAPI', 'Login request received')
+  
   // Call OAuth token endpoint
   try {
     // Exchange credentials for token
     const tokenData = await exchangeClientCredentials()
+    logger.debug('LoginAPI', 'Token exchange successful')
 
     // Extract user info from JWT
     const user = extractUserInfo(tokenData.access_token)
+    logger.debug('LoginAPI', 'User info extracted', { userName: user.name })
 
     // Create server-side session
     const expiresAt = Date.now() + tokenData.expires_in * 1000
@@ -25,6 +30,7 @@ export async function POST() {
       accessToken: tokenData.access_token,
       expiresAt,
     })
+    logger.info('LoginAPI', 'Session created successfully', { userName: user.name, expiresIn: tokenData.expires_in })
 
     // Return success (no sensitive data in response)
     return NextResponse.json({
@@ -33,13 +39,13 @@ export async function POST() {
     })
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      console.error('Token request failed:', error.response?.data || error.message)
+      logger.error('LoginAPI', 'Token request failed', error.response?.data || error.message)
       return NextResponse.json(
         { error: `Authentication failed: ${error.response?.data || error.message}` },
         { status: error.response?.status || 500 }
       )
     }
-    console.error('Token API error:', error)
+    logger.error('LoginAPI', 'Token API error', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

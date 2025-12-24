@@ -1,5 +1,9 @@
 export const ENV_CONFIG = {
-  isDevelopment: process.env.NEXT_PUBLIC_AUTH_MODE === 'development',
+  logging: {
+    enabled: process.env.NODE_ENV === 'development' || process.env.NEXT_PUBLIC_ENABLE_LOGGING === 'true',
+    minLevel: (process.env.NEXT_PUBLIC_LOG_LEVEL as 'debug' | 'info' | 'warn' | 'error') || 'debug',
+    includeTimestamp: process.env.NODE_ENV === 'development',
+  },
 
   oidm: {
     baseUrl: process.env.NEXT_PUBLIC_OIDM_BASE_URL || '',

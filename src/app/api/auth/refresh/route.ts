@@ -3,12 +3,16 @@ import { getServerCookie } from '@/utils/cookieUtils'
 import { ENV_CONFIG } from '@/config/env.config'
 import { updateSession } from '@/lib/auth/sessionManager'
 import { exchangeClientCredentials, exchangeJwtBearer } from '@/lib/auth/tokenService'
+import { logger } from '@/lib/logger'
 
 export async function POST() {
+  logger.debug('RefreshAPI', 'Token refresh request received')
+  
   try {
     let tokenData
 
-    if (ENV_CONFIG.isDevelopment) {
+    if (process.env.NODE_ENV === 'development') {
+      logger.debug('RefreshAPI', 'Development mode: using client credentials')
       // Development: Refresh using Client Credentials
       tokenData = await exchangeClientCredentials()
     } else {
@@ -16,8 +20,10 @@ export async function POST() {
       const assertion = await getServerCookie(ENV_CONFIG.sso.cookieName)
 
       if (!assertion) {
+        logger.warn('RefreshAPI', 'SSO cookie missing during refresh')
         return NextResponse.json({ error: 'SSO cookie missing' }, { status: 401 })
       }
+      logger.debug('RefreshAPI', 'Production mode: using JWT bearer flow')
 
       tokenData = await exchangeJwtBearer(assertion)
     }
@@ -29,10 +35,11 @@ export async function POST() {
       accessToken: tokenData.access_token,
       expiresAt,
     })
+    logger.info('RefreshAPI', 'Token refreshed successfully', { expiresIn: tokenData.expires_in })
 
     return NextResponse.json({ success: true, expiresIn: tokenData.expires_in })
   } catch (error) {
-    console.error('Token Refresh Failed:', error)
+    logger.error('RefreshAPI', 'Token refresh failed', error)
     return NextResponse.json({ error: 'Refresh failed' }, { status: 401 })
   }
 }

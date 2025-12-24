@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/shared/Button'
+import { logger } from '@/lib/logger'
 import styles from './LoginForm.module.css'
 
 export function LoginForm() {
@@ -12,6 +13,7 @@ export function LoginForm() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
+    logger.info('LoginForm', 'Login attempt initiated')
     setIsLoading(true)
     setError(null)
 
@@ -22,14 +24,18 @@ export function LoginForm() {
 
       if (!response.ok) {
         const data = await response.json()
+        logger.warn('LoginForm', 'Login failed', { error: data.error })
         throw new Error(data.error || 'Login failed')
       }
 
+      logger.info('LoginForm', 'Login successful, redirecting to dashboard')
       // Redirect to dashboard on success
       router.push('/dashboard')
       router.refresh()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed')
+      const errorMessage = err instanceof Error ? err.message : 'Login failed'
+      logger.error('LoginForm', 'Login error', err)
+      setError(errorMessage)
       setIsLoading(false)
     }
   }

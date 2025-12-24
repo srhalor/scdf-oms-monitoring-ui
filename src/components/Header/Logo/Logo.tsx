@@ -39,10 +39,10 @@ export const Logo = ({ size = 'md', className, ...rest }: LogoProps): JSX.Elemen
     >
       <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
         <g>
-          {letterPaths.map((path: string, index: number) => (
+          {letterPaths.map((path: string) => (
             <path
               d={sanitizeSvgPath(path)}
-              key={`letter-${index}`}
+              key={path.slice(0, 20)}
               className={styles.logoPath}
             />
           ))}

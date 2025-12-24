@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { withAuthSimple } from '@/lib/api/withAuth'
+import { logger } from '@/lib/logger'
 import type { HealthResponse } from '@/types/health'
 
 /**
@@ -15,7 +16,7 @@ export const GET = withAuthSimple(async (client) => {
     const response = await client.get<HealthResponse>('/health')
     return NextResponse.json(response.data)
   } catch (error) {
-    console.error('Health check failed:', error)
+    logger.error('HealthAPI', 'Health check failed', error)
     // Return DOWN status on error
     return NextResponse.json({ status: 'DOWN' }, { status: 200 })
   }

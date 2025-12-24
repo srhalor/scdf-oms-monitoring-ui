@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircleCheck, faCircleXmark, faTriangleExclamation, faArrowsRotate } from '@fortawesome/free-solid-svg-icons'
+import { logger } from '@/lib/logger'
 import type { HealthStatus } from '@/types/health'
 import styles from './HealthCard.module.css'
 
@@ -19,14 +20,16 @@ export const HealthCard = ({ onRefresh }: HealthCardProps) => {
   const [isRefreshing, setIsRefreshing] = useState(false)
 
   const fetchHealth = useCallback(async () => {
+    logger.debug('HealthCard', 'Fetching health status')
     try {
       setIsRefreshing(true)
       const response = await fetch('/api/health')
       const data = await response.json()
       setStatus(data.status)
       setLastChecked(new Date())
+      logger.debug('HealthCard', 'Health status received', { status: data.status })
     } catch (error) {
-      console.error('Failed to fetch health status:', error)
+      logger.error('HealthCard', 'Failed to fetch health status', error)
       setStatus('DOWN')
     } finally {
       setLoading(false)

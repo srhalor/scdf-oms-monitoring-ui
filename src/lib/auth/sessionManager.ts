@@ -1,6 +1,7 @@
 import { SignJWT, jwtVerify } from 'jose'
 import { ENV_CONFIG } from '@/config/env.config'
 import { getServerCookie, setServerCookie, deleteServerCookie } from '@/utils/cookieUtils'
+import { logger } from '@/lib/logger'
 import type { SessionData } from '@/types/auth'
 
 const secret = new TextEncoder().encode(ENV_CONFIG.session.secret)
@@ -44,21 +45,24 @@ export async function getSession(): Promise<SessionData | null> {
  * Secure, SameSite=Lax for AKS deployment
  */
 export async function createSession(data: SessionData): Promise<void> {
+  logger.debug('SessionManager', 'Creating new session', { userName: data.user?.name })
   const sessionToken = await encryptSession(data)
 
   await setServerCookie(ENV_CONFIG.session.cookieName, sessionToken, {
     httpOnly: true,
-    secure: !ENV_CONFIG.isDevelopment,
+    secure: process.env.NODE_ENV !== 'development',
     sameSite: 'lax',
     maxAge: ENV_CONFIG.session.maxAge,
     path: '/',
   })
+  logger.debug('SessionManager', 'Session created successfully')
 }
 
 /**
  * Delete session cookie
  */
 export async function deleteSession(): Promise<void> {
+  logger.debug('SessionManager', 'Deleting session')
   await deleteServerCookie(ENV_CONFIG.session.cookieName)
 }
 
@@ -66,9 +70,11 @@ export async function deleteSession(): Promise<void> {
  * Update existing session with new data
  */
 export async function updateSession(data: Partial<SessionData>): Promise<void> {
+  logger.debug('SessionManager', 'Updating session')
   const currentSession = await getSession()
 
   if (!currentSession) {
+    logger.error('SessionManager', 'No active session to update')
     throw new Error('No active session to update')
   }
 
@@ -76,4 +82,5 @@ export async function updateSession(data: Partial<SessionData>): Promise<void> {
     ...currentSession,
     ...data,
   })
+  logger.debug('SessionManager', 'Session updated successfully')
 }

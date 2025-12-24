@@ -5,6 +5,10 @@ import { Button } from '@/components/shared/Button'
 import styles from './GlobalControls.module.css'
 
 export function GlobalControls() {
+  const handleNotificationsClick = () => {
+    // Notifications functionality will be implemented in Phase 2
+  }
+
   return (
     <div className={styles.container}>
       <Button
@@ -12,7 +16,7 @@ export function GlobalControls() {
         label="Notifications"
         hierarchy="tertiary"
         size="md"
-        onClick={() => console.log('Notifications clicked')}
+        onClick={handleNotificationsClick}
       />
     </div>
   )

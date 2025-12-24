@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useRef } from 'react'
+import React, { useState, useId, useCallback } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircleInfo } from '@fortawesome/free-solid-svg-icons'
 import styles from './Tooltip.module.css'
@@ -20,39 +20,103 @@ export interface TooltipProps {
   message: string | JSX.Element
   position?: TooltipPosition
   className?: string
+  /** 
+   * Whether the trigger element is already interactive (button, link, input).
+   * If true, uses CSS-only hover (no JS events on wrapper).
+   * If false, wraps content in a button for full keyboard accessibility.
+   * @default false
+   */
+  hasInteractiveChild?: boolean
 }
 
 /**
- * Custom tooltip component that displays a message on hover
+ * Custom tooltip component that displays a message on hover, focus, and touch.
+ * Fully accessible with keyboard support (Escape to close) and proper ARIA attributes.
+ * 
+ * For interactive children (buttons, links): Uses CSS-only hover approach.
+ * For non-interactive content: Wraps in an accessible button element.
  */
 export function Tooltip({
   children,
   message,
   position = 'top',
   className,
-}: TooltipProps) {
-  const [isVisible, setIsVisible] = useState(false)
-  const triggerRef = useRef<HTMLDivElement>(null)
+  hasInteractiveChild = false,
+}: Readonly<TooltipProps>) {
+  const [isHovered, setIsHovered] = useState(false)
+  const [isFocused, setIsFocused] = useState(false)
+  const tooltipId = useId()
 
+  // Show tooltip if hovered OR focused (but not if just focused after click and mouse left)
+  const isVisible = isHovered || isFocused
+
+  const handleMouseEnter = useCallback(() => setIsHovered(true), [])
+  const handleMouseLeave = useCallback(() => {
+    setIsHovered(false)
+    // Also clear focus state when mouse leaves to handle click-then-leave scenario
+    setIsFocused(false)
+  }, [])
+  
+  const handleFocus = useCallback(() => setIsFocused(true), [])
+  const handleBlur = useCallback(() => setIsFocused(false), [])
+
+  const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
+    if (event.key === 'Escape' && isVisible) {
+      setIsHovered(false)
+      setIsFocused(false)
+    }
+  }, [isVisible])
+
+  // Touch support - toggle on touch for mobile devices
+  const handleTouchStart = useCallback((event: React.TouchEvent) => {
+    event.preventDefault()
+    setIsHovered(prev => !prev)
+  }, [])
+
+  // Common tooltip element
+  const tooltipElement = isVisible && message ? (
+    <span 
+      id={tooltipId}
+      className={`${styles.tooltip} ${styles[position.replace(' ', '-')]}`} 
+      role="tooltip"
+    >
+      <span className={styles.tooltipContent}>{message}</span>
+    </span>
+  ) : null
+
+  // When wrapping interactive children (buttons, links), use span wrapper with JS events
+  // The interactive child handles its own keyboard accessibility
+  if (hasInteractiveChild) {
+    return (
+      <span // NOSONAR - wrapper delegates keyboard accessibility to interactive child
+        className={`${styles.tooltipWrapper} ${className ?? ''}`}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onFocusCapture={handleFocus}
+        onBlurCapture={handleBlur}
+      >
+        {children}
+        {tooltipElement}
+      </span>
+    )
+  }
+
+  // For non-interactive children, wrap in a button for full accessibility
   return (
-    <div
-      ref={triggerRef}
-      className={`${styles.tooltipWrapper} ${className || ''}`}
-      onMouseEnter={() => setIsVisible(true)}
-      onMouseLeave={() => setIsVisible(false)}
-      onFocus={() => setIsVisible(true)}
-      onBlur={() => setIsVisible(false)}
+    <button
+      type="button"
+      className={`${styles.tooltipTrigger} ${className ?? ''}`}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+      onKeyDown={handleKeyDown}
+      onTouchStart={handleTouchStart}
+      aria-describedby={isVisible ? tooltipId : undefined}
     >
       {children}
-      {isVisible && message && (
-        <div 
-          className={`${styles.tooltip} ${styles[position.replace(' ', '-')]}`} 
-          role="tooltip"
-        >
-          <div className={styles.tooltipContent}>{message}</div>
-        </div>
-      )}
-    </div>
+      {tooltipElement}
+    </button>
   )
 }
 
@@ -71,7 +135,7 @@ export function TooltipIcon({
   tooltipPosition = 'top',
   iconColour = 'var(--color-gray-400)',
   className,
-}: TooltipIconProps) {
+}: Readonly<TooltipIconProps>) {
   return (
     <Tooltip message={tooltipText} position={tooltipPosition} className={className}>
       <span className={styles.tooltipIconWrapper}>

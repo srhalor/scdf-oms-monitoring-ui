@@ -1,7 +1,8 @@
 import { User } from '@/types/auth'
 import { ENV_CONFIG } from '@/config/env.config'
+import { logger } from '@/lib/logger'
 import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from 'axios'
-import https from 'https'
+import https from 'node:https'
 
 const { baseUrl } = ENV_CONFIG.api
 const { originService, originApplication } = ENV_CONFIG.headers
@@ -21,9 +22,10 @@ export const createApiClient = (user: User | null): AxiosInstance => {
       'Content-Type': 'application/json',
     },
     // Disable SSL verification in development (self-signed certificates)
-    httpsAgent: ENV_CONFIG.isDevelopment
-      ? new https.Agent({ rejectUnauthorized: false })
-      : undefined,
+    httpsAgent:
+      process.env.NODE_ENV === 'development'
+        ? new https.Agent({ rejectUnauthorized: false })
+        : undefined,
   })
 
   // Request interceptor: Add required headers
@@ -34,20 +36,29 @@ export const createApiClient = (user: User | null): AxiosInstance => {
       config.headers['Atradius-Origin-Application'] = originApplication
       config.headers['Atradius-Origin-User'] = user?.name || 'Development User'
 
+      logger.debug('APIClient', `${config.method?.toUpperCase()} ${config.url}`)
       return config
     },
     error => {
+      logger.error('APIClient', 'Request interceptor error', error)
       return Promise.reject(error)
     }
   )
 
   // Response interceptor: Handle errors
   client.interceptors.response.use(
-    response => response,
+    response => {
+      logger.debug('APIClient', `Response ${response.status} from ${response.config.url}`)
+      return response
+    },
     error => {
+      const status = error.response?.status
+      const url = error.config?.url
+      logger.error('APIClient', `Request failed: ${status} ${url}`, error.message)
+      
       // Handle 401 Unauthorized - could trigger re-authentication
-      if (error.response?.status === 401) {
-        console.error('Unauthorized request - token may be expired')
+      if (status === 401) {
+        logger.warn('API', 'Unauthorized request - token may be expired')
         // Future: trigger token refresh or redirect to login
       }
 

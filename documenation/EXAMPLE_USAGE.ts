@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { withAuth } from '@/lib/api/withAuth'
+import { logger } from '@/lib/logger'
 
 /**
  * Example: Get documents with query parameters
@@ -19,7 +20,7 @@ export const GET = withAuth(async (request, client) => {
 
     return NextResponse.json(response.data)
   } catch (error) {
-    console.error('Documents API error:', error)
+    logger.error('DocumentsAPI', 'Failed to fetch documents', error)
     return NextResponse.json({ error: 'Failed to fetch documents' }, { status: 500 })
   }
 })
@@ -37,7 +38,7 @@ export const POST = withAuth(async (request, client) => {
 
     return NextResponse.json(response.data, { status: 201 })
   } catch (error) {
-    console.error('Create document error:', error)
+    logger.error('DocumentsAPI', 'Failed to create document', error)
     return NextResponse.json({ error: 'Failed to create document' }, { status: 500 })
   }
 })

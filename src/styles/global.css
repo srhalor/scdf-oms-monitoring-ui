@@ -62,3 +62,40 @@ button {
     padding: var(--spacing-md);
   }
 }
+
+/* Not Found page styles (in global to avoid preload warning) */
+.not-found-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - var(--header-height));
+  padding: var(--spacing-lg);
+  text-align: center;
+}
+
+.not-found-title {
+  font-family: var(--font-family);
+  font-size: var(--font-size-display-md);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.not-found-description {
+  font-family: var(--font-family);
+  font-size: var(--font-size-text-lg);
+  color: var(--color-gray-600);
+  margin: 0 0 var(--spacing-lg) 0;
+}
+
+.not-found-link {
+  color: var(--color-informative-600);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.not-found-link:hover {
+  color: var(--color-informative-800);
+}
