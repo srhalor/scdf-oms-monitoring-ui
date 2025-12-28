@@ -45,7 +45,7 @@ interface DocConfigModalState {
  * for the Reference Data management page.
  */
 export function ReferenceDataContent() {
-  const [activeTab, setActiveTab] = useState(TABS[0].id)
+  const [activeTab, setActiveTab] = useState(TABS[2].id)
 
   // Reference Data Types tab state
   const [referenceDataTypes, setReferenceDataTypes] = useState<ReferenceData[]>([])
