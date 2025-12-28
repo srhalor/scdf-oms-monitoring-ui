@@ -6,7 +6,6 @@ import { Button } from '@/components/shared/Button'
 import {
   TextInput,
   TextArea,
-  Select,
   DateInput,
   Checkbox,
 } from '@/components/shared/FormField'
@@ -32,9 +31,6 @@ export interface ReferenceDataFormProps {
 
   /** Form mode label override */
   mode?: 'create' | 'edit'
-
-  /** Options for reference data type dropdown (if provided, shows dropdown instead of readonly) */
-  refDataTypeOptions?: ReferenceData[]
 }
 
 interface FormErrors {
@@ -58,11 +54,9 @@ export function ReferenceDataForm({
   initialData,
   defaultRefDataType = '',
   mode,
-  refDataTypeOptions,
 }: Readonly<ReferenceDataFormProps>) {
   const isEditMode = mode === 'edit' || Boolean(initialData)
   const title = isEditMode ? 'Edit Reference Data' : 'Create Reference Data'
-  const hasTypeOptions = refDataTypeOptions && refDataTypeOptions.length > 0
 
   // Form state
   const [formData, setFormData] = useState<ReferenceDataRequest>({
@@ -202,30 +196,14 @@ export function ReferenceDataForm({
       footer={footer}
     >
       <form className={styles.form} onSubmit={handleSubmit}>
-        {/* Reference Data Type - Show dropdown if options provided, otherwise readonly */}
-        {hasTypeOptions ? (
-          <Select
-            label="Reference Data Type"
-            name="refDataType"
-            value={formData.refDataType}
-            onChange={(e) => handleChange('refDataType', e.target.value)}
-            required
-            error={errors.refDataType}
-            options={refDataTypeOptions.map(type => ({
-              value: type.refDataValue,
-              label: type.refDataValue,
-            }))}
-            placeholder="Select reference data type..."
-          />
-        ) : (
-          <TextInput
-            label="Reference Data Type"
-            name="refDataType"
-            value={formData.refDataType}
-            readOnly
-            disabled
-          />
-        )}
+        {/* Reference Data Type - Always readonly */}
+        <TextInput
+          label="Reference Data Type"
+          name="refDataType"
+          value={formData.refDataType}
+          readOnly
+          disabled
+        />
 
         {/* Value */}
         <TextInput

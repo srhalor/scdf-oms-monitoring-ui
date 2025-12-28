@@ -8,7 +8,7 @@ import { Pagination } from '@/components/shared/Pagination'
 import { Button } from '@/components/shared/Button'
 import { formatDisplayDate } from '@/utils/dateUtils'
 import type { ReferenceData, SortState, TableColumn } from '@/types/referenceData'
-import styles from './ReferenceDataValuesTab.module.css'
+import styles from '@/styles/tabContent.module.css'
 
 /**
  * Props for ReferenceDataValuesTab

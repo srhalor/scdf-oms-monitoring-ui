@@ -9,7 +9,7 @@ import { Button } from '@/components/shared/Button'
 import { formatDisplayDate } from '@/utils/dateUtils'
 import type { DocumentConfiguration } from '@/types/documentConfiguration'
 import type { SortState, TableColumn } from '@/types/referenceData'
-import styles from './DocumentConfigurationsTab.module.css'
+import styles from '@/styles/tabContent.module.css'
 
 /**
  * Props for DocumentConfigurationsTab
