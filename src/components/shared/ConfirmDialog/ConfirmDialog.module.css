@@ -1,0 +1,73 @@
+.iconContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto var(--spacing-md);
+  border-radius: 50%;
+  background-color: var(--color-gray-100);
+}
+
+.iconContainer svg {
+  width: 24px;
+  height: 24px;
+  color: var(--color-gray-600);
+}
+
+/* Variant icons */
+.danger .iconContainer {
+  background-color: var(--color-error-100);
+}
+
+.danger .iconContainer svg {
+  color: var(--color-error-600);
+}
+
+.warning .iconContainer {
+  background-color: var(--color-warning-100);
+}
+
+.warning .iconContainer svg {
+  color: var(--color-warning-600);
+}
+
+.info .iconContainer {
+  background-color: var(--color-info-100);
+}
+
+.info .iconContainer svg {
+  color: var(--color-info-600);
+}
+
+/* Content */
+.content {
+  text-align: center;
+}
+
+.message {
+  margin: 0;
+  font-size: var(--text-md-size);
+  line-height: var(--text-md-line-height);
+  color: var(--color-text-primary);
+}
+
+.details {
+  margin: var(--spacing-sm) 0 0;
+  font-size: var(--text-sm-size);
+  line-height: var(--text-sm-line-height);
+  color: var(--color-text-secondary);
+}
+
+/* Footer buttons */
+.footer {
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: center;
+  width: 100%;
+}
+
+.footer > button {
+  flex: 1;
+  max-width: 160px;
+}

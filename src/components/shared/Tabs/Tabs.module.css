@@ -1,0 +1,113 @@
+.tabsContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.tabList {
+  display: flex;
+  gap: var(--spacing-xs);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background-color: transparent;
+}
+
+.tab {
+  position: relative;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--text-sm-size);
+  font-weight: 500;
+  line-height: var(--text-sm-line-height);
+  color: var(--color-gray-600);
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 0.15s ease;
+  white-space: nowrap;
+}
+
+.tab:hover {
+  color: var(--color-gray-900);
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--color-informative-500);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.tab.active {
+  color: var(--color-gray-900);
+}
+
+.tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: var(--color-gray-900);
+}
+
+.tabPanels {
+  flex: 1;
+  min-height: 0;
+}
+
+.tabPanel {
+  display: none;
+  padding-top: var(--spacing-md);
+}
+
+.tabPanel.active {
+  display: block;
+}
+
+/* Pill/Segmented variant (for alternate styling) */
+.tabList.segmented {
+  gap: 0;
+  padding: var(--spacing-xs);
+  background-color: var(--color-gray-50);
+  border: 1px solid var(--color-gray-100);
+  border-radius: 10px;
+  border-bottom: 1px solid var(--color-gray-100);
+}
+
+.tabList.segmented .tab {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: 6px;
+}
+
+.tabList.segmented .tab.active {
+  background-color: var(--color-white);
+  box-shadow: 0 1px 2px rgba(10, 13, 18, 0.1), 0 1px 3px rgba(10, 13, 18, 0.1);
+}
+
+.tabList.segmented .tab.active::after {
+  display: none;
+}
+
+/* Outline variant (bordered tabs) */
+.tabList.outline {
+  border-bottom: none;
+  gap: 0;
+  background-color: var(--color-gray-50);
+  border: 1px solid var(--color-gray-100);
+  border-radius: 8px;
+  padding: 0;
+}
+
+.tabList.outline .tab {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: 8px;
+  margin: 0;
+}
+
+.tabList.outline .tab.active {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-gray-200);
+}
+
+.tabList.outline .tab.active::after {
+  display: none;
+}

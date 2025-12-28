@@ -1,0 +1,209 @@
+.tableContainer {
+  width: 100%;
+  overflow-x: auto;
+  background-color: transparent;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: transparent;
+  font-size: var(--text-sm-size);
+  line-height: var(--text-sm-line-height);
+}
+
+/* Header */
+.thead {
+  background-color: var(--color-gray-50);
+}
+
+.headerRow {
+  border-bottom: 1px solid var(--color-gray-100);
+}
+
+.th {
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: left;
+  font-weight: 500;
+  color: var(--color-gray-600);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.th.sortable {
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.th.sortable:hover {
+  color: var(--color-gray-900);
+}
+
+.th.sorted {
+  color: var(--color-gray-900);
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.sortIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  color: var(--color-gray-400);
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.sortIcon.active {
+  color: var(--color-gray-900);
+}
+
+.sortIcon.desc {
+  transform: rotate(180deg);
+}
+
+/* Body */
+.tbody {
+  background-color: transparent;
+}
+
+.row {
+  border-bottom: 1px solid var(--color-gray-100);
+  transition: background-color 0.15s ease;
+}
+
+.row:hover {
+  background-color: var(--color-gray-25);
+}
+
+.row:nth-child(odd) {
+  background-color: var(--color-white);
+}
+
+.row:nth-child(odd):hover {
+  background-color: var(--color-gray-25);
+}
+
+.row:nth-child(even) {
+  background-color: var(--color-gray-25);
+}
+
+.row:nth-child(even):hover {
+  background-color: var(--color-gray-50);
+}
+
+.row.selected {
+  background-color: var(--color-informative-50);
+}
+
+.td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--color-gray-900);
+  vertical-align: middle;
+}
+
+/* Checkbox column */
+.checkboxCell {
+  width: 40px;
+  padding: var(--spacing-sm) var(--spacing-md);
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--color-gray-300);
+  border-radius: 4px;
+  cursor: pointer;
+  accent-color: var(--color-gray-900);
+}
+
+/* Actions column */
+.actionsCell {
+  width: 120px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: right;
+}
+
+.actionsWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-xs);
+}
+
+/* Empty state */
+.emptyState {
+  padding: var(--spacing-2xl) var(--spacing-md);
+  text-align: center;
+  color: var(--color-gray-500);
+}
+
+.emptyIcon {
+  font-size: 48px;
+  margin-bottom: var(--spacing-md);
+  opacity: 0.5;
+}
+
+.emptyText {
+  font-size: var(--text-base-size);
+  margin-bottom: var(--spacing-xs);
+}
+
+.emptySubtext {
+  font-size: var(--text-sm-size);
+  color: var(--color-gray-400);
+}
+
+/* Loading state */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2xl) var(--spacing-md);
+  color: var(--color-gray-500);
+}
+
+.loadingSpinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--color-gray-200);
+  border-top-color: var(--color-gray-600);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-right: var(--spacing-sm);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Cell content variants */
+.cellTruncate {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cellWrap {
+  white-space: normal;
+  word-break: break-word;
+}
+
+/* Status badge styles (for reference) */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  font-size: var(--text-xs-size);
+  font-weight: 500;
+  border-radius: 10px;
+  white-space: nowrap;
+}

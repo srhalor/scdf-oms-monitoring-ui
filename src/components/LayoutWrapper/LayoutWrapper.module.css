@@ -6,6 +6,20 @@
   width: 100%;
 }
 
+/* Sidebar spacer - reserves space for the fixed sidebar */
+.sidebarSpacer {
+  flex-shrink: 0;
+  transition: width var(--transition-slow);
+}
+
+.sidebarSpacer.collapsed {
+  width: var(--nav-width-collapsed);
+}
+
+.sidebarSpacer.expanded {
+  width: var(--nav-width-expanded);
+}
+
 /* Content area - grows to fill remaining space */
 .contentArea {
   flex: 1;

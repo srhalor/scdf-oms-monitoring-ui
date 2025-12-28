@@ -1,5 +1,5 @@
 import { PageLayout } from '@/components/shared/PageLayout/PageLayout'
-import { Card } from '@/components/shared/Card/Card'
+import { ReferenceDataContent } from '@/components/ReferenceData/ReferenceDataContent'
 
 export default function ReferenceDataPage() {
   return (
@@ -7,9 +7,7 @@ export default function ReferenceDataPage() {
       title="Reference Data"
       description="Manage and configure reference data for the application."
     >
-        <Card title="Data Sets">
-            <p>Reference data filtering and configuration controls will appear here.</p>
-        </Card>
+      <ReferenceDataContent />
     </PageLayout>
   )
 }

@@ -33,6 +33,23 @@ import {
   faServer,
   faDatabase,
   faRightFromBracket,
+  faArrowUp,
+  faInbox,
+  faChevronLeft,
+  faChevronRight,
+  faPen,
+  faTrash,
+  faPlus,
+  faSearch,
+  faFilter,
+  faRefresh,
+  faTriangleExclamation,
+  faCircleQuestion,
+  faCalendar,
+  faChevronDown,
+  faCheck,
+  faEye,
+  faEyeSlash,
 } from '@fortawesome/free-solid-svg-icons'
 
 // Register icons with the library
@@ -51,6 +68,23 @@ library.add(
   faServer,          // Server icon
   faDatabase,        // Database icon
   faRightFromBracket, // Logout icon
+  faArrowUp,         // Sort arrow icon
+  faInbox,           // Empty state icon
+  faChevronLeft,     // Pagination previous
+  faChevronRight,    // Pagination next
+  faPen,             // Edit icon
+  faTrash,           // Delete icon
+  faPlus,            // Add/Create icon
+  faSearch,          // Search icon
+  faFilter,          // Filter icon
+  faRefresh,         // Refresh icon
+  faTriangleExclamation, // Warning icon
+  faCircleQuestion,  // Question/help icon
+  faCalendar,        // Calendar/date icon
+  faChevronDown,     // Dropdown arrow
+  faCheck,           // Checkbox/success icon
+  faEye,             // Show password
+  faEyeSlash,        // Hide password
 )
 
 /**

@@ -10,7 +10,7 @@
   padding: var(--spacing-md);
   background-color: var(--color-error-50);
   border: 1px solid var(--color-error-300);
-  border-radius: var(--radius-md);
+  border-radius: var(--border-radius-md);
   color: var(--color-error-700);
   font-size: var(--text-sm-size);
 }

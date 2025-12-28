@@ -29,6 +29,9 @@ export function LayoutWrapper({ children, user }: Readonly<LayoutWrapperProps>) 
     <div className={styles.layoutContainer}>
       <TokenRefresher />
       <Sidebar isOpen={sidebarOpen} onToggle={setSidebarOpen} />
+      <div
+        className={`${styles.sidebarSpacer} ${sidebarOpen ? styles.expanded : styles.collapsed}`}
+      />
       <div className={styles.contentArea}>
         <Header user={user} />
         <main className={styles.mainContent}>{children}</main>
