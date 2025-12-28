@@ -8,6 +8,9 @@ import { getCurrentUser } from '@/lib/auth/authHelpers'
 export const metadata: Metadata = {
   title: APP_CONFIG.appName,
   description: APP_CONFIG.description,
+  icons: {
+    icon: '/favicon.svg',
+  },
 }
 
 export default async function RootLayout({
