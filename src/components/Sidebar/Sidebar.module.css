@@ -6,7 +6,7 @@
   left: 0;
   height: 100vh;
   padding: var(--spacing-md);
-  background-color: transparent;
+  background-color: var(--color-white);
   border-right: 1px solid var(--color-gray-100);
   transition: width var(--transition-slow);
   z-index: var(--z-index-fixed);

@@ -14,7 +14,7 @@ const { originService, originApplication } = ENV_CONFIG.headers
  * @param user - User object from session
  * @returns Axios instance with interceptors
  */
-export const createApiClient = (user: User | null): AxiosInstance => {
+const createApiClient = (user: User | null): AxiosInstance => {
   const client = axios.create({
     baseURL: baseUrl,
     timeout: 30000,

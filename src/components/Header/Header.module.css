@@ -3,7 +3,7 @@
 .header {
   flex-shrink: 0;
   height: var(--header-height);
-  background-color: transparent;
+  background-color: var(--color-white);
   border-bottom: 1px solid var(--color-gray-100);
   position: sticky;
   top: 0;

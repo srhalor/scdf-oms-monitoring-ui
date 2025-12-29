@@ -58,6 +58,27 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - `pnpm docker:build` - Build Docker image
 - `pnpm helm:lint` - Validate Helm chart
 
+## Local Production Build Testing (Standalone Mode)
+
+To test the production build locally (as it will run in Docker):
+
+1. **Build the app:**
+   ```cmd
+   pnpm build
+   ```
+2. **Copy static and public assets for standalone server:**
+   ```cmd
+   xcopy /E /I /Y .next\static .next\standalone\.next\static
+   xcopy /E /I /Y public .next\standalone\public
+   ```
+3. **Start the standalone server:**
+   ```cmd
+   node .next/standalone/server.js
+   ```
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+> **Note:** This ensures all static files and public assets (fonts, favicon, etc.) are served correctly, matching the Docker/production environment. If you skip step 2, you may see 404 errors for fonts, favicon, or static assets.
+
 ## Container Testing (Podman/Docker)
 
 ### Build & Run Locally

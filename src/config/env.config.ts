@@ -16,8 +16,8 @@ export const ENV_CONFIG = {
   },
 
   sso: {
-    loginUrl: process.env.NEXT_PUBLIC_SSO_LOGIN_URL || '',
-    logoutUrl: process.env.NEXT_PUBLIC_SSO_LOGOUT_URL || '',
+    loginUrl: process.env.NEXT_PUBLIC_SSO_LOGIN_URL || 'http://localhost:3000',
+    logoutUrl: process.env.NEXT_PUBLIC_SSO_LOGOUT_URL || 'http://localhost:3000',
     cookieName: process.env.NEXT_PUBLIC_OAUTH_TOKEN_COOKIE_NAME || 'OAUTH_TOKEN',
   },
 
