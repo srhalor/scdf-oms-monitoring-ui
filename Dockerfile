@@ -1,9 +1,10 @@
 # =============================================================================
 # Dockerfile for Next.js Standalone Production Build
 # Optimized for Kubernetes deployment with minimal image size
-# 
-# Prerequisites: Run `pnpm build` in Azure Pipeline before docker build
+#
+# Prerequisites: Run `pnpm install && pnpm build` in Azure Pipeline before docker build
 # The .next/standalone folder must exist in the build context
+# Note: .npmrc must have `node-linker=hoisted` to avoid symlink issues
 # =============================================================================
 
 FROM node:22-alpine AS runner
@@ -23,8 +24,7 @@ RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
 
 # Copy pre-built standalone output from Azure Pipeline build
-# Requires: pnpm build to have been run before docker build
-COPY public ./public
+COPY --chown=nextjs:nodejs public ./public
 COPY --chown=nextjs:nodejs .next/standalone ./
 COPY --chown=nextjs:nodejs .next/static ./.next/static
 
@@ -33,10 +33,6 @@ USER nextjs
 
 # Expose application port
 EXPOSE 3000
-
-# Health check for container orchestration
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD node -e "require('http').get('http://localhost:3000/api/probe/live', (r) => process.exit(r.statusCode === 200 ? 0 : 1))" || exit 1
 
 # Start the application with graceful shutdown support
 CMD ["node", "server.js"]

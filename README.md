@@ -90,10 +90,10 @@ cp .env.local.example .env.local
 pnpm build
 
 # 2. Build container image
-podman build -t oms-monitoring-ui:latest .
+podman build --no-cache -t oms-monitoring-ui:latest .
 
 # 3. Run container (uses same .env.local file)
-podman run -p 3000:3000 --env-file .env.local oms-monitoring-ui:latest
+podman run --rm -p 3000:3000 --env-file .env.local oms-monitoring-ui:latest
 ```
 
 > **Note:** `NEXT_PUBLIC_*` vars are baked into the build. Server-side vars (e.g., `SESSION_SECRET`) are read at container runtime.

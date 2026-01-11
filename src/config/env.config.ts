@@ -1,29 +1,34 @@
+/**
+ * Runtime Environment Configuration
+ * All values are read at runtime from environment variables (Helm ConfigMaps)
+ * No NEXT_PUBLIC_* prefix - these are server-side only
+ */
 export const ENV_CONFIG = {
   logging: {
-    enabled: process.env.NODE_ENV === 'development' || process.env.NEXT_PUBLIC_ENABLE_LOGGING === 'true',
-    minLevel: (process.env.NEXT_PUBLIC_LOG_LEVEL as 'debug' | 'info' | 'warn' | 'error') || 'debug',
+    enabled: process.env.NODE_ENV === 'development' || process.env.ENABLE_LOGGING === 'true',
+    minLevel: (process.env.LOG_LEVEL as 'debug' | 'info' | 'warn' | 'error') || 'info',
     includeTimestamp: process.env.NODE_ENV === 'development',
     // JSON format for ELK/structured logging - enable in production for log aggregation
-    jsonFormat: process.env.NEXT_PUBLIC_LOG_FORMAT === 'json',
+    jsonFormat: process.env.LOG_FORMAT === 'json',
   },
 
   oidm: {
-    baseUrl: process.env.NEXT_PUBLIC_OIDM_BASE_URL || '',
-    domain: process.env.NEXT_PUBLIC_OAUTH_DOMAIN || '',
-    scope: process.env.NEXT_PUBLIC_OAUTH_SCOPE || '',
+    baseUrl: process.env.OIDM_BASE_URL || '',
+    domain: process.env.OAUTH_DOMAIN || '',
+    scope: process.env.OAUTH_SCOPE || '',
     clientId: process.env.OAUTH_CLIENT_ID || '',
     clientSecret: process.env.OAUTH_CLIENT_SECRET || '',
   },
 
   sso: {
-    loginUrl: process.env.NEXT_PUBLIC_SSO_LOGIN_URL || 'http://localhost:3000',
-    logoutUrl: process.env.NEXT_PUBLIC_SSO_LOGOUT_URL || 'http://localhost:3000',
-    cookieName: process.env.NEXT_PUBLIC_OAUTH_TOKEN_COOKIE_NAME || 'OAUTH_TOKEN',
+    loginUrl: process.env.SSO_LOGIN_URL || 'http://localhost:3000',
+    logoutUrl: process.env.SSO_LOGOUT_URL || 'http://localhost:3000',
+    cookieName: process.env.OAUTH_TOKEN_COOKIE_NAME || 'OAUTH_TOKEN',
   },
 
   headers: {
-    originService: process.env.NEXT_PUBLIC_ORIGIN_SERVICE || 'oms-monitoring-ui',
-    originApplication: process.env.NEXT_PUBLIC_ORIGIN_APPLICATION || 'OMS-Monitoring-Tool',
+    originService: process.env.ORIGIN_SERVICE || 'oms-monitoring-ui',
+    originApplication: process.env.ORIGIN_APPLICATION || 'OMS-Monitoring-Tool',
   },
 
   session: {
@@ -37,6 +42,6 @@ export const ENV_CONFIG = {
   },
 
   api: {
-    baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080',
+    baseUrl: process.env.API_BASE_URL || 'http://localhost:8080',
   },
 }

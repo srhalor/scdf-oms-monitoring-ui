@@ -1,76 +1,15 @@
 # =============================================================================
 # Docker Ignore File
 # Excludes files/directories from Docker build context for faster builds
+#
+# Strategy: Exclude everything, then whitelist only what's needed
+# Prerequisites: Run `pnpm install && pnpm build` before docker build
 # =============================================================================
 
-# Dependencies (installed in Docker)
-node_modules
-.pnpm-store
+# Exclude everything by default
+*
 
-# Build outputs (created in Docker)
-.next
-out
-build
-dist
-
-# Development files
-.git
-.github
-.gitignore
-
-# IDE and editor
-.vscode
-.idea
-*.swp
-*.swo
-*~
-
-# Environment files (secrets injected via K8s)
-.env
-.env.*
-!.env.example
-!.env.local.example
-
-# Documentation
-*.md
-!README.md
-documenation/
-design/
-docs/
-
-# Testing
-coverage
-*.test.ts
-*.test.tsx
-*.spec.ts
-*.spec.tsx
-__tests__
-src/test
-
-# Kubernetes/Helm (not needed in image)
-helm/
-charts/
-*.yaml
-!pnpm-workspace.yaml
-!pnpm-lock.yaml
-
-# Logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-pnpm-debug.log*
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# TypeScript build info
-*.tsbuildinfo
-next-env.d.ts
-
-# Misc
-*.map
-.prettierrc
-eslint.config.mjs
-jest.config.js
-tsconfig.json
+# Whitelist: Only include what's needed for production image
+!public
+!.next/standalone
+!.next/static
