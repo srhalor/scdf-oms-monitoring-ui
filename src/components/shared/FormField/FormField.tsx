@@ -7,6 +7,23 @@ import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
 import styles from './FormField.module.css'
 
 /**
+ * Counter for generating unique field IDs
+ */
+let fieldIdCounter = 0
+
+/**
+ * Generate a unique field ID using a counter instead of Math.random()
+ * This avoids SonarQube S2245 warning while providing predictable, unique IDs
+ */
+function generateFieldId(prefix: string, name?: string): string {
+  if (name) {
+    return `${prefix}-${name}`
+  }
+  fieldIdCounter++
+  return `${prefix}-${fieldIdCounter}`
+}
+
+/**
  * Helper function to get aria-describedby value
  */
 function getAriaDescribedBy(
@@ -14,8 +31,12 @@ function getAriaDescribedBy(
   error?: string,
   hint?: string
 ): string | undefined {
-  if (error) return `${inputId}-error`
-  if (hint) return `${inputId}-hint`
+  if (error) {
+    return `${inputId}-error`
+  }
+  if (hint) {
+    return `${inputId}-hint`
+  }
   return undefined
 }
 
@@ -23,8 +44,58 @@ function getAriaDescribedBy(
  * Helper function to get input type for password fields
  */
 function getPasswordInputType(showPassword: boolean, originalType: string): string {
-  if (originalType !== 'password') return originalType
+  if (originalType !== 'password') {
+    return originalType
+  }
   return showPassword ? 'text' : 'password'
+}
+
+/**
+ * Render trailing icon for text input (password toggle or custom icon)
+ */
+function renderTrailingIcon(
+  isPassword: boolean,
+  showPassword: boolean,
+  setShowPassword: (show: boolean) => void,
+  trailingIcon?: IconDefinition,
+  onTrailingIconClick?: () => void
+): JSX.Element | null {
+  if (isPassword) {
+    return (
+      <span className={styles.trailingIcon}>
+        <button
+          type="button"
+          className={styles.iconButton}
+          onClick={() => setShowPassword(!showPassword)}
+          aria-label={showPassword ? 'Hide password' : 'Show password'}
+          tabIndex={-1}
+        >
+          <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+        </button>
+      </span>
+    )
+  }
+
+  if (trailingIcon) {
+    return (
+      <span className={styles.trailingIcon}>
+        {onTrailingIconClick ? (
+          <button
+            type="button"
+            className={styles.iconButton}
+            onClick={onTrailingIconClick}
+            tabIndex={-1}
+          >
+            <FontAwesomeIcon icon={trailingIcon} />
+          </button>
+        ) : (
+          <FontAwesomeIcon icon={trailingIcon} />
+        )}
+      </span>
+    )
+  }
+
+  return null
 }
 
 export interface TextInputProps
@@ -81,7 +152,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
     const [showPassword, setShowPassword] = useState(false)
     const isPassword = type === 'password'
     const inputType = getPasswordInputType(showPassword, type)
-    const inputId = id ?? `input-${rest.name ?? Math.random().toString(36).slice(2)}`
+    const inputId = id ?? generateFieldId('input', rest.name)
 
     const inputClassNames = [
       styles.input,
@@ -122,36 +193,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
             {...rest}
           />
 
-          {isPassword && (
-            <span className={styles.trailingIcon}>
-              <button
-                type="button"
-                className={styles.iconButton}
-                onClick={() => setShowPassword(!showPassword)}
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-                tabIndex={-1}
-              >
-                <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
-              </button>
-            </span>
-          )}
-
-          {!isPassword && trailingIcon && (
-            <span className={styles.trailingIcon}>
-              {onTrailingIconClick ? (
-                <button
-                  type="button"
-                  className={styles.iconButton}
-                  onClick={onTrailingIconClick}
-                  tabIndex={-1}
-                >
-                  <FontAwesomeIcon icon={trailingIcon} />
-                </button>
-              ) : (
-                <FontAwesomeIcon icon={trailingIcon} />
-              )}
-            </span>
-          )}
+          {renderTrailingIcon(isPassword, showPassword, setShowPassword, trailingIcon, onTrailingIconClick)}
         </div>
 
         {hint && !error && (
@@ -215,7 +257,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
     },
     ref
   ) {
-    const inputId = id ?? `textarea-${rest.name ?? Math.random().toString(36).slice(2)}`
+    const inputId = id ?? generateFieldId('textarea', rest.name)
 
     const textareaClassNames = [
       styles.input,
@@ -319,7 +361,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
     },
     ref
   ) {
-    const inputId = id ?? `select-${rest.name ?? Math.random().toString(36).slice(2)}`
+    const inputId = id ?? generateFieldId('select', rest.name)
 
     const selectClassNames = [
       styles.input,
@@ -433,7 +475,7 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
     { label, hint, error, required, fullWidth = true, className, id, ...rest },
     ref
   ) {
-    const inputId = id ?? `date-${rest.name ?? Math.random().toString(36).slice(2)}`
+    const inputId = id ?? generateFieldId('date', rest.name)
 
     const inputClassNames = [
       styles.input,
@@ -525,7 +567,7 @@ export interface CheckboxProps
  */
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
   function Checkbox({ label, error, hint, className, id, ...rest }, ref) {
-    const inputId = id ?? `checkbox-${rest.name ?? Math.random().toString(36).slice(2)}`
+    const inputId = id ?? generateFieldId('checkbox', rest.name)
 
     return (
       <div className={styles.fieldWrapper}>

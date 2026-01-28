@@ -23,7 +23,7 @@ export function UserMenu({ user }: Readonly<UserMenuProps>) {
   const handleLogout = async () => {
     setIsLoggingOut(true)
     try {
-      const response = await fetch('/api/auth/logout', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BASEPATH || ''}/api/auth/logout`, {
         method: 'POST',
       })
 

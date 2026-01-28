@@ -29,7 +29,9 @@ export function isValidDate(date: Date): boolean {
  * Returns null if the value cannot be parsed to a valid date
  */
 export function parseDate(value: unknown): Date | null {
-  if (!value) return null
+  if (!value) {
+    return null
+  }
 
   if (value instanceof Date) {
     return isValidDate(value) ? value : null
@@ -53,7 +55,9 @@ export function parseDate(value: unknown): Date | null {
 export function formatDisplayDate(value: unknown, fallback = '-'): string {
   const date = parseDate(value)
 
-  if (!date) return fallback
+  if (!date) {
+    return fallback
+  }
 
   return date.toLocaleDateString('en-GB', {
     day: '2-digit',
@@ -72,7 +76,9 @@ export function formatDisplayDate(value: unknown, fallback = '-'): string {
 export function formatInputDate(value: unknown, fallback = ''): string {
   const date = parseDate(value)
 
-  if (!date) return fallback
+  if (!date) {
+    return fallback
+  }
 
   return date.toISOString().split('T')[0]
 }
@@ -87,7 +93,9 @@ export function formatInputDate(value: unknown, fallback = ''): string {
 export function formatDisplayDateTime(value: unknown, fallback = '-'): string {
   const date = parseDate(value)
 
-  if (!date) return fallback
+  if (!date) {
+    return fallback
+  }
 
   return date.toLocaleDateString('en-GB', {
     day: '2-digit',
@@ -108,7 +116,9 @@ export function formatDisplayDateTime(value: unknown, fallback = '-'): string {
 export function formatISODate(value: unknown, fallback = ''): string {
   const date = parseDate(value)
 
-  if (!date) return fallback
+  if (!date) {
+    return fallback
+  }
 
   return date.toISOString()
 }
@@ -122,7 +132,9 @@ export function formatISODate(value: unknown, fallback = ''): string {
 export function formatRelativeTime(value: unknown, fallback = '-'): string {
   const date = parseDate(value)
 
-  if (!date) return fallback
+  if (!date) {
+    return fallback
+  }
 
   const now = new Date()
   const diffMs = now.getTime() - date.getTime()
@@ -131,10 +143,18 @@ export function formatRelativeTime(value: unknown, fallback = '-'): string {
   const diffHours = Math.floor(diffMins / 60)
   const diffDays = Math.floor(diffHours / 24)
 
-  if (diffSecs < 60) return 'Just now'
-  if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`
-  if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`
-  if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`
+  if (diffSecs < 60) {
+    return 'Just now'
+  }
+  if (diffMins < 60) {
+    return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`
+  }
+  if (diffHours < 24) {
+    return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`
+  }
+  if (diffDays < 7) {
+    return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`
+  }
 
   return formatDisplayDate(date, fallback)
 }

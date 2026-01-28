@@ -84,9 +84,15 @@ function compareValues(aValue: unknown, bValue: unknown): number {
   // Handle null/undefined - sort nullish values to end
   const aIsNull = isNullish(aValue)
   const bIsNull = isNullish(bValue)
-  if (aIsNull && bIsNull) return 0
-  if (aIsNull) return 1
-  if (bIsNull) return -1
+  if (aIsNull && bIsNull) {
+    return 0
+  }
+  if (aIsNull) {
+    return 1
+  }
+  if (bIsNull) {
+    return -1
+  }
 
   // String comparison
   if (typeof aValue === 'string' && typeof bValue === 'string') {
@@ -194,12 +200,14 @@ export function DataTable<T>({
   }, [data, sort])
 
   const handleSelectAll = useCallback(() => {
-    if (!onSelectionChange) return
+    if (!onSelectionChange) {
+      return
+    }
 
     const allKeys = new Set(data.map(getRowKey))
-    const allSelected = selectedKeys?.size === data.length
+    const allSelectedNow = selectedKeys?.size === data.length
 
-    if (allSelected) {
+    if (allSelectedNow) {
       onSelectionChange(new Set())
     } else {
       onSelectionChange(allKeys)
@@ -208,7 +216,9 @@ export function DataTable<T>({
 
   const handleSelectRow = useCallback(
     (key: string | number) => {
-      if (!onSelectionChange || !selectedKeys) return
+      if (!onSelectionChange || !selectedKeys) {
+        return
+      }
 
       const newKeys = new Set(selectedKeys)
       if (newKeys.has(key)) {
@@ -262,7 +272,9 @@ export function DataTable<T>({
                   className={styles.checkbox}
                   checked={allSelected}
                   ref={el => {
-                    if (el) el.indeterminate = someSelected || false
+                    if (el) {
+                      el.indeterminate = someSelected || false
+                    }
                   }}
                   onChange={handleSelectAll}
                   aria-label="Select all rows"

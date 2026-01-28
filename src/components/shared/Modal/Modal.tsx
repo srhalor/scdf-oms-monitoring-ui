@@ -9,6 +9,14 @@ import styles from './Modal.module.css'
 export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'fullscreen'
 export type ModalFooterAlign = 'left' | 'center' | 'right' | 'space-between'
 
+/** Maps footer alignment to CSS class name */
+const FOOTER_ALIGN_CLASS_MAP: Record<ModalFooterAlign, string> = {
+  left: styles.footerLeft,
+  center: styles.footerCenter,
+  right: '',
+  'space-between': styles.footerSpaceBetween,
+}
+
 export interface ModalProps {
   /** Whether the modal is open */
   isOpen: boolean
@@ -100,54 +108,43 @@ export function Modal({
 
   // Focus management and body scroll lock
   useEffect(() => {
-    if (isOpen) {
-      // Store current active element
-      previousActiveElement.current = document.activeElement as HTMLElement
+    if (!isOpen) {
+      return undefined
+    }
 
-      // Focus the modal
-      modalRef.current?.focus()
+    // Store current active element
+    previousActiveElement.current = document.activeElement as HTMLElement
 
-      // Lock body scroll
-      document.body.style.overflow = 'hidden'
+    // Focus the modal
+    modalRef.current?.focus()
 
-      // Add escape listener
-      document.addEventListener('keydown', handleKeyDown)
+    // Lock body scroll
+    document.body.style.overflow = 'hidden'
 
-      return () => {
-        // Restore body scroll
-        document.body.style.overflow = ''
+    // Add escape listener
+    document.addEventListener('keydown', handleKeyDown)
 
-        // Remove escape listener
-        document.removeEventListener('keydown', handleKeyDown)
+    return () => {
+      // Restore body scroll
+      document.body.style.overflow = ''
 
-        // Restore focus
-        previousActiveElement.current?.focus()
-      }
+      // Remove escape listener
+      document.removeEventListener('keydown', handleKeyDown)
+
+      // Restore focus
+      previousActiveElement.current?.focus()
     }
   }, [isOpen, handleKeyDown])
 
-  // Don't render if not open
-  if (!isOpen) {
+  // Don't render if not open or if window is undefined (SSR)
+  if (!isOpen || globalThis.window === undefined) {
     return null
   }
 
   const modalId = id ?? 'modal'
   const titleId = `${modalId}-title`
   const descriptionId = description ? `${modalId}-description` : undefined
-
-  const getFooterAlignClass = () => {
-    switch (footerAlign) {
-      case 'left':
-        return styles.footerLeft
-      case 'center':
-        return styles.footerCenter
-      case 'space-between':
-        return styles.footerSpaceBetween
-      default:
-        return ''
-    }
-  }
-  const footerAlignClass = getFooterAlignClass()
+  const footerAlignClass = FOOTER_ALIGN_CLASS_MAP[footerAlign]
 
   const modalContent = (
     <div
@@ -200,9 +197,5 @@ export function Modal({
   )
 
   // Render in portal
-  if (globalThis.window === undefined) {
-    return null
-  }
-
   return createPortal(modalContent, document.body)
 }

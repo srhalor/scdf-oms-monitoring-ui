@@ -2,14 +2,14 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "oms-monitoring-ui.fullname" . }}
+  name: {{ include "helm.fullname" . }}
   labels:
-    {{- include "oms-monitoring-ui.labels" . | nindent 4 }}
+    {{- include "helm.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "oms-monitoring-ui.fullname" . }}
+    name: {{ include "helm.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:

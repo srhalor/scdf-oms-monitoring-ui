@@ -1,8 +1,25 @@
 import type { NextConfig } from 'next'
 
+// Use basePath for production builds (Kubernetes ingress routing)
+// Set SKIP_BASEPATH=true in local development to disable
+const basePath = process.env.SKIP_BASEPATH === 'true' ? '' : '/sc/oms/monitoring-ui'
+
 const nextConfig: NextConfig = {
   // Enable standalone output for Docker deployment
   output: 'standalone',
+  
+  // Base path for ingress routing (production only)
+  basePath,
+  
+  // Turbopack configuration (suppress workspace root warning in Azure Pipeline)
+  turbopack: {
+    root: process.cwd(),
+  },
+  
+  // Expose basePath to client-side code
+  env: {
+    NEXT_PUBLIC_BASEPATH: basePath,
+  },
   
   // Disable x-powered-by header
   poweredByHeader: false,

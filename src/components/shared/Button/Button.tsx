@@ -133,6 +133,52 @@ function TextButtonContent({
   )
 }
 
+/**
+ * Validates button props in development mode (complexity reduction helper)
+ */
+function validateButtonProps(
+  isIconOnly: boolean,
+  label: string | undefined,
+  icon: IconDefinition | undefined,
+  iconBefore: IconDefinition | undefined,
+  iconAfter: IconDefinition | undefined
+): void {
+  if (process.env.NODE_ENV === 'development') {
+    if (isIconOnly && !label) {
+      logger.warn('Button', 'icon-only buttons require a label prop for accessibility')
+    }
+    if (icon && (iconBefore || iconAfter)) {
+      logger.warn('Button', 'icon prop is for icon-only buttons. Use iconBefore/iconAfter for text buttons.')
+    }
+  }
+}
+
+/**
+ * Builds button className string (complexity reduction helper)
+ */
+function buildButtonClassNames(
+  hierarchy: string,
+  size: string,
+  isIconOnly: boolean,
+  variant: string,
+  focusVariant: string,
+  fullWidth: boolean,
+  className: string | undefined
+): string {
+  return [
+    styles.button,
+    styles[hierarchy],
+    styles[size],
+    isIconOnly && styles.iconOnly,
+    variant === 'destructive' && styles.destructive,
+    focusVariant === 'error' && styles.focusError,
+    fullWidth && styles.fullWidth,
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ')
+}
+
 export function Button({
   hierarchy = 'primary',
   size = 'md',
@@ -159,27 +205,17 @@ export function Button({
   const iconToUse = icon ?? iconBefore ?? iconAfter
 
   // Development validation (stripped in production)
-  if (process.env.NODE_ENV === 'development') {
-    if (isIconOnly && !label) {
-      logger.warn('Button', 'icon-only buttons require a label prop for accessibility')
-    }
-    if (icon && (iconBefore || iconAfter)) {
-      logger.warn('Button', 'icon prop is for icon-only buttons. Use iconBefore/iconAfter for text buttons.')
-    }
-  }
+  validateButtonProps(isIconOnly, label, icon, iconBefore, iconAfter)
 
-  const classNames = [
-    styles.button,
-    styles[hierarchy],
-    styles[size],
-    isIconOnly && styles.iconOnly,
-    variant === 'destructive' && styles.destructive,
-    focusVariant === 'error' && styles.focusError,
-    fullWidth && styles.fullWidth,
-    className,
-  ]
-    .filter(Boolean)
-    .join(' ')
+  const classNames = buildButtonClassNames(
+    hierarchy,
+    size,
+    isIconOnly,
+    variant,
+    focusVariant,
+    fullWidth,
+    className
+  )
 
   const renderContent = () => {
     if (loading) {

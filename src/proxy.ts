@@ -1,12 +1,11 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { ENV_CONFIG } from '@/config/env.config'
+import { isDevelopment } from '@/utils/envUtils'
 import { getServerCookie } from '@/utils/cookieUtils'
 
 export async function proxy(request: NextRequest) {
   let { pathname } = request.nextUrl
-
-  const isDevelopment = process.env.NODE_ENV === 'development'
 
   // If Production and /login -> Redirect to / as SSO will handle login
   if (pathname === '/login' && !isDevelopment) {
@@ -31,9 +30,10 @@ export async function proxy(request: NextRequest) {
   }
 
   // Handle Unauthenticated Private Access
-  if (isDevelopment) {
+  if (isDevelopment()) {
     // Development: Redirect to local login
-    return NextResponse.redirect(new URL('/login', request.url))
+    const loginUrl = new URL(`${process.env.NEXTJS_BASEPATH || ''}/login`, request.url)
+    return NextResponse.redirect(loginUrl)
   }
 
   // If production and no session, check for SSO Cookie for seamless exchange

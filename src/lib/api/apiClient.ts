@@ -2,7 +2,7 @@ import { User } from '@/types/auth'
 import { ENV_CONFIG } from '@/config/env.config'
 import { logger } from '@/lib/logger'
 import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from 'axios'
-import https from 'node:https'
+import { httpsAgent } from './certHelper'
 
 const { baseUrl } = ENV_CONFIG.api
 const { originService, originApplication } = ENV_CONFIG.headers
@@ -21,11 +21,8 @@ const createApiClient = (user: User | null): AxiosInstance => {
     headers: {
       'Content-Type': 'application/json',
     },
-    // Disable SSL verification in development (self-signed certificates)
-    httpsAgent:
-      process.env.NODE_ENV === 'development'
-        ? new https.Agent({ rejectUnauthorized: false })
-        : undefined,
+    // Attach custom https.Agent if CA certificates are loaded
+    httpsAgent,
   })
 
   // Request interceptor: Add required headers

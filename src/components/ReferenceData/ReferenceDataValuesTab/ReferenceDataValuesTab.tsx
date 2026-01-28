@@ -70,7 +70,9 @@ export function ReferenceDataValuesTab({
 
   // Filter data based on search query
   const filteredData = useMemo(() => {
-    if (!searchQuery.trim()) return data
+    if (!searchQuery.trim()) {
+      return data
+    }
 
     const query = searchQuery.toLowerCase()
     return data.filter(item => {

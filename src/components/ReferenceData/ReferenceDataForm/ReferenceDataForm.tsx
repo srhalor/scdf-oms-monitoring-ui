@@ -12,6 +12,7 @@ import {
 import { formatInputDate, getCurrentDate, DEFAULT_END_DATE } from '@/utils/dateUtils'
 import type { ReferenceData, ReferenceDataRequest } from '@/types/referenceData'
 import styles from './ReferenceDataForm.module.css'
+import { logger } from '@/lib/logger'
 
 export interface ReferenceDataFormProps {
   /** Whether the form modal is open */
@@ -156,7 +157,7 @@ export function ReferenceDataForm({
         resetForm()
       } catch (error) {
         // Error handling is done by parent component
-        console.error('Form submission error:', error)
+        logger.error('ReferenceDataForm', 'Form submission error', error)
       } finally {
         setLoading(false)
       }

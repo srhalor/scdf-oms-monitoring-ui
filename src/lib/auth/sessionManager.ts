@@ -2,6 +2,7 @@ import { SignJWT, jwtVerify } from 'jose'
 import { ENV_CONFIG } from '@/config/env.config'
 import { getServerCookie, setServerCookie, deleteServerCookie } from '@/utils/cookieUtils'
 import { logger } from '@/lib/logger'
+import { isDevelopment } from '@/utils/envUtils'
 import type { SessionData } from '@/types/auth'
 
 const secret = new TextEncoder().encode(ENV_CONFIG.session.secret)
@@ -10,8 +11,8 @@ const secret = new TextEncoder().encode(ENV_CONFIG.session.secret)
  * Encrypt session data into JWT token
  * Stateless - works across multiple AKS replicas
  */
-export async function encryptSession(data: SessionData): Promise<string> {
-  return await new SignJWT(data as unknown as Record<string, unknown>)
+export function encryptSession(data: SessionData): Promise<string> {
+  return new SignJWT(data as unknown as Record<string, unknown>)
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime(`${ENV_CONFIG.session.maxAge}s`)
@@ -36,8 +37,10 @@ export async function decryptSession(token: string): Promise<SessionData | null>
  */
 export async function getSession(): Promise<SessionData | null> {
   const sessionToken = await getServerCookie(ENV_CONFIG.session.cookieName)
-  if (!sessionToken) return null
-  return await decryptSession(sessionToken)
+  if (!sessionToken) {
+    return null
+  }
+  return decryptSession(sessionToken)
 }
 
 /**
@@ -50,7 +53,7 @@ export async function createSession(data: SessionData): Promise<void> {
 
   await setServerCookie(ENV_CONFIG.session.cookieName, sessionToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV !== 'development',
+    secure: !isDevelopment(),
     sameSite: 'lax',
     maxAge: ENV_CONFIG.session.maxAge,
     path: '/',

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { deleteServerCookie } from '@/utils/cookieUtils'
 import { deleteSession } from '@/lib/auth/sessionManager'
 import { ENV_CONFIG } from '@/config/env.config'
+import { isDevelopment } from '@/utils/envUtils'
 import { logger } from '@/lib/logger'
 
 /**
@@ -23,8 +24,9 @@ export async function POST() {
     await deleteServerCookie(ENV_CONFIG.sso.cookieName)
     logger.debug('LogoutAPI', 'SSO cookie cleared')
 
-    const redirectUrl =
-      process.env.NODE_ENV === 'development' ? '/login' : ENV_CONFIG.sso.logoutUrl
+    const redirectUrl = isDevelopment() 
+      ? `${process.env.NEXTJS_BASEPATH || ''}/login` 
+      : ENV_CONFIG.sso.logoutUrl
     logger.info('LogoutAPI', 'Logout successful', { redirectUrl })
 
     // Return success

@@ -1,0 +1,163 @@
+# Default values for helm.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: $(ACR-URL)/sc-oms/scdf-oms-monitoring-ui
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: "scdf-oms-monitoring-ui"
+
+podAnnotations: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1001
+  fsGroup: 1001
+  seccompProfile:
+    type: RuntimeDefault
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 1001
+
+service:
+  type: ClusterIP
+  port: 80
+
+container:
+  port: 3000
+
+ingress:
+  enabled: true
+  className: nginx
+  host: df.sit.atradiusnet.com
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+  http:
+    paths:
+        - path: /sc/oms/monitoring-ui(/|$)(.*)
+          pathType: ImplementationSpecific
+          backend:
+            service:
+              name: scdf-oms-monitoring-ui
+              port:
+                number: 80
+  tls:
+    - secretName: oms-monitoring-tls-sit
+      hosts:
+        - df.sit.atradiusnet.com
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+# -----------------------------------------------------------------------------
+# Environment Variables
+# Values will be overridden by Azure Pipeline Variable Groups during deployment
+# -----------------------------------------------------------------------------
+deployment:
+  container:
+    env:
+      - name: OIDM_BASE_URL
+        value: ${OIDM_BASE_URL}
+      - name: OAUTH_DOMAIN
+        value: ${OAUTH_DOMAIN}
+      - name: OAUTH_SCOPE
+        value: ${OAUTH_SCOPE}
+      - name: SSO_LOGIN_URL
+        value: ${SSO_LOGIN_URL}
+      - name: SSO_LOGOUT_URL
+        value: ${SSO_LOGOUT_URL}
+      - name: OAUTH_CLIENT_ID
+        value: ${OAUTH_CLIENT_ID}
+      - name: OAUTH_CLIENT_SECRET
+        value: ${OAUTH_CLIENT_SECRET}
+      - name: SESSION_SECRET
+        value: ${SESSION_SECRET}
+      - name: ORIGIN_SERVICE
+        value: ${ORIGIN_SERVICE}
+      - name: ORIGIN_APPLICATION
+        value: ${ORIGIN_APPLICATION}
+      - name: API_BASE_URL
+        value: ${API_BASE_URL}
+      - name: ENABLE_LOGGING
+        value: "${ENABLE_LOGGING}"
+      - name: LOG_LEVEL
+        value: "${LOG_LEVEL}"
+      - name: LOG_FORMAT
+        value: "${LOG_FORMAT}"
+      - name: NEXTJS_BASEPATH
+        value: "/sc/oms/monitoring-ui"
+
+# -----------------------------------------------------------------------------
+# Autoscaling (HPA)
+# -----------------------------------------------------------------------------
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+# -----------------------------------------------------------------------------
+# Health Probes
+# -----------------------------------------------------------------------------
+livenessProbe:
+  httpGet:
+    path: /api/probe/live
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 15
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /api/probe/ready
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+startupProbe:
+  httpGet:
+    path: /api/probe/startup
+    port: http
+  initialDelaySeconds: 0
+  periodSeconds: 5
+  timeoutSeconds: 5
+  failureThreshold: 30
+
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

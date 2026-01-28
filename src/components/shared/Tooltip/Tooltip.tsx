@@ -86,23 +86,19 @@ export function Tooltip({
 
   // When wrapping interactive children (buttons, links), use span wrapper with JS events
   // The interactive child handles its own keyboard accessibility
-  if (hasInteractiveChild) {
-    return (
-      <span // NOSONAR - wrapper delegates keyboard accessibility to interactive child
-        className={`${styles.tooltipWrapper} ${className ?? ''}`}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        onFocusCapture={handleFocus}
-        onBlurCapture={handleBlur}
-      >
-        {children}
-        {tooltipElement}
-      </span>
-    )
-  }
-
   // For non-interactive children, wrap in a button for full accessibility
-  return (
+  return hasInteractiveChild ? (
+    <span // NOSONAR - wrapper delegates keyboard accessibility to interactive child
+      className={`${styles.tooltipWrapper} ${className ?? ''}`}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onFocusCapture={handleFocus}
+      onBlurCapture={handleBlur}
+    >
+      {children}
+      {tooltipElement}
+    </span>
+  ) : (
     <button
       type="button"
       className={`${styles.tooltipTrigger} ${className ?? ''}`}

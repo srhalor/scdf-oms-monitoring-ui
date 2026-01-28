@@ -1,15 +1,11 @@
 import axios from 'axios'
-import https from 'node:https'
 import { ENV_CONFIG } from '@/config/env.config'
 import { logger } from '@/lib/logger'
 import type { TokenResponse } from '@/types/auth'
+import { httpsAgent } from '@/lib/api/certHelper'
 
 const { clientId, clientSecret, baseUrl, domain, scope } = ENV_CONFIG.oidm
 
-const httpsAgent =
-  process.env.NODE_ENV === 'development'
-    ? new https.Agent({ rejectUnauthorized: false })
-    : undefined
 
 /**
  * Exchange Client Credentials for Token (Development)

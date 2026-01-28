@@ -31,8 +31,7 @@
  */
 
 import { ENV_CONFIG } from '@/config/env.config'
-
-type LogLevel = 'debug' | 'info' | 'warn' | 'error'
+import { LogLevel } from '@/types/logging'
 
 interface UserContext {
   name?: string
@@ -68,17 +67,17 @@ interface LogEntry {
 }
 
 const LOG_LEVELS: Record<LogLevel, number> = {
-  debug: 0,
-  info: 1,
-  warn: 2,
-  error: 3,
+  [LogLevel.debug]: 0,
+  [LogLevel.info]: 1,
+  [LogLevel.warn]: 2,
+  [LogLevel.error]: 3,
 }
 
 const LEVEL_LABELS: Record<LogLevel, string> = {
-  debug: 'DEBUG',
-  info: 'INFO ',
-  warn: 'WARN ',
-  error: 'ERROR',
+  [LogLevel.debug]: 'DEBUG',
+  [LogLevel.info]: 'INFO ',
+  [LogLevel.warn]: 'WARN ',
+  [LogLevel.error]: 'ERROR',
 }
 
 const DEFAULT_CONFIG: LoggerConfig = {
@@ -126,7 +125,9 @@ class Logger {
   }
 
   private shouldLog(level: LogLevel): boolean {
-    if (!this.config.enabled) return false
+    if (!this.config.enabled) {
+      return false
+    }
     return LOG_LEVELS[level] >= LOG_LEVELS[this.config.minLevel]
   }
 
@@ -224,18 +225,45 @@ class Logger {
   /**
    * Output log using appropriate format (JSON or text)
    */
-  private output(consoleFn: (...args: unknown[]) => void, level: LogLevel, context: string, message: string, data?: unknown): void {
+  private output(level: LogLevel, context: string, message: string, data?: unknown): void {
+    const writeJson = (obj: unknown, toStderr = false) => {
+      const line = `${JSON.stringify(obj)}\n`
+      if (toStderr) {
+        try {
+          process.stderr.write(line)
+        } catch {
+          // fallback 
+          console.info(line)
+        }
+      } else {
+        console.info(line)
+      }
+    }
+
+    const writeText = (text: string, extra?: unknown, toStderr = false) => {
+      if (toStderr) {
+        try {
+          const extraStr = extra ? ` ${String(extra)}` : ''
+          process.stderr.write(`${text}${extraStr}\n`)
+        } catch {
+          // fallback
+          console.info(text, extra)
+        }
+      } else {
+        console.info(text, extra)
+      }
+    }
+
     if (this.config.jsonFormat) {
-      // JSON structured output for ELK
       const entry = this.buildLogEntry(level, context, message, data)
-      consoleFn(JSON.stringify(entry))
+      // send errors to stderr, others to stdout via console.info
+      writeJson(entry, level === 'error')
     } else {
-      // Human-readable text output
       const formattedMessage = this.formatMessage(level, context, message)
       if (data === undefined) {
-        consoleFn(formattedMessage)
+        writeText(formattedMessage, undefined, level === 'error')
       } else {
-        consoleFn(formattedMessage, data)
+        writeText(formattedMessage, data, level === 'error')
       }
     }
   }
@@ -245,24 +273,30 @@ class Logger {
    * Only shows in development by default
    */
   debug(context: string, message: string, data?: unknown): void {
-    if (!this.shouldLog('debug')) return
-    this.output(console.debug, 'debug', context, message, data)
+    if (!this.shouldLog(LogLevel.debug)) {
+      return
+    }
+    this.output(LogLevel.debug, context, message, data)
   }
 
   /**
    * Info level - for general information
    */
   info(context: string, message: string, data?: unknown): void {
-    if (!this.shouldLog('info')) return
-    this.output(console.info, 'info', context, message, data)
+    if (!this.shouldLog(LogLevel.info)) {
+      return
+    }
+    this.output(LogLevel.info, context, message, data)
   }
 
   /**
    * Warn level - for warnings that don't break functionality
    */
   warn(context: string, message: string, data?: unknown): void {
-    if (!this.shouldLog('warn')) return
-    this.output(console.warn, 'warn', context, message, data)
+    if (!this.shouldLog(LogLevel.warn)) {
+      return
+    }
+    this.output(LogLevel.warn, context, message, data)
   }
 
   /**
@@ -270,8 +304,10 @@ class Logger {
    * Always logs in development, conditionally in production
    */
   error(context: string, message: string, error?: unknown): void {
-    if (!this.shouldLog('error')) return
-    this.output(console.error, 'error', context, message, error)
+    if (!this.shouldLog(LogLevel.error)) {
+      return
+    }
+    this.output(LogLevel.error, context, message, error)
   }
 
   /**
@@ -316,4 +352,5 @@ export const logger = new Logger()
 
 // Export class for testing or custom instances
 export { Logger }
-export type { LogLevel, LoggerConfig, UserContext, LogEntry }
+export type { LoggerConfig, UserContext, LogEntry }
+export { LogLevel }

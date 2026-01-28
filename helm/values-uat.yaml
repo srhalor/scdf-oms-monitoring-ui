@@ -1,0 +1,192 @@
+# Production values for SCDF OMS Monitoring UI
+# This is a template - copy to values-prod.yaml and fill in actual values
+
+replicaCount: 3  # Increased for high availability
+
+image:
+  repository: $(ACR-URL)/sc-oms/scdf-oms-monitoring-ui
+  pullPolicy: IfNotPresent  # Changed from Always for production
+  tag: ""  # Set via CI/CD pipeline
+
+imagePullSecrets: []
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: "scdf-oms-monitoring-ui"
+
+podAnnotations: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1001
+  fsGroup: 1001
+  seccompProfile:
+    type: RuntimeDefault
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 1001
+
+service:
+  type: ClusterIP
+  port: 80
+
+container:
+  port: 3000
+
+ingress:
+  enabled: true
+  className: nginx
+  host: df.uat.atradiusnet.com  # UAT domain
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    # UAT-specific annotations
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "30"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "30"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "30"
+    # Rate limiting
+    nginx.ingress.kubernetes.io/limit-rps: "100"
+    # CORS (if needed)
+    # nginx.ingress.kubernetes.io/enable-cors: "true"
+    # nginx.ingress.kubernetes.io/cors-allow-origin: "https://your-domain.com"
+  http:
+    paths:
+        - path: /sc/oms/monitoring-ui(/|$)(.*)
+          pathType: ImplementationSpecific
+          backend:
+            service:
+              name: scdf-oms-monitoring-ui
+              port:
+                number: 80
+  tls:
+    - secretName: oms-monitoring-tls-uat
+      hosts:
+        - df.uat.atradiusnet.com
+
+# UAT resource limits (adjust based on actual usage)
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+# -----------------------------------------------------------------------------
+# Environment Variables
+# Values will be overridden by Azure Pipeline Variable Groups during deployment
+# -----------------------------------------------------------------------------
+deployment:
+  container:
+    env:
+      - name: OIDM_BASE_URL
+        value: ${OIDM_BASE_URL}
+      - name: OAUTH_DOMAIN
+        value: ${OAUTH_DOMAIN}
+      - name: OAUTH_SCOPE
+        value: ${OAUTH_SCOPE}
+      - name: SSO_LOGIN_URL
+        value: ${SSO_LOGIN_URL}
+      - name: SSO_LOGOUT_URL
+        value: ${SSO_LOGOUT_URL}
+      - name: OAUTH_CLIENT_ID
+        value: ${OAUTH_CLIENT_ID}
+      - name: OAUTH_CLIENT_SECRET
+        value: ${OAUTH_CLIENT_SECRET}
+      - name: SESSION_SECRET
+        value: ${SESSION_SECRET}
+      - name: ORIGIN_SERVICE
+        value: ${ORIGIN_SERVICE}
+      - name: ORIGIN_APPLICATION
+        value: ${ORIGIN_APPLICATION}
+      - name: API_BASE_URL
+        value: ${API_BASE_URL}
+      - name: ENABLE_LOGGING
+        value: "${ENABLE_LOGGING}"
+      - name: LOG_LEVEL
+        value: "${LOG_LEVEL}"
+      - name: LOG_FORMAT
+        value: "${LOG_FORMAT}"
+      - name: NEXTJS_BASEPATH
+        value: "/sc/oms/monitoring-ui"
+
+# -----------------------------------------------------------------------------
+# Autoscaling (HPA) - ENABLED for UAT
+# -----------------------------------------------------------------------------
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 20
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 75
+
+# -----------------------------------------------------------------------------
+# Health Probes (more aggressive for UAT)
+# -----------------------------------------------------------------------------
+livenessProbe:
+  httpGet:
+    path: /api/probe/live
+    port: http
+  initialDelaySeconds: 15
+  periodSeconds: 20
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /api/probe/ready
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+startupProbe:
+  httpGet:
+    path: /api/probe/startup
+    port: http
+  initialDelaySeconds: 0
+  periodSeconds: 5
+  timeoutSeconds: 5
+  failureThreshold: 40  # Increased for UAT
+
+# -----------------------------------------------------------------------------
+# Node Selection and Affinity (optional - configure based on cluster setup)
+# -----------------------------------------------------------------------------
+nodeSelector: {}
+  # Example: Route to specific node pool
+  # agentpool: monitoring
+
+tolerations: []
+  # Example: Tolerate specific taints
+  # - key: "workload"
+  #   operator: "Equal"
+  #   value: "monitoring"
+  #   effect: "NoSchedule"
+
+affinity:
+  # Pod anti-affinity to spread pods across nodes
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - scdf-oms-monitoring-ui
+        topologyKey: kubernetes.io/hostname

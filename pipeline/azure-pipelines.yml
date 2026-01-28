@@ -1,0 +1,42 @@
+trigger:
+  - main
+
+pool: Atradius-Self-Hosted
+
+variables:
+  - group: "Global Variables"
+  - group: "Security Tools"
+  - name: ContainerPrefix
+    value: "sc-oms"
+  - name: WorkingDirectory
+    value: "."
+  - name: npmBuildCommand
+    value: "build"
+  - name: npmInstallCommand
+    value: "install"
+  - name: AquaSec_SC
+    value: "AquaSec"
+
+resources:
+  repositories:
+    - repository: Azure-pipeline-templates
+      type: github
+      name: AtradiusGroup/azure-pipeline-templates
+      ref: refs/tags/v0.10.1
+      endpoint: Azure-pipeline-templates
+
+stages:
+  - stage: BuildStage
+    displayName: Build and package the application
+    jobs:
+      - template: templates/build/nodejs/build-stage.yml@Azure-pipeline-templates
+        parameters:
+          appName: 'scdf-oms-monitoring-ui'
+          executeDockerBuild: true
+          deployApproach: 'helm'
+          executeDependabotCheck: false
+  ##      dependabot_severity: 'critical,high' // Only needed if above variable it true.
+          dockerArgs: "--build-arg=ACR_URL=$(ACR-URL)"
+          nodeVersionSpec: 22.14.0
+          usePNPM: true
+          npmAuthenticate: true

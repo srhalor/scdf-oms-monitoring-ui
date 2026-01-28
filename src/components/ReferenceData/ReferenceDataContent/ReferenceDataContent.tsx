@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { Tabs, type TabItem } from '@/components/shared/Tabs'
+import { logger } from '@/lib/logger'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { ReferenceDataTypesTab } from '@/components/ReferenceData/ReferenceDataTypesTab'
 import { ReferenceDataValuesTab } from '@/components/ReferenceData/ReferenceDataValuesTab'
@@ -14,17 +15,36 @@ import type { DocumentConfiguration, DocumentConfigurationRequest } from '@/type
 /**
  * Tab configuration for Reference Data page
  */
+const TAB_IDS = {
+  TYPES: 'reference-data-types',
+  VALUES: 'reference-data-values',
+  CONFIGURATIONS: 'document-configurations',
+} as const
+
 const TABS: TabItem[] = [
-  { id: 'reference-data-types', label: 'Reference Data Types' },
-  { id: 'reference-data-values', label: 'Reference Data Values' },
-  { id: 'document-configurations', label: 'Document Configurations' },
+  { id: TAB_IDS.TYPES, label: 'Reference Data Types' },
+  { id: TAB_IDS.VALUES, label: 'Reference Data Values' },
+  { id: TAB_IDS.CONFIGURATIONS, label: 'Document Configurations' },
 ]
+
+// Shared message fragments
+const FETCH_FAILED_PREFIX = 'Failed to fetch: '
+const FAILED_LOAD_MSG = 'Failed to load data'
 
 /**
  * Modal state for create/edit/delete operations
  */
+/**
+ * Modal actions (use enum to avoid large union literal types)
+ */
+enum ModalAction {
+  Create = 'create',
+  Edit = 'edit',
+  Delete = 'delete',
+}
+
 interface ModalState {
-  type: 'create' | 'edit' | 'delete' | null
+  type: ModalAction | null
   item: ReferenceData | null
   /** Context for which tab the modal is from */
   context: 'types' | 'values' | 'configurations'
@@ -34,7 +54,7 @@ interface ModalState {
  * Modal state for document configuration operations
  */
 interface DocConfigModalState {
-  type: 'create' | 'edit' | 'delete' | null
+  type: ModalAction | null
   item: DocumentConfiguration | null
 }
 
@@ -45,7 +65,7 @@ interface DocConfigModalState {
  * for the Reference Data management page.
  */
 export function ReferenceDataContent() {
-  const [activeTab, setActiveTab] = useState(TABS[2].id)
+  const [activeTab, setActiveTab] = useState<string>(TAB_IDS.CONFIGURATIONS)
 
   // Reference Data Types tab state
   const [referenceDataTypes, setReferenceDataTypes] = useState<ReferenceData[]>([])
@@ -91,13 +111,13 @@ export function ReferenceDataContent() {
       const response = await fetch('/api/reference-data/types')
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch: ${response.statusText}`)
+        throw new Error(`${FETCH_FAILED_PREFIX}${response.statusText}`)
       }
 
       const data = await response.json()
       setReferenceDataTypes(data)
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to load data'
+      const message = err instanceof Error ? err.message : FAILED_LOAD_MSG
       setTypesError(message)
     } finally {
       setTypesLoading(false)
@@ -120,13 +140,13 @@ export function ReferenceDataContent() {
       const response = await fetch(`/api/reference-data/types?refDataType=${encodeURIComponent(type)}`)
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch: ${response.statusText}`)
+        throw new Error(`${FETCH_FAILED_PREFIX}${response.statusText}`)
       }
 
       const data = await response.json()
       setReferenceDataValues(data)
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to load data'
+      const message = err instanceof Error ? err.message : FAILED_LOAD_MSG
       setValuesError(message)
     } finally {
       setValuesLoading(false)
@@ -144,13 +164,13 @@ export function ReferenceDataContent() {
       const response = await fetch('/api/document-configurations')
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch: ${response.statusText}`)
+        throw new Error(`${FETCH_FAILED_PREFIX}${response.statusText}`)
       }
 
       const data = await response.json()
       setDocumentConfigurations(data)
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to load data'
+      const message = err instanceof Error ? err.message : FAILED_LOAD_MSG
       setConfigsError(message)
     } finally {
       setConfigsLoading(false)
@@ -180,7 +200,7 @@ export function ReferenceDataContent() {
         setCodeOptions(await codeRes.json())
       }
     } catch (err) {
-      console.error('Failed to fetch dropdown options:', err)
+      logger.error('ReferenceDataContent', 'Failed to fetch dropdown options', err)
     } finally {
       setOptionsLoading(false)
     }
@@ -188,35 +208,35 @@ export function ReferenceDataContent() {
 
   // Fetch types on mount and when switching to types tab
   useEffect(() => {
-    if (activeTab === 'reference-data-types') {
+    if (activeTab === TAB_IDS.TYPES) {
       fetchReferenceDataTypes()
     }
   }, [activeTab, fetchReferenceDataTypes])
 
   // Fetch types for dropdown when switching to values tab
   useEffect(() => {
-    if (activeTab === 'reference-data-values' && referenceDataTypes.length === 0) {
+    if (activeTab === TAB_IDS.VALUES && referenceDataTypes.length === 0) {
       fetchReferenceDataTypes()
     }
   }, [activeTab, referenceDataTypes.length, fetchReferenceDataTypes])
 
   // Fetch values when selected type changes
   useEffect(() => {
-    if (activeTab === 'reference-data-values' && selectedRefDataType) {
+    if (activeTab === TAB_IDS.VALUES && selectedRefDataType) {
       fetchReferenceDataValues(selectedRefDataType)
     }
   }, [activeTab, selectedRefDataType, fetchReferenceDataValues])
 
   // Fetch document configurations when switching to configurations tab
   useEffect(() => {
-    if (activeTab === 'document-configurations') {
+    if (activeTab === TAB_IDS.CONFIGURATIONS) {
       fetchDocumentConfigurations()
     }
   }, [activeTab, fetchDocumentConfigurations])
 
   // Fetch dropdown options when opening document configuration form
   useEffect(() => {
-    if (docConfigModalState.type === 'create' || docConfigModalState.type === 'edit') {
+    if (docConfigModalState.type === ModalAction.Create || docConfigModalState.type === ModalAction.Edit) {
       fetchDocConfigOptions()
     }
   }, [docConfigModalState.type, fetchDocConfigOptions])
@@ -239,42 +259,42 @@ export function ReferenceDataContent() {
    * Handle create new reference data (types tab)
    */
   const handleCreateType = useCallback(() => {
-    setModalState({ type: 'create', item: null, context: 'types' })
+    setModalState({ type: ModalAction.Create, item: null, context: 'types' })
   }, [])
 
   /**
    * Handle create new reference data (values tab)
    */
   const handleCreateValue = useCallback(() => {
-    setModalState({ type: 'create', item: null, context: 'values' })
+    setModalState({ type: ModalAction.Create, item: null, context: 'values' })
   }, [])
 
   /**
    * Handle edit reference data (types tab)
    */
   const handleEditType = useCallback((item: ReferenceData) => {
-    setModalState({ type: 'edit', item, context: 'types' })
+    setModalState({ type: ModalAction.Edit, item, context: 'types' })
   }, [])
 
   /**
    * Handle edit reference data (values tab)
    */
   const handleEditValue = useCallback((item: ReferenceData) => {
-    setModalState({ type: 'edit', item, context: 'values' })
+    setModalState({ type: ModalAction.Edit, item, context: 'values' })
   }, [])
 
   /**
    * Handle delete reference data (types tab)
    */
   const handleDeleteType = useCallback((item: ReferenceData) => {
-    setModalState({ type: 'delete', item, context: 'types' })
+    setModalState({ type: ModalAction.Delete, item, context: 'types' })
   }, [])
 
   /**
    * Handle delete reference data (values tab)
    */
   const handleDeleteValue = useCallback((item: ReferenceData) => {
-    setModalState({ type: 'delete', item, context: 'values' })
+    setModalState({ type: ModalAction.Delete, item, context: 'values' })
   }, [])
 
   /**
@@ -317,7 +337,9 @@ export function ReferenceDataContent() {
    * Confirm delete action
    */
   const handleConfirmDelete = useCallback(async () => {
-    if (!modalState.item) return
+    if (!modalState.item) {
+      return
+    }
 
     setDeleteLoading(true)
     const isValuesContext = modalState.context === 'values'
@@ -340,7 +362,7 @@ export function ReferenceDataContent() {
       }
       closeModal()
     } catch (err) {
-      console.error('Delete error:', err)
+      logger.error('ReferenceDataContent', 'Delete error', err)
     } finally {
       setDeleteLoading(false)
     }
@@ -357,21 +379,21 @@ export function ReferenceDataContent() {
    * Handle create new document configuration
    */
   const handleCreateDocConfig = useCallback(() => {
-    setDocConfigModalState({ type: 'create', item: null })
+    setDocConfigModalState({ type: ModalAction.Create, item: null })
   }, [])
 
   /**
    * Handle edit document configuration
    */
   const handleEditDocConfig = useCallback((item: DocumentConfiguration) => {
-    setDocConfigModalState({ type: 'edit', item })
+    setDocConfigModalState({ type: ModalAction.Edit, item })
   }, [])
 
   /**
    * Handle delete document configuration
    */
   const handleDeleteDocConfig = useCallback((item: DocumentConfiguration) => {
-    setDocConfigModalState({ type: 'delete', item })
+    setDocConfigModalState({ type: ModalAction.Delete, item })
   }, [])
 
   /**
@@ -411,7 +433,9 @@ export function ReferenceDataContent() {
    * Confirm delete document configuration
    */
   const handleConfirmDeleteDocConfig = useCallback(async () => {
-    if (!docConfigModalState.item) return
+    if (!docConfigModalState.item) {
+      return
+    }
 
     setDocConfigDeleteLoading(true)
 
@@ -429,7 +453,7 @@ export function ReferenceDataContent() {
       await fetchDocumentConfigurations()
       closeDocConfigModal()
     } catch (err) {
-      console.error('Delete error:', err)
+      logger.error('ReferenceDataContent', 'Delete error', err)
     } finally {
       setDocConfigDeleteLoading(false)
     }
@@ -440,7 +464,7 @@ export function ReferenceDataContent() {
    */
   const renderTabContent = (tabId: string) => {
     switch (tabId) {
-      case 'reference-data-types':
+      case TAB_IDS.TYPES:
         return (
           <ReferenceDataTypesTab
             data={referenceDataTypes}
@@ -452,7 +476,7 @@ export function ReferenceDataContent() {
             onDelete={handleDeleteType}
           />
         )
-      case 'reference-data-values':
+      case TAB_IDS.VALUES:
         return (
           <ReferenceDataValuesTab
             refDataTypes={referenceDataTypes}
@@ -468,7 +492,7 @@ export function ReferenceDataContent() {
             onDelete={handleDeleteValue}
           />
         )
-      case 'document-configurations':
+      case TAB_IDS.CONFIGURATIONS:
         return (
           <DocumentConfigurationsTab
             data={documentConfigurations}

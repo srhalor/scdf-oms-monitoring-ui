@@ -44,6 +44,84 @@ export interface LinkButtonProps {
   showTooltip?: boolean
 }
 
+/**
+ * Validates LinkButton props in development mode (complexity reduction helper)
+ */
+function validateLinkButtonProps(
+  isIconOnly: boolean,
+  label: string | undefined,
+  icon: IconDefinition | undefined,
+  iconBefore: IconDefinition | undefined,
+  iconAfter: IconDefinition | undefined
+): void {
+  if (process.env.NODE_ENV === 'development') {
+    if (isIconOnly && !label) {
+      logger.warn('LinkButton', 'icon-only buttons require a label prop for accessibility')
+    }
+    if (icon && (iconBefore || iconAfter)) {
+      logger.warn(
+        'LinkButton',
+        'icon prop is for icon-only buttons. Use iconBefore/iconAfter for text buttons with icons.'
+      )
+    }
+  }
+}
+
+/**
+ * Builds LinkButton className string (complexity reduction helper)
+ */
+function buildLinkButtonClassNames(
+  variant: string,
+  size: string,
+  isIconOnly: boolean,
+  destructive: boolean,
+  className: string | undefined
+): string {
+  return [
+    styles.linkButton,
+    styles[variant],
+    styles[size],
+    isIconOnly && styles.iconOnly,
+    destructive && styles.destructive,
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ')
+}
+
+interface LinkButtonContentProps {
+  isIconOnly: boolean
+  iconToUse: IconDefinition | undefined
+  iconBefore: IconDefinition | undefined
+  iconAfter: IconDefinition | undefined
+  children: ReactNode
+}
+
+/**
+ * Renders LinkButton content (complexity reduction helper)
+ */
+function LinkButtonContent({
+  isIconOnly,
+  iconToUse,
+  iconBefore,
+  iconAfter,
+  children,
+}: Readonly<LinkButtonContentProps>) {
+  if (isIconOnly && iconToUse) {
+    return <FontAwesomeIcon icon={iconToUse} className={styles.icon} />
+  }
+
+  return (
+    <>
+      {iconBefore && (
+        <FontAwesomeIcon icon={iconBefore} className={styles.iconBefore} />
+      )}
+      {children && <span className={styles.label}>{children}</span>}
+      {iconAfter && <FontAwesomeIcon icon={iconAfter} className={styles.iconAfter} />}
+    </>
+  )
+}
+
 export function LinkButton({
   variant = 'primary',
   size = 'md',
@@ -59,35 +137,22 @@ export function LinkButton({
   showTooltip = true,
 }: Readonly<LinkButtonProps>) {
   // Detect button type
-  const isIconOnly = !children && (icon || iconBefore || iconAfter)
-  const iconToUse = icon || iconBefore || iconAfter
+  const isIconOnly = !children && Boolean(icon ?? iconBefore ?? iconAfter)
+  const iconToUse = icon ?? iconBefore ?? iconAfter
 
   // Development validation (stripped in production)
-  if (process.env.NODE_ENV === 'development') {
-    // Validate: icon-only buttons require label
-    if (isIconOnly && !label) {
-      logger.warn('LinkButton', 'icon-only buttons require a label prop for accessibility')
-    }
+  validateLinkButtonProps(isIconOnly, label, icon, iconBefore, iconAfter)
 
-    // Validate: conflicting icon props
-    if (icon && (iconBefore || iconAfter)) {
-      logger.warn(
-        'LinkButton',
-        'icon prop is for icon-only buttons. Use iconBefore/iconAfter for text buttons with icons.'
-      )
-    }
-  }
+  const classNames = buildLinkButtonClassNames(
+    variant,
+    size,
+    isIconOnly,
+    destructive,
+    className
+  )
 
-  const classNames = [
-    styles.linkButton,
-    styles[variant],
-    styles[size],
-    isIconOnly && styles.iconOnly,
-    destructive && styles.destructive,
-    className,
-  ]
-    .filter(Boolean)
-    .join(' ')
+  const ariaLabel = isIconOnly ? label : undefined
+  const title = isIconOnly && showTooltip ? label : undefined
 
   return (
     <button
@@ -95,20 +160,17 @@ export function LinkButton({
       className={classNames}
       onClick={onClick}
       disabled={disabled}
-      aria-label={isIconOnly ? label : undefined}
-      title={isIconOnly && showTooltip ? label : undefined}
+      aria-label={ariaLabel}
+      title={title}
     >
-      {isIconOnly ? (
-        <FontAwesomeIcon icon={iconToUse!} className={styles.icon} />
-      ) : (
-        <>
-          {iconBefore && (
-            <FontAwesomeIcon icon={iconBefore} className={styles.iconBefore} />
-          )}
-          {children && <span className={styles.label}>{children}</span>}
-          {iconAfter && <FontAwesomeIcon icon={iconAfter} className={styles.iconAfter} />}
-        </>
-      )}
+      <LinkButtonContent
+        isIconOnly={isIconOnly}
+        iconToUse={iconToUse}
+        iconBefore={iconBefore}
+        iconAfter={iconAfter}
+      >
+        {children}
+      </LinkButtonContent>
     </button>
   )
 }

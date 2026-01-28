@@ -1,0 +1,117 @@
+parameters:
+  - name: buildDefinitionId
+    type: string
+    default: '4484'
+  - name: buildNumber
+    type: string
+  - name: changeNumber
+    type: string
+
+  
+trigger: none
+variables:
+  - group: "Global Variables"
+  - name: ChangeNumber
+    value: ${{ parameters.changeNumber }}
+  - name: KUBERNETES_NAMESPACE
+    value: "scoms"
+  - name: appName
+    value: 'scdf-oms-monitoring-ui'
+  - name: appVersion
+    value: ${{ parameters.buildNumber }}
+
+resources:
+  repositories:
+    - repository: Azure-pipeline-templates
+      type: github
+      name: AtradiusGroup/azure-pipeline-templates
+      ref: refs/tags/v0.10.3
+      endpoint: Azure-pipeline-templates
+      
+stages:
+  - stage: DeployDev
+    displayName: Deploy to dev
+    # condition: eq(${{ parameters.dev }}, true)
+    variables:
+      - group: "Global Variables"
+      - group: "SCDF-OMS-MONITORING-UI-DEV"
+
+    jobs:
+      - template: templates/deploy/aks/deploy-stage-helm.yml@Azure-pipeline-templates
+        parameters:
+          environment: 'dev'
+          aksName: scdf-weu-dev-app-aks
+          resourceGroupName: scdf-weu-dev-aks-rg
+          resourceManager: atr-sharedcomp-dev-aks-df
+          projectId: '$(System.TeamProjectId)'
+          pipelineId: ${{ parameters.buildDefinitionId }}
+          # buildId: '$(Build.BuildId)'
+          appName: '$(appName)'
+          appVersion: '$(appVersion)'
+
+  - stage: DeploySit
+    trigger: manual
+    displayName: Deploy to sit
+    # condition: eq(${{ parameters.sit }}, true)
+    variables:
+      - group: "Global Variables"
+      - group: "SCDF-OMS-MONITORING-UI-SIT"
+
+    jobs:
+      - template: templates/deploy/aks/deploy-stage-helm.yml@Azure-pipeline-templates
+        parameters:
+          environment: 'sit'
+          aksName: scdf-weu-sit-app-aks
+          resourceGroupName: scdf-weu-sit-aks-rg
+          resourceManager: atr-sharedcomp-sit-aks-df
+          projectId: '$(System.TeamProjectId)'
+          pipelineId: ${{ parameters.buildDefinitionId }}
+          # buildId: '$(Build.BuildId)'
+          appName: '$(appName)'
+          appVersion: '$(appVersion)'
+
+  - stage: DeployUat
+    trigger: manual
+    displayName: Deploy to uat
+    # condition: eq(${{ parameters.uat }}, true)
+    variables:
+      - group: "Global Variables"
+      - group: "SCDF-OMS-MONITORING-UI-UAT"
+
+    jobs:
+      - template: templates/deploy/aks/deploy-stage-helm.yml@Azure-pipeline-templates
+        parameters:
+          environment: 'uat'
+          aksName: scdf-weu-uat-app-aks
+          resourceGroupName: scdf-weu-uat-aks-rg
+          resourceManager: atr-sharedcomp-uat-documentfactory
+          projectId: '$(System.TeamProjectId)'
+          pipelineId: ${{ parameters.buildDefinitionId }}
+          # buildId: '$(Build.BuildId)'
+          appName: '$(appName)'
+          appVersion: '$(appVersion)'
+
+  - stage: DeployProd
+    trigger: manual
+    displayName: Deploy to prod
+    # condition: eq(${{ parameters.prod }}, true)
+    variables:
+      - group: "Global Variables"
+      - group: "SCDF-OMS-MONITORING-UI-PROD"
+
+    jobs:
+      - template: templates/deploy/aks/deploy-stage-helm.yml@Azure-pipeline-templates
+        parameters:
+          environment: 'prod'
+          aksName: scdf-weu-prd-app-aks
+          resourceGroupName: scdf-weu-prd-aks-rg
+          resourceManager: atr-sharedcomp-prd-aks-df-oms
+          projectId: '$(System.TeamProjectId)'
+          pipelineId: ${{ parameters.buildDefinitionId }}
+          # buildId: '$(Build.BuildId)'
+          appName: '$(appName)'
+          appVersion: '$(appVersion)'
+      - template: templates/push-to-golden-acr/push-to-golden-acr.yml@Azure-pipeline-templates
+        parameters:
+          imageTag: "sc-oms/scdf-oms-monitoring-ui:${{ parameters.buildNumber }}"
+          env: 'prod'

@@ -11,6 +11,7 @@ import type {
   DocumentConfigurationRequest,
 } from '@/types/documentConfiguration'
 import styles from './DocumentConfigurationForm.module.css'
+import { logger } from '@/lib/logger'
 
 export interface DocumentConfigurationFormProps {
   /** Whether the form modal is open */
@@ -198,7 +199,7 @@ export function DocumentConfigurationForm({
         onClose()
         resetForm()
       } catch (error) {
-        console.error('Form submission error:', error)
+        logger.error('DocumentConfigurationForm', 'Form submission error', error)
       } finally {
         setLoading(false)
       }

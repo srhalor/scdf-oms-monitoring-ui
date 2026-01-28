@@ -3,11 +3,14 @@
  * All values are read at runtime from environment variables (Helm ConfigMaps)
  * No NEXT_PUBLIC_* prefix - these are server-side only
  */
+import { isDevelopment } from '@/utils/envUtils'
+import { LogLevel } from '@/types/logging'
+
 export const ENV_CONFIG = {
   logging: {
-    enabled: process.env.NODE_ENV === 'development' || process.env.ENABLE_LOGGING === 'true',
-    minLevel: (process.env.LOG_LEVEL as 'debug' | 'info' | 'warn' | 'error') || 'info',
-    includeTimestamp: process.env.NODE_ENV === 'development',
+    enabled: isDevelopment() || process.env.ENABLE_LOGGING === 'true',
+    minLevel: (process.env.LOG_LEVEL as LogLevel) || LogLevel.info,
+    includeTimestamp: isDevelopment(),
     // JSON format for ELK/structured logging - enable in production for log aggregation
     jsonFormat: process.env.LOG_FORMAT === 'json',
   },

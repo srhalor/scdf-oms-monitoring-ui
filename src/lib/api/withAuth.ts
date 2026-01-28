@@ -44,7 +44,7 @@ export function withAuth(handler: AuthenticatedRouteHandler) {
       const client = createAuthenticatedClient(accessToken, user)
 
       // Call the actual handler with the authenticated client
-      return await handler(request, client)
+      return handler(request, client)
     } catch (error) {
       logger.error('API', 'Route handler error', error)
 

@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
       await createSession({
         user,
         accessToken: tokenData.access_token,
-        expiresAt: expiresAt,
+        expiresAt,
       })
       
       // Set user context for logging

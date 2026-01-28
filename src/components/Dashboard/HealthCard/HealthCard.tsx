@@ -83,12 +83,18 @@ export const HealthCard = ({ onRefresh }: HealthCardProps) => {
   }
 
   const formatLastChecked = () => {
-    if (!lastChecked) return 'Never'
+    if (!lastChecked) {
+      return 'Never'
+    }
     const now = new Date()
     const diff = Math.floor((now.getTime() - lastChecked.getTime()) / 1000)
     
-    if (diff < 60) return 'Just now'
-    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`
+    if (diff < 60) {
+      return 'Just now'
+    }
+    if (diff < 3600) {
+      return `${Math.floor(diff / 60)}m ago`
+    }
     return lastChecked.toLocaleTimeString()
   }
 

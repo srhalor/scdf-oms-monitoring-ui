@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getServerCookie } from '@/utils/cookieUtils'
 import { ENV_CONFIG } from '@/config/env.config'
+import { isDevelopment } from '@/utils/envUtils'
 import { updateSession } from '@/lib/auth/sessionManager'
 import { exchangeClientCredentials, exchangeJwtBearer } from '@/lib/auth/tokenService'
 import { logger } from '@/lib/logger'
@@ -11,7 +12,7 @@ export async function POST() {
   try {
     let tokenData
 
-    if (process.env.NODE_ENV === 'development') {
+    if (isDevelopment()) {
       logger.debug('RefreshAPI', 'Development mode: using client credentials')
       // Development: Refresh using Client Credentials
       tokenData = await exchangeClientCredentials()

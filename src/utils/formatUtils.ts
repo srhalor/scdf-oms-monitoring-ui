@@ -12,9 +12,15 @@
  * @param fallback - Value to return for null/undefined (default: '')
  */
 export function formatValue(value: unknown, fallback = ''): string {
-  if (value == null) return fallback
-  if (typeof value === 'object') return JSON.stringify(value)
-  if (typeof value === 'string') return value
+  if (value == null) {
+    return fallback
+  }
+  if (typeof value === 'object') {
+    return JSON.stringify(value)
+  }
+  if (typeof value === 'string') {
+    return value
+  }
   if (typeof value === 'number' || typeof value === 'boolean') {
     return String(value)
   }
@@ -28,9 +34,15 @@ export function formatValue(value: unknown, fallback = ''): string {
  * @param value - Any value to convert
  */
 export function toComparableString(value: unknown): string {
-  if (value == null) return ''
-  if (typeof value === 'object') return JSON.stringify(value)
-  if (typeof value === 'string') return value
+  if (value == null) {
+    return ''
+  }
+  if (typeof value === 'object') {
+    return JSON.stringify(value)
+  }
+  if (typeof value === 'string') {
+    return value
+  }
   if (typeof value === 'number' || typeof value === 'boolean') {
     return String(value)
   }
@@ -45,7 +57,9 @@ export function toComparableString(value: unknown): string {
  * @param suffix - Suffix to add when truncated (default: '...')
  */
 export function truncate(value: string, maxLength: number, suffix = '...'): string {
-  if (value.length <= maxLength) return value
+  if (value.length <= maxLength) {
+    return value
+  }
   return value.slice(0, maxLength - suffix.length) + suffix
 }
 
@@ -55,7 +69,9 @@ export function truncate(value: string, maxLength: number, suffix = '...'): stri
  * @param value - String to capitalize
  */
 export function capitalize(value: string): string {
-  if (!value) return value
+  if (!value) {
+    return value
+  }
   return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase()
 }
 
@@ -65,7 +81,9 @@ export function capitalize(value: string): string {
  * @param value - String to convert
  */
 export function toTitleCase(value: string): string {
-  if (!value) return value
+  if (!value) {
+    return value
+  }
   return value
     .toLowerCase()
     .split(' ')
@@ -124,7 +142,9 @@ export function formatPercentage(
  * @param decimals - Number of decimal places (default: 2)
  */
 export function formatBytes(bytes: number, decimals = 2): string {
-  if (bytes === 0) return '0 Bytes'
+  if (bytes === 0) {
+    return '0 Bytes'
+  }
 
   const k = 1024
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB']
