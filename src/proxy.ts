@@ -5,20 +5,21 @@ import { isDevelopment } from '@/utils/envUtils'
 import { getServerCookie } from '@/utils/cookieUtils'
 
 export async function proxy(request: NextRequest) {
-  let { pathname } = request.nextUrl
+  const { pathname } = request.nextUrl
+  const basePath = process.env.NEXTJS_BASEPATH || ''
 
-  // If Production and /login -> Redirect to / as SSO will handle login
-  if (pathname === '/login' && !isDevelopment) {
-    pathname = '/'
-  }
+  // Strip basePath from pathname for internal logic
+  const pathWithoutBase = basePath && pathname.startsWith(basePath) 
+    ? pathname.slice(basePath.length) || '/'
+    : pathname
 
   // Setup Request Headers
   const requestHeaders = new Headers(request.headers)
-  requestHeaders.set('x-pathname', pathname)
+  requestHeaders.set('x-pathname', pathWithoutBase)
 
-  // Check if public path
+  // Check if public path (check against path without basePath)
   const publicPaths = ['/login', '/_next', '/static', '/favicon.ico', '/api/auth']
-  const isPublic = publicPaths.some(path => pathname.startsWith(path))
+  const isPublic = publicPaths.some(path => pathWithoutBase.startsWith(path))
   // Check if session exists
   const session = await getServerCookie(ENV_CONFIG.session.cookieName)
 
@@ -32,7 +33,7 @@ export async function proxy(request: NextRequest) {
   // Handle Unauthenticated Private Access
   if (isDevelopment()) {
     // Development: Redirect to local login
-    const loginUrl = new URL(`${process.env.NEXTJS_BASEPATH || ''}/login`, request.url)
+    const loginUrl = new URL(`${basePath}/login`, request.url)
     return NextResponse.redirect(loginUrl)
   }
 
@@ -40,8 +41,8 @@ export async function proxy(request: NextRequest) {
   const assertion = await getServerCookie(ENV_CONFIG.sso.cookieName)
 
   if (assertion) {
-    const ssoUrl = new URL('/api/auth/sso', request.url)
-    ssoUrl.searchParams.set('next', pathname)
+    const ssoUrl = new URL(`${basePath}/api/auth/sso`, request.url)
+    ssoUrl.searchParams.set('next', pathWithoutBase)
     return NextResponse.redirect(ssoUrl)
   }
 

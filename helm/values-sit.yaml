@@ -54,20 +54,14 @@ ingress:
   host: df.sit.atradiusnet.com
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
   http:
     paths:
-        - path: /sc/oms/monitoring-ui(/|$)(.*)
-          pathType: ImplementationSpecific
-          backend:
-            service:
-              name: scdf-oms-monitoring-ui
-              port:
-                number: 80
-  tls:
-    - secretName: oms-monitoring-tls-sit
-      hosts:
-        - df.sit.atradiusnet.com
+        - path: /sc/oms/monitoring-ui
+          pathType: Prefix
+  # tls:
+  #   - secretName: oms-monitoring-tls-sit
+  #     hosts:
+  #       - df.sit.atradiusnet.com
 
 resources:
   limits:
@@ -85,35 +79,37 @@ deployment:
   container:
     env:
       - name: OIDM_BASE_URL
-        value: ${OIDM_BASE_URL}
+        value: $(OIDM_BASE_URL)
       - name: OAUTH_DOMAIN
-        value: ${OAUTH_DOMAIN}
+        value: $(OAUTH_DOMAIN)
       - name: OAUTH_SCOPE
-        value: ${OAUTH_SCOPE}
+        value: $(OAUTH_SCOPE)
       - name: SSO_LOGIN_URL
-        value: ${SSO_LOGIN_URL}
+        value: $(SSO_LOGIN_URL)
       - name: SSO_LOGOUT_URL
-        value: ${SSO_LOGOUT_URL}
+        value: $(SSO_LOGOUT_URL)
       - name: OAUTH_CLIENT_ID
-        value: ${OAUTH_CLIENT_ID}
+        value: $(OAUTH_CLIENT_ID)
       - name: OAUTH_CLIENT_SECRET
-        value: ${OAUTH_CLIENT_SECRET}
+        value: $(OAUTH_CLIENT_SECRET)
       - name: SESSION_SECRET
-        value: ${SESSION_SECRET}
+        value: $(SESSION_SECRET)
       - name: ORIGIN_SERVICE
-        value: ${ORIGIN_SERVICE}
+        value: $(ORIGIN_SERVICE)
       - name: ORIGIN_APPLICATION
-        value: ${ORIGIN_APPLICATION}
+        value: $(ORIGIN_APPLICATION)
       - name: API_BASE_URL
-        value: ${API_BASE_URL}
+        value: $(API_BASE_URL)
       - name: ENABLE_LOGGING
-        value: "${ENABLE_LOGGING}"
+        value: $(ENABLE_LOGGING)
       - name: LOG_LEVEL
-        value: "${LOG_LEVEL}"
+        value: $(LOG_LEVEL)
       - name: LOG_FORMAT
-        value: "${LOG_FORMAT}"
+        value: $(LOG_FORMAT)
+      # Added for base path routing - same as nginx ingress path
       - name: NEXTJS_BASEPATH
         value: "/sc/oms/monitoring-ui"
+
 
 # -----------------------------------------------------------------------------
 # Autoscaling (HPA)
@@ -128,32 +124,32 @@ autoscaling:
 # -----------------------------------------------------------------------------
 # Health Probes
 # -----------------------------------------------------------------------------
-livenessProbe:
-  httpGet:
-    path: /api/probe/live
-    port: http
-  initialDelaySeconds: 10
-  periodSeconds: 15
-  timeoutSeconds: 5
-  failureThreshold: 3
+# livenessProbe:
+#   httpGet:
+#     path: /sc/oms/monitoring-ui/api/probe/live
+#     port: http
+#   initialDelaySeconds: 10
+#   periodSeconds: 15
+#   timeoutSeconds: 5
+#   failureThreshold: 3
 
-readinessProbe:
-  httpGet:
-    path: /api/probe/ready
-    port: http
-  initialDelaySeconds: 5
-  periodSeconds: 10
-  timeoutSeconds: 5
-  failureThreshold: 3
+# readinessProbe:
+#   httpGet:
+#     path: /sc/oms/monitoring-ui/api/probe/ready
+#     port: http
+#   initialDelaySeconds: 5
+#   periodSeconds: 10
+#   timeoutSeconds: 5
+#   failureThreshold: 3
 
-startupProbe:
-  httpGet:
-    path: /api/probe/startup
-    port: http
-  initialDelaySeconds: 0
-  periodSeconds: 5
-  timeoutSeconds: 5
-  failureThreshold: 30
+# startupProbe:
+#   httpGet:
+#     path: /sc/oms/monitoring-ui/api/probe/startup
+#     port: http
+#   initialDelaySeconds: 0
+#   periodSeconds: 10
+#   timeoutSeconds: 5
+#   failureThreshold: 60  # 60 × 10s = 600s = 10 minutes max startup time
 
 
 nodeSelector: {}

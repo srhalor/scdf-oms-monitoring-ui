@@ -49,8 +49,6 @@ ingress:
   host: df.uat.atradiusnet.com  # UAT domain
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
-    # UAT-specific annotations
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     nginx.ingress.kubernetes.io/proxy-body-size: "10m"
@@ -59,22 +57,14 @@ ingress:
     nginx.ingress.kubernetes.io/proxy-read-timeout: "30"
     # Rate limiting
     nginx.ingress.kubernetes.io/limit-rps: "100"
-    # CORS (if needed)
-    # nginx.ingress.kubernetes.io/enable-cors: "true"
-    # nginx.ingress.kubernetes.io/cors-allow-origin: "https://your-domain.com"
   http:
     paths:
-        - path: /sc/oms/monitoring-ui(/|$)(.*)
-          pathType: ImplementationSpecific
-          backend:
-            service:
-              name: scdf-oms-monitoring-ui
-              port:
-                number: 80
-  tls:
-    - secretName: oms-monitoring-tls-uat
-      hosts:
-        - df.uat.atradiusnet.com
+        - path: /sc/oms/monitoring-ui
+          pathType: Prefix
+  # tls:
+  #   - secretName: oms-monitoring-tls-uat
+  #     hosts:
+  #       - df.uat.atradiusnet.com
 
 # UAT resource limits (adjust based on actual usage)
 resources:
@@ -93,35 +83,37 @@ deployment:
   container:
     env:
       - name: OIDM_BASE_URL
-        value: ${OIDM_BASE_URL}
+        value: $(OIDM_BASE_URL)
       - name: OAUTH_DOMAIN
-        value: ${OAUTH_DOMAIN}
+        value: $(OAUTH_DOMAIN)
       - name: OAUTH_SCOPE
-        value: ${OAUTH_SCOPE}
+        value: $(OAUTH_SCOPE)
       - name: SSO_LOGIN_URL
-        value: ${SSO_LOGIN_URL}
+        value: $(SSO_LOGIN_URL)
       - name: SSO_LOGOUT_URL
-        value: ${SSO_LOGOUT_URL}
+        value: $(SSO_LOGOUT_URL)
       - name: OAUTH_CLIENT_ID
-        value: ${OAUTH_CLIENT_ID}
+        value: $(OAUTH_CLIENT_ID)
       - name: OAUTH_CLIENT_SECRET
-        value: ${OAUTH_CLIENT_SECRET}
+        value: $(OAUTH_CLIENT_SECRET)
       - name: SESSION_SECRET
-        value: ${SESSION_SECRET}
+        value: $(SESSION_SECRET)
       - name: ORIGIN_SERVICE
-        value: ${ORIGIN_SERVICE}
+        value: $(ORIGIN_SERVICE)
       - name: ORIGIN_APPLICATION
-        value: ${ORIGIN_APPLICATION}
+        value: $(ORIGIN_APPLICATION)
       - name: API_BASE_URL
-        value: ${API_BASE_URL}
+        value: $(API_BASE_URL)
       - name: ENABLE_LOGGING
-        value: "${ENABLE_LOGGING}"
+        value: $(ENABLE_LOGGING)
       - name: LOG_LEVEL
-        value: "${LOG_LEVEL}"
+        value: $(LOG_LEVEL)
       - name: LOG_FORMAT
-        value: "${LOG_FORMAT}"
+        value: $(LOG_FORMAT)
+      # Added for base path routing - same as nginx ingress path
       - name: NEXTJS_BASEPATH
         value: "/sc/oms/monitoring-ui"
+
 
 # -----------------------------------------------------------------------------
 # Autoscaling (HPA) - ENABLED for UAT
@@ -136,32 +128,32 @@ autoscaling:
 # -----------------------------------------------------------------------------
 # Health Probes (more aggressive for UAT)
 # -----------------------------------------------------------------------------
-livenessProbe:
-  httpGet:
-    path: /api/probe/live
-    port: http
-  initialDelaySeconds: 15
-  periodSeconds: 20
-  timeoutSeconds: 5
-  failureThreshold: 3
+# livenessProbe:
+#   httpGet:
+#     path: /api/probe/live
+#     port: http
+#   initialDelaySeconds: 15
+#   periodSeconds: 20
+#   timeoutSeconds: 5
+#   failureThreshold: 3
 
-readinessProbe:
-  httpGet:
-    path: /api/probe/ready
-    port: http
-  initialDelaySeconds: 10
-  periodSeconds: 10
-  timeoutSeconds: 5
-  failureThreshold: 3
+# readinessProbe:
+#   httpGet:
+#     path: /api/probe/ready
+#     port: http
+#   initialDelaySeconds: 10
+#   periodSeconds: 10
+#   timeoutSeconds: 5
+#   failureThreshold: 3
 
-startupProbe:
-  httpGet:
-    path: /api/probe/startup
-    port: http
-  initialDelaySeconds: 0
-  periodSeconds: 5
-  timeoutSeconds: 5
-  failureThreshold: 40  # Increased for UAT
+# startupProbe:
+#   httpGet:
+#     path: /api/probe/startup
+#     port: http
+#   initialDelaySeconds: 0
+#   periodSeconds: 5
+#   timeoutSeconds: 5
+#   failureThreshold: 40  # Increased for UAT
 
 # -----------------------------------------------------------------------------
 # Node Selection and Affinity (optional - configure based on cluster setup)

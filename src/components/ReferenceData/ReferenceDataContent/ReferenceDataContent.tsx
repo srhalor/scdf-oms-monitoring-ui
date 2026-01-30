@@ -65,6 +65,7 @@ interface DocConfigModalState {
  * for the Reference Data management page.
  */
 export function ReferenceDataContent() {
+  const basePath = process.env.NEXT_PUBLIC_BASEPATH || ''
   const [activeTab, setActiveTab] = useState<string>(TAB_IDS.CONFIGURATIONS)
 
   // Reference Data Types tab state
@@ -108,7 +109,7 @@ export function ReferenceDataContent() {
     setTypesError(null)
 
     try {
-      const response = await fetch('/api/reference-data/types')
+      const response = await fetch(`${basePath}/api/reference-data/types`)
 
       if (!response.ok) {
         throw new Error(`${FETCH_FAILED_PREFIX}${response.statusText}`)
@@ -137,7 +138,7 @@ export function ReferenceDataContent() {
     setValuesError(null)
 
     try {
-      const response = await fetch(`/api/reference-data/types?refDataType=${encodeURIComponent(type)}`)
+      const response = await fetch(`${basePath}/api/reference-data/types?refDataType=${encodeURIComponent(type)}`)
 
       if (!response.ok) {
         throw new Error(`${FETCH_FAILED_PREFIX}${response.statusText}`)
@@ -161,7 +162,7 @@ export function ReferenceDataContent() {
     setConfigsError(null)
 
     try {
-      const response = await fetch('/api/document-configurations')
+      const response = await fetch(`${basePath}/api/document-configurations`)
 
       if (!response.ok) {
         throw new Error(`${FETCH_FAILED_PREFIX}${response.statusText}`)
@@ -185,9 +186,9 @@ export function ReferenceDataContent() {
 
     try {
       const [footerRes, appDocSpecRes, codeRes] = await Promise.all([
-        fetch('/api/reference-data/types?refDataType=FOOTER_ID'),
-        fetch('/api/reference-data/types?refDataType=APP_DOC_SPEC'),
-        fetch('/api/reference-data/types?refDataType=DOC_CONFIG_CODE'),
+        fetch(`${basePath}/api/reference-data/types?refDataType=FOOTER_ID`),
+        fetch(`${basePath}/api/reference-data/types?refDataType=APP_DOC_SPEC`),
+        fetch(`${basePath}/api/reference-data/types?refDataType=DOC_CONFIG_CODE`),
       ])
 
       if (footerRes.ok) {
@@ -307,8 +308,8 @@ export function ReferenceDataContent() {
       const isValuesContext = modalState.context === 'values'
 
       const url = isEdit && editItem
-        ? `/api/reference-data/types/${editItem.id}`
-        : '/api/reference-data/types'
+        ? `${basePath}/api/reference-data/types/${editItem.id}`
+        : `${basePath}/api/reference-data/types`
 
       const method = isEdit ? 'PUT' : 'POST'
 
@@ -345,7 +346,7 @@ export function ReferenceDataContent() {
     const isValuesContext = modalState.context === 'values'
 
     try {
-      const response = await fetch(`/api/reference-data/types/${modalState.item.id}`, {
+      const response = await fetch(`${basePath}/api/reference-data/types/${modalState.item.id}`, {
         method: 'DELETE',
       })
 
@@ -405,8 +406,8 @@ export function ReferenceDataContent() {
       const editItem = docConfigModalState.item
 
       const url = isEdit && editItem
-        ? `/api/document-configurations/${editItem.id}`
-        : '/api/document-configurations'
+        ? `${basePath}/api/document-configurations/${editItem.id}`
+        : `${basePath}/api/document-configurations`
 
       const method = isEdit ? 'PUT' : 'POST'
 
@@ -440,7 +441,7 @@ export function ReferenceDataContent() {
     setDocConfigDeleteLoading(true)
 
     try {
-      const response = await fetch(`/api/document-configurations/${docConfigModalState.item.id}`, {
+      const response = await fetch(`${basePath}/api/document-configurations/${docConfigModalState.item.id}`, {
         method: 'DELETE',
       })
 

@@ -56,7 +56,8 @@ export function TokenRefresher() {
   const performRefresh = async () => {
     logger.info('TokenRefresher', 'Performing token refresh')
     try {
-      const response = await fetch('/api/auth/refresh', { method: 'POST' })
+      const basePath = process.env.NEXT_PUBLIC_BASEPATH || ''
+      const response = await fetch(`${basePath}/api/auth/refresh`, { method: 'POST' })
       
       if (response.ok) {
         const data: RefreshResponse = await response.json()
@@ -89,7 +90,8 @@ export function TokenRefresher() {
     // Initial check
     const checkSession = async () => {
       try {
-        const response = await fetch('/api/auth/session')
+        const basePath = process.env.NEXT_PUBLIC_BASEPATH || ''
+        const response = await fetch(`${basePath}/api/auth/session`)
         if (response.ok) {
           const data: SessionResponse = await response.json()
           if (data.authenticated && data.expiresAt) {

@@ -54,7 +54,6 @@ ingress:
   host: df.dev.atradiusnet.com
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
-    # No rewrite needed - Next.js handles basePath internally
   http:
     paths:
         - path: /sc/oms/monitoring-ui
@@ -107,6 +106,7 @@ deployment:
         value: $(LOG_LEVEL)
       - name: LOG_FORMAT
         value: $(LOG_FORMAT)
+      # Added for base path routing - same as nginx ingress path
       - name: NEXTJS_BASEPATH
         value: "/sc/oms/monitoring-ui"
 
@@ -125,7 +125,7 @@ autoscaling:
 # -----------------------------------------------------------------------------
 # livenessProbe:
 #   httpGet:
-#     path: /sc/oms/monitoring-ui/api/probe/live
+#     path: /api/probe/live
 #     port: http
 #   initialDelaySeconds: 10
 #   periodSeconds: 15
@@ -134,7 +134,7 @@ autoscaling:
 
 # readinessProbe:
 #   httpGet:
-#     path: /sc/oms/monitoring-ui/api/probe/ready
+#     path: /api/probe/ready
 #     port: http
 #   initialDelaySeconds: 5
 #   periodSeconds: 10
@@ -143,7 +143,7 @@ autoscaling:
 
 # startupProbe:
 #   httpGet:
-#     path: /sc/oms/monitoring-ui/api/probe/startup
+#     path: /api/probe/startup
 #     port: http
 #   initialDelaySeconds: 0
 #   periodSeconds: 10

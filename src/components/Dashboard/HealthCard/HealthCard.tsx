@@ -23,7 +23,8 @@ export const HealthCard = ({ onRefresh }: HealthCardProps) => {
     logger.debug('HealthCard', 'Fetching health status')
     try {
       setIsRefreshing(true)
-      const response = await fetch('/api/health')
+      const basePath = process.env.NEXT_PUBLIC_BASEPATH || ''
+      const response = await fetch(`${basePath}/api/health`)
       const data = await response.json()
       setStatus(data.status)
       setLastChecked(new Date())

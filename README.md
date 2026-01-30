@@ -90,7 +90,7 @@ cp .env.local.example .env.local
 pnpm build
 
 # 2. Build container image locally
-podman build --no-cache -t oms-monitoring-ui:latest .
+podman build --no-cache -f misc/Dockerfile.local -t oms-monitoring-ui:latest .
 
 # 3. Run container (uses same .env.local file) --rm removes container after exit
 podman run --rm --name oms-monitoring-ui -p 3000:3000 --env-file .env.local oms-monitoring-ui:latest

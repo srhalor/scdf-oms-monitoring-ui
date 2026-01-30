@@ -16,6 +16,8 @@ variables:
     value: "install"
   - name: AquaSec_SC
     value: "AquaSec"
+  - name: NEXTJS_BASEPATH
+    value: "/sc/oms/monitoring-ui"
 
 resources:
   repositories:
