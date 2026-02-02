@@ -1,0 +1,81 @@
+.tableContainer {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table {
+  min-width: 1000px;
+}
+
+/* Checkbox */
+.checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--color-brand-600);
+}
+
+/* Sortable header */
+.sortableHeader {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color var(--transition-fast);
+}
+
+.sortableHeader:hover {
+  color: var(--color-brand-600);
+}
+
+.sortableHeader.sorted {
+  color: var(--color-brand-700);
+}
+
+.sortIcon {
+  width: 12px;
+  height: 12px;
+  color: var(--color-brand-600);
+}
+
+/* Cell styles */
+.idCell {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.documentName {
+  display: block;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Error state */
+.errorContainer {
+  padding: var(--spacing-xl);
+  text-align: center;
+}
+
+.errorMessage {
+  color: var(--color-error-600);
+  font-size: var(--font-size-text-md);
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .tableContainer {
+    margin: 0 calc(-1 * var(--spacing-md));
+    padding: 0 var(--spacing-md);
+  }
+}

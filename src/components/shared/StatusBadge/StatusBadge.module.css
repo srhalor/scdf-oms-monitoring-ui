@@ -1,0 +1,25 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: 2px 6px;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-gray-200);
+  border-radius: 6px;
+  box-shadow: var(--shadow-sm);
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.text {
+  font-size: var(--font-size-text-xs);
+  line-height: 18px;
+  font-weight: 500;
+  color: var(--color-gray-600);
+  white-space: nowrap;
+}

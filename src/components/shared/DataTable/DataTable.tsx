@@ -41,6 +41,10 @@ export interface DataTableProps<T> {
   sort?: SortState
   /** Sort change handler */
   onSortChange?: (sort: SortState) => void
+  /** Multi-column sort: get direction for a column (for visual indicators) */
+  getColumnSortDirection?: (column: string) => 'ASC' | 'DESC' | null
+  /** Multi-column sort: get sort index for a column (1-based, for multi-sort indicator) */
+  getColumnSortIndex?: (column: string) => number
 }
 
 /**
@@ -148,6 +152,8 @@ export function DataTable<T>({
   defaultSort,
   sort: controlledSort,
   onSortChange,
+  getColumnSortDirection,
+  getColumnSortIndex,
 }: Readonly<DataTableProps<T>>) {
   const [internalSort, setInternalSort] = useState<SortState>(
     defaultSort || { column: '', direction: null }
@@ -282,7 +288,14 @@ export function DataTable<T>({
               </th>
             )}
             {columns.map(column => {
-              const isSorted = sort.column === column.key
+              // Support multi-column sort: use getColumnSortDirection if available, fallback to single sort
+              const columnKey = String(column.key)
+              const multiSortDir = getColumnSortDirection?.(columnKey)
+              const multiSortIndex = getColumnSortIndex?.(columnKey) ?? -1
+              const isSorted = multiSortDir ? true : sort.column === column.key
+              const sortDirection: SortDirection = (multiSortDir?.toLowerCase() as SortDirection) ?? sort.direction
+              const isDesc = sortDirection === 'desc'
+              
               const thClasses = [
                 styles.th,
                 column.sortable ? styles.sortable : '',
@@ -293,24 +306,36 @@ export function DataTable<T>({
 
               return (
                 <th
-                  key={String(column.key)}
+                  key={columnKey}
                   className={thClasses}
                   style={column.width ? { width: column.width } : undefined}
-                  onClick={column.sortable ? () => handleSort(String(column.key)) : undefined}
-                  aria-sort={isSorted ? getAriaSortValue(sort.direction) : undefined}
+                  aria-sort={isSorted && sortDirection ? getAriaSortValue(sortDirection) : undefined}
                 >
-                  <div className={styles.headerContent}>
-                    {column.header}
-                    {column.sortable && (
-                      <span
-                        className={`${styles.sortIcon} ${isSorted ? styles.active : ''} ${
-                          isSorted && sort.direction === 'desc' ? styles.desc : ''
-                        }`}
-                      >
-                        <FontAwesomeIcon icon={faArrowUp} size="xs" />
+                  {column.sortable ? (
+                    <button
+                      type="button"
+                      className={styles.sortButton}
+                      onClick={() => handleSort(columnKey)}
+                    >
+                      <span className={styles.headerContent}>
+                        {column.header}
+                        {multiSortIndex > 0 && (
+                          <span className={styles.sortIndex}>{multiSortIndex}</span>
+                        )}
+                        <span
+                          className={`${styles.sortIcon} ${isSorted ? styles.active : ''} ${
+                            isDesc ? styles.desc : ''
+                          }`}
+                        >
+                          <FontAwesomeIcon icon={faArrowUp} size="xs" />
+                        </span>
                       </span>
-                    )}
-                  </div>
+                    </button>
+                  ) : (
+                    <div className={styles.headerContent}>
+                      {column.header}
+                    </div>
+                  )}
                 </th>
               )
             })}

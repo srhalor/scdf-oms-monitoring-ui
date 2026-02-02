@@ -46,6 +46,7 @@ export const REFERENCE_DATA_TYPES = {
   FOOTER_ID: 'FOOTER_ID',
   APP_DOC_SPEC: 'APP_DOC_SPEC',
   CODE: 'CODE',
+  METADATA_KEY: 'METADATA_KEY',
 } as const
 
 /**

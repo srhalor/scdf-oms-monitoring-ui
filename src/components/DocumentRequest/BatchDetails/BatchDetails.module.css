@@ -1,0 +1,129 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.title {
+  font-size: var(--text-xl-size);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-900);
+  margin: 0;
+}
+
+/* Content */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* Info Grid */
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-xl);
+}
+
+.infoSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.sectionTitle {
+  font-size: var(--text-sm-size);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-600);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+  padding-bottom: var(--spacing-xs);
+  border-bottom: 1px solid var(--color-gray-200);
+}
+
+.infoList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin: 0;
+}
+
+.infoItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xs);
+}
+
+.infoItem dt {
+  font-size: var(--text-xs-size);
+  color: var(--color-gray-500);
+  font-weight: var(--font-weight-medium);
+}
+
+.infoItem dd {
+  font-size: var(--text-sm-size);
+  color: var(--color-gray-900);
+  margin: 0;
+}
+
+/* Status indicators */
+.statusYes {
+  color: var(--color-positive-700);
+  font-weight: var(--font-weight-medium);
+}
+
+.statusNo {
+  color: var(--color-gray-500);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Loading State */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  color: var(--color-gray-500);
+  font-size: var(--text-md-size);
+}
+
+/* Error State */
+.error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  min-height: 200px;
+  text-align: center;
+  color: var(--color-gray-600);
+}
+
+.error h2 {
+  font-size: var(--text-lg-size);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-900);
+  margin: 0;
+}
+
+.error p {
+  font-size: var(--text-md-size);
+  color: var(--color-gray-600);
+  margin: 0;
+}

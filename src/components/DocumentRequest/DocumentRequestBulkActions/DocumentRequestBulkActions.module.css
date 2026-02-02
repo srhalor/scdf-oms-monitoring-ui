@@ -1,0 +1,77 @@
+.bulkActionsBar {
+  position: fixed;
+  bottom: var(--spacing-lg);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-md) var(--spacing-xl);
+  background-color: var(--color-gray-900);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-xl);
+  z-index: var(--z-index-modal);
+  animation: slideUp 0.2s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.selectionInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--color-white);
+}
+
+.selectedCount {
+  font-size: var(--font-size-text-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white);
+  background-color: var(--color-brand-600);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  min-width: 32px;
+  text-align: center;
+}
+
+.selectedLabel {
+  font-size: var(--font-size-text-sm);
+  color: var(--color-gray-300);
+  white-space: nowrap;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .bulkActionsBar {
+    left: var(--spacing-md);
+    right: var(--spacing-md);
+    transform: none;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+  }
+
+  .actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .actions > button {
+    flex: 1;
+  }
+}

@@ -1,0 +1,133 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.breadcrumb {
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--text-2xl-size);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-900);
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+/* Content Grid */
+.contentGrid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* Info Grid - similar to BatchDetails */
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-xl);
+}
+
+.infoSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.sectionTitle {
+  font-size: var(--text-sm-size);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-600);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+  padding-bottom: var(--spacing-xs);
+  border-bottom: 1px solid var(--color-gray-200);
+}
+
+/* Cards */
+.metadataCard,
+.batchesCard {
+  width: 100%;
+}
+
+/* Info List (dl/dt/dd) */
+.infoList {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  margin: 0;
+}
+
+.infoItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.infoItem dt {
+  font-size: var(--text-sm-size);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-500);
+}
+
+.infoItem dd {
+  margin: 0;
+  font-size: var(--text-base-size);
+  color: var(--color-gray-900);
+}
+
+/* Loading State */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  color: var(--color-gray-500);
+  font-size: var(--text-base-size);
+}
+
+/* Error State */
+.error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  min-height: 200px;
+  text-align: center;
+}
+
+.error h3 {
+  margin: 0;
+  font-size: var(--text-lg-size);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-error-600);
+}
+
+.error p {
+  margin: 0;
+  color: var(--color-gray-600);
+}

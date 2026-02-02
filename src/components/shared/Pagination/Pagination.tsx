@@ -167,7 +167,7 @@ export function Pagination({
       {/* Info section */}
       {showInfo && (
         <div className={styles.paginationInfo}>
-          Showing {startItem} to {endItem} of {totalItems} results
+          Showing {startItem} of {endItem} ({endItem} of {totalItems} results)
         </div>
       )}
 
@@ -237,7 +237,7 @@ export function Pagination({
                 </option>
               ))}
             </select>
-            <span className={styles.pageSizeLabel}>per page</span>
+            <span className={styles.pageSizeLabel}>results per page</span>
           </div>
         )}
       </div>
