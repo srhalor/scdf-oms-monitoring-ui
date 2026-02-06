@@ -97,8 +97,7 @@ export function useClipboard(options: UseClipboardOptions = {}): UseClipboardRet
           textArea.select()
 
           // Using deprecated execCommand as fallback for older browsers
-          // Note: execCommand is deprecated but required for compatibility with older browsers
-          // that don't support the modern Clipboard API. SonarLint warning S1874 is expected.
+          // NOSONAR typescript:S1874 - Intentional use for backward compatibility
           const successful = document.execCommand('copy')
           textArea.remove()
 
