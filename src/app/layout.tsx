@@ -3,6 +3,7 @@ import localFont from 'next/font/local'
 import '@styles/global.css'
 import '@fortawesome/fontawesome-svg-core/styles.css'
 import { LayoutWrapper } from '@components/LayoutWrapper'
+import { ErrorBoundary } from '@/components/shared/ErrorBoundary'
 import { APP_CONFIG } from '@/config/app.config'
 import { getCurrentUser } from '@/lib/auth/authHelpers'
 
@@ -78,11 +79,13 @@ export default async function RootLayout({
   return (
     <html lang="en" className={gcoSans.variable}>
       <body>
-        {user ? (
-          <LayoutWrapper user={user}>{children}</LayoutWrapper>
-        ) : (
-          children
-        )}
+        <ErrorBoundary>
+          {user ? (
+            <LayoutWrapper user={user}>{children}</LayoutWrapper>
+          ) : (
+            children
+          )}
+        </ErrorBoundary>
       </body>
     </html>
   )

@@ -1,0 +1,97 @@
+.panel {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-lg);
+  transition: var(--transition-fast);
+}
+
+.panel.collapsed {
+  padding-bottom: var(--spacing-lg);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.panel.collapsed .header {
+  margin-bottom: 0;
+}
+
+.titleGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.collapseButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  background-color: transparent;
+  color: var(--color-gray-600);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.collapseButton:hover {
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-900);
+}
+
+.collapseButton:active {
+  background-color: var(--color-gray-200);
+}
+
+.collapseButton:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-brand-600);
+}
+
+.collapseIcon {
+  font-size: var(--text-sm-size);
+  transition: transform 0.2s ease;
+}
+
+.title {
+  font-size: var(--text-md-size);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-900);
+  line-height: var(--text-md-line-height);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.badge {
+  color: var(--color-brand-600);
+  font-size: var(--text-xl-size);
+  line-height: 1;
+  margin-left: var(--spacing-xs);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}

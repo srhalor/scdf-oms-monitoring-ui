@@ -9,6 +9,8 @@ import {
   DateInput,
   Checkbox,
 } from '@/components/shared/FormField'
+import { FormSection } from '@/components/ui/Form/FormSection'
+import { FormActions } from '@/components/ui/Form/FormActions'
 import { formatInputDate, getCurrentDate, DEFAULT_END_DATE } from '@/utils/dateUtils'
 import type { ReferenceData, ReferenceDataRequest } from '@/types/referenceData'
 import styles from './ReferenceDataForm.module.css'
@@ -171,91 +173,92 @@ export function ReferenceDataForm({
     onClose()
   }, [onClose, resetForm])
 
-  const footer = (
-    <>
-      <Button hierarchy="secondary" size="md" onClick={handleCancel} disabled={loading}>
-        Cancel
-      </Button>
-      <Button
-        hierarchy="primary"
-        size="md"
-        type="submit"
-        loading={loading}
-        onClick={handleSubmit}
-      >
-        {isEditMode ? 'Save Changes' : 'Create'}
-      </Button>
-    </>
-  )
-
   return (
     <Modal
       isOpen={isOpen}
       onClose={handleCancel}
       title={title}
       size="md"
-      footer={footer}
     >
       <form className={styles.form} onSubmit={handleSubmit}>
-        {/* Reference Data Type - Always readonly */}
-        <TextInput
-          label="Reference Data Type"
-          name="refDataType"
-          value={formData.refDataType}
-          readOnly
-          disabled
-        />
+        <FormSection>
+          {/* Reference Data Type - Always readonly */}
+          <TextInput
+            label="Reference Data Type"
+            name="refDataType"
+            value={formData.refDataType}
+            readOnly
+            disabled
+          />
 
-        {/* Value */}
-        <TextInput
-          label="Value"
-          name="refDataValue"
-          value={formData.refDataValue}
-          onChange={(e) => handleChange('refDataValue', e.target.value)}
-          placeholder="Enter value..."
-          required
-          error={errors.refDataValue}
-        />
-
-        {/* Description (optional) */}
-        <TextArea
-          label="Description"
-          name="description"
-          value={formData.description}
-          onChange={(e) => handleChange('description', e.target.value)}
-          placeholder="Enter description (optional)..."
-          rows={3}
-          error={errors.description}
-        />
-
-        {/* Effective Dates */}
-        <div className={styles.row}>
-          <DateInput
-            label="Effective From"
-            name="effectFromDat"
-            value={formData.effectFromDat}
-            onChange={(e) => handleChange('effectFromDat', e.target.value)}
+          {/* Value */}
+          <TextInput
+            label="Value"
+            name="refDataValue"
+            value={formData.refDataValue}
+            onChange={(e) => handleChange('refDataValue', e.target.value)}
+            placeholder="Enter value..."
             required
-            error={errors.effectFromDat}
+            error={errors.refDataValue}
           />
-          <DateInput
-            label="Effective To"
-            name="effectToDat"
-            value={formData.effectToDat}
-            onChange={(e) => handleChange('effectToDat', e.target.value)}
-            error={errors.effectToDat}
-          />
-        </div>
 
-        {/* Editable Checkbox */}
-        <div className={styles.checkboxRow}>
-          <Checkbox
-            label="Allow editing after creation"
-            name="editable"
-            checked={formData.editable}
-            onChange={(e) => handleChange('editable', e.target.checked)}
+          {/* Description (optional) */}
+          <TextArea
+            label="Description"
+            name="description"
+            value={formData.description}
+            onChange={(e) => handleChange('description', e.target.value)}
+            placeholder="Enter description (optional)..."
+            rows={3}
+            error={errors.description}
           />
-        </div>
+        </FormSection>
+
+        <FormSection title="Effective Dates" divider>
+          <div className={styles.row}>
+            <DateInput
+              label="Effective From"
+              name="effectFromDat"
+              value={formData.effectFromDat}
+              onChange={(e) => handleChange('effectFromDat', e.target.value)}
+              required
+              error={errors.effectFromDat}
+            />
+            <DateInput
+              label="Effective To"
+              name="effectToDat"
+              value={formData.effectToDat}
+              onChange={(e) => handleChange('effectToDat', e.target.value)}
+              error={errors.effectToDat}
+            />
+          </div>
+        </FormSection>
+
+        <FormSection divider>
+          {/* Editable Checkbox */}
+          <div className={styles.checkboxRow}>
+            <Checkbox
+              label="Allow editing after creation"
+              name="editable"
+              checked={formData.editable}
+              onChange={(e) => handleChange('editable', e.target.checked)}
+            />
+          </div>
+        </FormSection>
+
+        <FormActions align="right">
+          <Button hierarchy="secondary" size="md" onClick={handleCancel} disabled={loading}>
+            Cancel
+          </Button>
+          <Button
+            hierarchy="primary"
+            size="md"
+            type="submit"
+            loading={loading}
+          >
+            {isEditMode ? 'Save Changes' : 'Create'}
+          </Button>
+        </FormActions>
       </form>
     </Modal>
   )

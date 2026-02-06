@@ -1,61 +1,44 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useCallback } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircleCheck, faCircleXmark, faTriangleExclamation, faArrowsRotate } from '@fortawesome/free-solid-svg-icons'
-import { logger } from '@/lib/logger'
+import { Card } from '@/components/shared/Card'
+import { useApiQuery } from '@/hooks/useApiQuery'
 import type { HealthStatus } from '@/types/health'
 import styles from './HealthCard.module.css'
 
 interface HealthCardProps {
-  onRefresh?: () => void
+  readonly onRefresh?: () => void
+}
+
+interface HealthResponse {
+  status: HealthStatus
 }
 
 const REFRESH_INTERVAL = 5 * 60 * 1000 // 5 minutes in milliseconds
 
 export const HealthCard = ({ onRefresh }: HealthCardProps) => {
-  const [status, setStatus] = useState<HealthStatus | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [lastChecked, setLastChecked] = useState<Date | null>(null)
-  const [isRefreshing, setIsRefreshing] = useState(false)
+  const basePath = process.env.NEXT_PUBLIC_BASEPATH || ''
 
-  const fetchHealth = useCallback(async () => {
-    logger.debug('HealthCard', 'Fetching health status')
-    try {
-      setIsRefreshing(true)
-      const basePath = process.env.NEXT_PUBLIC_BASEPATH || ''
+  const { data, loading, error, refetch, isFetching } = useApiQuery<HealthResponse>({
+    queryFn: async () => {
       const response = await fetch(`${basePath}/api/health`)
-      const data = await response.json()
-      setStatus(data.status)
-      setLastChecked(new Date())
-      logger.debug('HealthCard', 'Health status received', { status: data.status })
-    } catch (error) {
-      logger.error('HealthCard', 'Failed to fetch health status', error)
-      setStatus('DOWN')
-    } finally {
-      setLoading(false)
-      setIsRefreshing(false)
-    }
-  }, [])
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+      return response.json()
+    },
+    refetchInterval: REFRESH_INTERVAL,
+  })
 
   const handleRefresh = useCallback(() => {
-    fetchHealth()
+    refetch()
     onRefresh?.()
-  }, [fetchHealth, onRefresh])
+  }, [refetch, onRefresh])
 
-  // Initial fetch
-  useEffect(() => {
-    fetchHealth()
-  }, [fetchHealth])
-
-  // Auto-refresh every 5 minutes
-  useEffect(() => {
-    const interval = setInterval(() => {
-      fetchHealth()
-    }, REFRESH_INTERVAL)
-
-    return () => clearInterval(interval)
-  }, [fetchHealth])
+  const status = error ? 'DOWN' : data?.status || null
+  const isRefreshing = isFetching && !loading
 
   const getStatusIcon = () => {
     switch (status) {
@@ -83,39 +66,30 @@ export const HealthCard = ({ onRefresh }: HealthCardProps) => {
     }
   }
 
-  const formatLastChecked = () => {
-    if (!lastChecked) {
-      return 'Never'
-    }
-    const now = new Date()
-    const diff = Math.floor((now.getTime() - lastChecked.getTime()) / 1000)
-    
-    if (diff < 60) {
-      return 'Just now'
-    }
-    if (diff < 3600) {
-      return `${Math.floor(diff / 60)}m ago`
-    }
-    return lastChecked.toLocaleTimeString()
+  const getStatusMessage = () => {
+    if (loading) return 'Checking status...'
+    if (isRefreshing) return 'Refreshing...'
+    if (error) return 'Check failed'
+    return 'Status up to date'
   }
 
   if (loading) {
     return (
-      <div className={styles.card}>
-        <div className={styles.header}>
-          <h3 className={styles.title}>Service Health</h3>
-        </div>
-        <div className={styles.content}>
+      <Card>
+        <Card.Header>
+          <Card.Title>Service Health</Card.Title>
+        </Card.Header>
+        <Card.Body>
           <div className={styles.loading}>Loading...</div>
-        </div>
-      </div>
+        </Card.Body>
+      </Card>
     )
   }
 
   return (
-    <div className={styles.card}>
-      <div className={styles.header}>
-        <h3 className={styles.title}>Service Health</h3>
+    <Card>
+      <Card.Header>
+        <Card.Title>Service Health</Card.Title>
         <button
           className={`${styles.refreshButton} ${isRefreshing ? styles.refreshing : ''}`}
           onClick={handleRefresh}
@@ -124,18 +98,18 @@ export const HealthCard = ({ onRefresh }: HealthCardProps) => {
         >
           <FontAwesomeIcon icon={faArrowsRotate} />
         </button>
-      </div>
+      </Card.Header>
       
-      <div className={styles.content}>
+      <Card.Body>
         <div className={`${styles.status} ${getStatusClass()}`}>
           <FontAwesomeIcon icon={getStatusIcon()} className={styles.statusIcon} />
           <span className={styles.statusText}>{status || 'UNKNOWN'}</span>
         </div>
         
         <div className={styles.lastChecked}>
-          Last checked: {formatLastChecked()}
+          {getStatusMessage()}
         </div>
-      </div>
-    </div>
+      </Card.Body>
+    </Card>
   )
 }

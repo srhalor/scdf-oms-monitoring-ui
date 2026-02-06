@@ -226,44 +226,53 @@ class Logger {
    * Output log using appropriate format (JSON or text)
    */
   private output(level: LogLevel, context: string, message: string, data?: unknown): void {
-    const writeJson = (obj: unknown, toStderr = false) => {
+    const writeJsonToStderr = (obj: unknown) => {
       const line = `${JSON.stringify(obj)}\n`
-      if (toStderr) {
-        try {
-          process.stderr.write(line)
-        } catch {
-          // fallback 
-          console.info(line)
-        }
-      } else {
+      try {
+        process.stderr.write(line)
+      } catch {
+        // fallback 
         console.info(line)
       }
     }
 
-    const writeText = (text: string, extra?: unknown, toStderr = false) => {
-      if (toStderr) {
-        try {
-          const extraStr = extra ? ` ${String(extra)}` : ''
-          process.stderr.write(`${text}${extraStr}\n`)
-        } catch {
-          // fallback
-          console.info(text, extra)
-        }
-      } else {
+    const writeJsonToStdout = (obj: unknown) => {
+      const line = `${JSON.stringify(obj)}\n`
+      console.info(line)
+    }
+
+    const writeTextToStderr = (text: string, extra?: unknown) => {
+      try {
+        const extraStr = extra ? ` ${JSON.stringify(extra)}` : ''
+        process.stderr.write(`${text}${extraStr}\n`)
+      } catch {
+        // fallback
         console.info(text, extra)
+      }
+    }
+
+    const writeTextToStdout = (text: string, extra?: unknown) => {
+      if (extra === undefined) {
+        console.info(text)
+      } else {
+        console.info(text, JSON.stringify(extra))
       }
     }
 
     if (this.config.jsonFormat) {
       const entry = this.buildLogEntry(level, context, message, data)
       // send errors to stderr, others to stdout via console.info
-      writeJson(entry, level === 'error')
+      if (level === 'error') {
+        writeJsonToStderr(entry)
+      } else {
+        writeJsonToStdout(entry)
+      }
     } else {
       const formattedMessage = this.formatMessage(level, context, message)
-      if (data === undefined) {
-        writeText(formattedMessage, undefined, level === 'error')
+      if (level === 'error') {
+        writeTextToStderr(formattedMessage, data)
       } else {
-        writeText(formattedMessage, data, level === 'error')
+        writeTextToStdout(formattedMessage, data)
       }
     }
   }
@@ -353,4 +362,4 @@ export const logger = new Logger()
 // Export class for testing or custom instances
 export { Logger }
 export type { LoggerConfig, UserContext, LogEntry }
-export { LogLevel }
+export { LogLevel } from '@/types/logging'

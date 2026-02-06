@@ -1,12 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons'
 import { Breadcrumb } from '@/components/shared/Breadcrumb'
 import { Button } from '@/components/shared/Button'
 import { Card } from '@/components/shared/Card'
 import { ContentViewer } from '@/components/shared/ContentViewer'
+import { useApiQuery } from '@/hooks/useApiQuery'
 import { DocumentContentResponse } from '@/types/documentRequest'
 import styles from './content.module.css'
 
@@ -15,36 +15,25 @@ export default function JsonContentPage() {
   const router = useRouter()
   const requestId = Number.parseInt(params.id as string, 10)
 
-  const [content, setContent] = useState<DocumentContentResponse | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    async function fetchContent() {
-      setIsLoading(true)
-      setError(null)
-
-      try {
-        const response = await fetch(`/api/document-requests/${requestId}/json-content`)
-        if (!response.ok) {
-          if (response.status === 404) {
-            throw new Error('JSON content not found')
-          }
-          throw new Error('Failed to fetch JSON content')
+  const {
+    data: content,
+    loading: isLoading,
+    error: apiError,
+  } = useApiQuery<DocumentContentResponse>({
+    queryFn: async () => {
+      const response = await fetch(`/api/document-requests/${requestId}/json-content`)
+      if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error('JSON content not found')
         }
-        const data = await response.json()
-        setContent(data)
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred')
-      } finally {
-        setIsLoading(false)
+        throw new Error('Failed to fetch JSON content')
       }
-    }
+      return response.json()
+    },
+    enabled: !Number.isNaN(requestId),
+  })
 
-    if (!Number.isNaN(requestId)) {
-      fetchContent()
-    }
-  }, [requestId])
+  const error = apiError?.message || null
 
   const handleBack = () => {
     router.push(`/document-request/${requestId}`)

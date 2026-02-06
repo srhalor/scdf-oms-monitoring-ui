@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
 import { Button } from '@/components/shared/Button'
-import { logger } from '@/lib/logger'
+import { useApiMutation } from '@/hooks/useApiMutation'
 import type { User } from '@/types/auth'
 import styles from './UserMenu.module.css'
 
@@ -11,31 +11,36 @@ interface UserMenuProps {
   user: User
 }
 
+interface LogoutResponse {
+  redirectUrl?: string
+}
+
 export function UserMenu({ user }: Readonly<UserMenuProps>) {
   const [isOpen, setIsOpen] = useState(false)
-  const [isLoggingOut, setIsLoggingOut] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+
+  const { mutate: logout, loading: isLoggingOut } = useApiMutation<LogoutResponse, void>({
+    mutationFn: async () => {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BASEPATH || ''}/api/auth/logout`, {
+        method: 'POST',
+      })
+      if (!response.ok) {
+        throw new Error('Logout failed')
+      }
+      return response.json()
+    },
+    onSuccess: (data) => {
+      // Use globalThis.location for hard redirect (important for SSO logout)
+      globalThis.location.href = data.redirectUrl || '/login'
+    },
+  })
 
   const toggleMenu = () => {
     setIsOpen(!isOpen)
   }
 
-  const handleLogout = async () => {
-    setIsLoggingOut(true)
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BASEPATH || ''}/api/auth/logout`, {
-        method: 'POST',
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        // Use globalThis.location for hard redirect (important for SSO logout)
-        globalThis.location.href = data.redirectUrl || '/login'
-      }
-    } catch (error) {
-      logger.error('UserMenu', 'Logout failed', error)
-      setIsLoggingOut(false)
-    }
+  const handleLogout = () => {
+    logout(undefined)
   }
 
   // Close dropdown when clicking outside

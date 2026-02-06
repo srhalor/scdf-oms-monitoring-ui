@@ -8,6 +8,7 @@ import {
   DEFAULT_SORT,
   PAGINATION_DEFAULTS,
 } from '@/types/documentRequest'
+import { logger } from '@/lib/logger'
 
 /**
  * Persisted search state structure
@@ -103,7 +104,7 @@ export function useSearchStatePreservation(
       sessionStorage.setItem(storageKeyRef.current, JSON.stringify(persistedState))
     } catch (error) {
       // Silently fail - storage might be full or disabled
-      console.warn('Failed to save search state:', error)
+      logger.warn('useSearchStatePreservation', 'Failed to save search state', { error })
     }
   }, [])
 

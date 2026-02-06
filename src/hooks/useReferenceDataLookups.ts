@@ -78,13 +78,17 @@ export function useReferenceDataLookups(): UseReferenceDataLookupsReturn {
     setData(prev => ({ ...prev, isLoading: true, error: null }))
 
     try {
-      const response = await fetch(`/api/reference-data/types?refDataType=${typeCode}`)
+      const queryFn = async () => {
+        const response = await fetch(`/api/reference-data/types?refDataType=${typeCode}`)
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch ${typeCode}: ${response.status}`)
+        if (!response.ok) {
+          throw new Error(`Failed to fetch ${typeCode}: ${response.status}`)
+        }
+
+        return response.json()
       }
 
-      const data: ReferenceData[] = await response.json()
+      const data: ReferenceData[] = await queryFn()
 
       if (isMounted.current) {
         setData({

@@ -1,0 +1,63 @@
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.form-group.full-width {
+  width: 100%;
+}
+
+.form-group.disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.label {
+  font-size: var(--text-sm-size);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-700);
+  line-height: var(--text-sm-line-height);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.required {
+  color: var(--color-error-500);
+  font-weight: var(--font-weight-bold);
+}
+
+.control {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.hint {
+  font-size: var(--text-xs-size);
+  color: var(--color-gray-500);
+  line-height: var(--text-xs-line-height);
+  margin: 0;
+}
+
+.error {
+  font-size: var(--text-xs-size);
+  color: var(--color-error-600);
+  line-height: var(--text-xs-line-height);
+  margin: 0;
+  font-weight: var(--font-weight-medium);
+}
+
+.form-group.has-error .control input,
+.form-group.has-error .control select,
+.form-group.has-error .control textarea {
+  border-color: var(--color-error-500);
+}
+
+.form-group.has-error .control input:focus,
+.form-group.has-error .control select:focus,
+.form-group.has-error .control textarea:focus {
+  border-color: var(--color-error-600);
+  box-shadow: 0 0 0 3px rgba(220, 0, 40, 0.1);
+}

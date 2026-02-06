@@ -35,6 +35,10 @@ export interface PaginationProps {
   className?: string
 }
 
+type PageItem = 
+  | { type: 'page'; value: number }
+  | { type: 'ellipsis'; position: 'start' | 'end' }
+
 /**
  * Generate page numbers to display with ellipsis
  */
@@ -42,16 +46,19 @@ function getPageNumbers(
   currentPage: number,
   totalPages: number,
   maxButtons: number
-): (number | 'ellipsis')[] {
+): PageItem[] {
   if (totalPages <= maxButtons) {
-    return Array.from({ length: totalPages }, (_, i) => i + 1)
+    return Array.from({ length: totalPages }, (_, i) => ({
+      type: 'page' as const,
+      value: i + 1,
+    }))
   }
 
-  const pages: (number | 'ellipsis')[] = []
+  const pages: PageItem[] = []
   const halfButtons = Math.floor((maxButtons - 3) / 2) // Reserve 3 for first, last, and one ellipsis
 
   // Always show first page
-  pages.push(1)
+  pages.push({ type: 'page', value: 1 })
 
   let startPage = Math.max(2, currentPage - halfButtons)
   let endPage = Math.min(totalPages - 1, currentPage + halfButtons)
@@ -68,22 +75,22 @@ function getPageNumbers(
 
   // Add ellipsis before middle pages if needed
   if (startPage > 2) {
-    pages.push('ellipsis')
+    pages.push({ type: 'ellipsis', position: 'start' })
   }
 
   // Add middle pages
   for (let i = startPage; i <= endPage; i++) {
-    pages.push(i)
+    pages.push({ type: 'page', value: i })
   }
 
   // Add ellipsis after middle pages if needed
   if (endPage < totalPages - 1) {
-    pages.push('ellipsis')
+    pages.push({ type: 'ellipsis', position: 'end' })
   }
 
   // Always show last page
   if (totalPages > 1) {
-    pages.push(totalPages)
+    pages.push({ type: 'page', value: totalPages })
   }
 
   return pages
@@ -186,26 +193,24 @@ export function Pagination({
         </button>
 
         {/* Page numbers */}
-        {pageNumbers.map((page, _index, arr) => {
-          // For ellipsis, use position context (before or after current page)
-          if (page === 'ellipsis') {
-            const ellipsisPosition = arr.indexOf(page) < arr.length / 2 ? 'start' : 'end'
+        {pageNumbers.map((item) => {
+          if (item.type === 'ellipsis') {
             return (
-              <span key={`ellipsis-${ellipsisPosition}`} className={styles.ellipsis}>
+              <span key={`ellipsis-${item.position}`} className={styles.ellipsis}>
                 ...
               </span>
             )
           }
           return (
             <button
-              key={page}
+              key={`page-${item.value}`}
               type="button"
-              className={`${styles.pageButton} ${currentPage === page ? styles.active : ''}`}
-              onClick={() => goToPage(page)}
-              aria-label={`Go to page ${page}`}
-              aria-current={currentPage === page ? 'page' : undefined}
+              className={`${styles.pageButton} ${currentPage === item.value ? styles.active : ''}`}
+              onClick={() => goToPage(item.value)}
+              aria-label={`Go to page ${item.value}`}
+              aria-current={currentPage === item.value ? 'page' : undefined}
             >
-              {page}
+              {item.value}
             </button>
           )
         })}

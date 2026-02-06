@@ -4,6 +4,14 @@
  * Reusable React hooks for the SCDF OMS Monitoring UI.
  */
 
+// API Hooks - MANDATORY for all API calls
+export { useApiQuery, type UseApiQueryOptions, type UseApiQueryReturn } from './useApiQuery'
+export {
+  useApiMutation,
+  type UseApiMutationOptions,
+  type UseApiMutationReturn,
+} from './useApiMutation'
+
 // Document Request Hooks
 export {
   useDocumentRequestFilters,
@@ -46,3 +54,22 @@ export {
   type UseReferenceDataLookupsReturn,
   type ReferenceDataLookup,
 } from './useReferenceDataLookups'
+
+export {
+  useRefDataCrud,
+  type UseRefDataCrudOptions,
+  type UseRefDataCrudReturn,
+} from './useRefDataCrud'
+
+// Utility Hooks
+export {
+  useClipboard,
+  type UseClipboardOptions,
+  type UseClipboardReturn,
+} from './useClipboard'
+
+export {
+  useLocalStorage,
+  type UseLocalStorageOptions,
+  type UseLocalStorageReturn,
+} from './useLocalStorage'

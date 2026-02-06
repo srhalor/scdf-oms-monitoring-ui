@@ -6,6 +6,33 @@
   --spacing-lg: 24px;
   --spacing-xl: 32px;
   --spacing-2xl: 48px;
+  --spacing-3xl: 64px;
+  --spacing-4xl: 80px;
+
+  /* Layout Spacing */
+  --layout-gap-xs: 8px;
+  --layout-gap-sm: 12px;
+  --layout-gap-md: 16px;
+  --layout-gap-lg: 24px;
+  --layout-gap-xl: 32px;
+  --layout-gap-2xl: 48px;
+
+  /* Container Widths */
+  --container-max-width: 1280px;
+  --container-max-width-narrow: 960px;
+  --container-max-width-wide: 1440px;
+  --container-padding-x: var(--spacing-lg);
+  --container-padding-y: var(--spacing-xl);
+
+  /* Section Spacing */
+  --section-gap: var(--spacing-2xl);
+  --section-gap-sm: var(--spacing-xl);
+  --section-gap-lg: var(--spacing-3xl);
+
+  /* Form Spacing */
+  --form-field-gap: var(--spacing-md);
+  --form-section-gap: var(--spacing-xl);
+  --form-group-gap: var(--spacing-sm);
 
   /* Colors - Base */
   --color-white: #FFFFFF;

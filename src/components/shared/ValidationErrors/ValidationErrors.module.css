@@ -1,0 +1,87 @@
+/**
+ * ValidationErrors Styles
+ */
+
+.validationErrors {
+  padding: var(--spacing-md);
+  background-color: var(--color-error-50);
+  border: 1px solid var(--color-error-200);
+  border-radius: 4px;
+  margin-bottom: var(--spacing-lg);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.icon {
+  color: var(--color-error-700);
+  font-size: var(--text-lg-size);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--text-md-size);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-error-700);
+}
+
+.errorList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.errorItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.errorContent {
+  display: flex;
+  gap: var(--spacing-xs);
+  align-items: baseline;
+}
+
+.fieldName {
+  font-size: var(--text-sm-size);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-error-800);
+}
+
+.errorMessage {
+  font-size: var(--text-sm-size);
+  color: var(--color-error-700);
+}
+
+.rejectedValue {
+  display: flex;
+  gap: var(--spacing-xs);
+  align-items: center;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background-color: var(--color-error-100);
+  border-radius: 3px;
+  margin-left: var(--spacing-md);
+}
+
+.label {
+  font-size: var(--text-xs-size);
+  color: var(--color-gray-600);
+  font-weight: var(--font-weight-medium);
+}
+
+.value {
+  font-size: var(--text-xs-size);
+  font-family: monospace;
+  color: var(--color-error-900);
+  background-color: var(--color-error-200);
+  padding: 2px 6px;
+  border-radius: 2px;
+}

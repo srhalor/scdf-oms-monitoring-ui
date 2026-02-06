@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useState } from 'react'
 import { faDownload, faCopy, faCheck } from '@fortawesome/free-solid-svg-icons'
 import { Button } from '@/components/shared/Button'
+import { logger } from '@/lib/logger'
 import styles from './ContentViewer.module.css'
 
 export interface ContentViewerProps {
@@ -104,7 +105,7 @@ export function ContentViewer({
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch (error) {
-      console.error('Failed to copy content:', error)
+      logger.error('ContentViewer', 'Failed to copy content', { error })
     }
   }, [formattedContent])
 

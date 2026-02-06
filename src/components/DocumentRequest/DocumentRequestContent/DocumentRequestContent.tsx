@@ -15,6 +15,7 @@ import {
   useSearchStatePreservation,
   useReferenceDataLookups,
 } from '@/hooks'
+import { useApiMutation } from '@/hooks/useApiMutation'
 import { EMPTY_FILTERS, DEFAULT_SORT } from '@/types/documentRequest'
 import styles from './DocumentRequestContent.module.css'
 
@@ -32,7 +33,6 @@ import styles from './DocumentRequestContent.module.css'
  * - State preservation on navigation
  */
 export function DocumentRequestContent() {
-  const [isReprocessing, setIsReprocessing] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
   const [reprocessResult, setReprocessResult] = useState<{
     message: string
@@ -217,29 +217,24 @@ export function DocumentRequestContent() {
     toggleSelectAll(currentPageIds)
   }, [searchState.data, toggleSelectAll])
 
-  // Handle reprocess
-  const handleReprocess = useCallback(async (ids: number[]) => {
-    setIsReprocessing(true)
-    setReprocessResult(null)
-
-    try {
+  // Reprocess mutation
+  const { mutate: reprocessRequests, loading: isReprocessing } = useApiMutation<
+    { totalSubmitted: number; totalNotFound: number; notFoundRequestIds: number[] },
+    { requestIds: number[] }
+  >({
+    mutationFn: async (variables) => {
       const response = await fetch('/api/document-requests/reprocess', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ requestIds: ids }),
+        body: JSON.stringify(variables),
       })
-
-      const data = await response.json()
-
       if (!response.ok) {
-        setReprocessResult({
-          message: data.error || 'Reprocess failed',
-          success: false,
-        })
-        return
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Reprocess failed')
       }
-
-      // Show success message with details
+      return response.json()
+    },
+    onSuccess: (data) => {
       const { totalSubmitted, totalNotFound, notFoundRequestIds } = data
       let message = `Successfully submitted ${totalSubmitted} request(s) for reprocessing.`
       
@@ -247,23 +242,23 @@ export function DocumentRequestContent() {
         message += ` ${totalNotFound} request(s) not found (IDs: ${notFoundRequestIds.join(', ')}).`
       }
 
-      setReprocessResult({
-        message,
-        success: true,
-      })
-
-      // Refresh the table after showing result
+      setReprocessResult({ message, success: true })
       deselectAll()
-    } catch (error) {
-      console.error('Reprocess error:', error)
+      refresh()
+    },
+    onError: (error) => {
       setReprocessResult({
-        message: 'Failed to reprocess requests. Please try again.',
+        message: error.message || 'An error occurred',
         success: false,
       })
-    } finally {
-      setIsReprocessing(false)
-    }
-  }, [deselectAll])
+    },
+  })
+
+  // Handle reprocess callback
+  const handleReprocess = useCallback(async (ids: number[]) => {
+    setReprocessResult(null)
+    reprocessRequests({ requestIds: ids })
+  }, [reprocessRequests])
 
   return (
     <div className={styles.container}>

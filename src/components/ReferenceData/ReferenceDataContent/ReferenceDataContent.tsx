@@ -9,6 +9,8 @@ import { ReferenceDataValuesTab } from '@/components/ReferenceData/ReferenceData
 import { ReferenceDataForm } from '@/components/ReferenceData/ReferenceDataForm'
 import { DocumentConfigurationsTab } from '@/components/ReferenceData/DocumentConfigurationsTab'
 import { DocumentConfigurationForm } from '@/components/ReferenceData/DocumentConfigurationForm'
+import { useApiQuery } from '@/hooks/useApiQuery'
+import { useApiMutation } from '@/hooks/useApiMutation'
 import type { ReferenceData, ReferenceDataRequest } from '@/types/referenceData'
 import type { DocumentConfiguration, DocumentConfigurationRequest } from '@/types/documentConfiguration'
 
@@ -26,10 +28,6 @@ const TABS: TabItem[] = [
   { id: TAB_IDS.VALUES, label: 'Reference Data Values' },
   { id: TAB_IDS.CONFIGURATIONS, label: 'Document Configurations' },
 ]
-
-// Shared message fragments
-const FETCH_FAILED_PREFIX = 'Failed to fetch: '
-const FAILED_LOAD_MSG = 'Failed to load data'
 
 /**
  * Modal state for create/edit/delete operations
@@ -68,32 +66,128 @@ export function ReferenceDataContent() {
   const basePath = process.env.NEXT_PUBLIC_BASEPATH || ''
   const [activeTab, setActiveTab] = useState<string>(TAB_IDS.CONFIGURATIONS)
 
-  // Reference Data Types tab state
-  const [referenceDataTypes, setReferenceDataTypes] = useState<ReferenceData[]>([])
-  const [typesLoading, setTypesLoading] = useState(true)
-  const [typesError, setTypesError] = useState<string | null>(null)
+  // Fetch reference data types using useApiQuery
+  const {
+    data: referenceDataTypes,
+    loading: typesLoading,
+    error: typesApiError,
+    refetch: refetchReferenceDataTypes,
+  } = useApiQuery<ReferenceData[]>({
+    queryFn: async () => {
+      const response = await fetch(`${basePath}/api/reference-data/types`)
+      if (!response.ok) {
+        throw new Error(`Failed to fetch: ${response.statusText}`)
+      }
+      return response.json()
+    },
+  })
+
+  const typesError = typesApiError?.message || null
 
   // Reference Data Values tab state
   const [selectedRefDataType, setSelectedRefDataType] = useState('')
-  const [referenceDataValues, setReferenceDataValues] = useState<ReferenceData[]>([])
-  const [valuesLoading, setValuesLoading] = useState(false)
-  const [valuesError, setValuesError] = useState<string | null>(null)
+
+  // Fetch reference data values using useApiQuery (conditional on selected type)
+  const {
+    data: referenceDataValues,
+    loading: valuesLoading,
+    error: valuesApiError,
+    refetch: refetchReferenceDataValues,
+  } = useApiQuery<ReferenceData[]>({
+    queryFn: async () => {
+      const response = await fetch(`${basePath}/api/reference-data/types?refDataType=${encodeURIComponent(selectedRefDataType)}`)
+      if (!response.ok) {
+        throw new Error(`Failed to fetch: ${response.statusText}`)
+      }
+      return response.json()
+    },
+    enabled: Boolean(selectedRefDataType),
+  })
+
+  const valuesError = valuesApiError?.message || null
+
+  // Refetch values when selected type changes
+  useEffect(() => {
+    if (selectedRefDataType) {
+      refetchReferenceDataValues()
+    }
+  }, [selectedRefDataType, refetchReferenceDataValues])
 
   // Modal state
   const [modalState, setModalState] = useState<ModalState>({ type: null, item: null, context: 'types' })
-  const [deleteLoading, setDeleteLoading] = useState(false)
 
   // Document Configurations tab state
-  const [documentConfigurations, setDocumentConfigurations] = useState<DocumentConfiguration[]>([])
-  const [configsLoading, setConfigsLoading] = useState(false)
-  const [configsError, setConfigsError] = useState<string | null>(null)
+  const {
+    data: documentConfigurations,
+    loading: configsLoading,
+    error: configsApiError,
+    refetch: refetchDocumentConfigurations,
+  } = useApiQuery<DocumentConfiguration[]>({
+    queryFn: async () => {
+      const response = await fetch(`${basePath}/api/document-configurations`)
+      if (!response.ok) {
+        throw new Error(`Failed to fetch: ${response.statusText}`)
+      }
+      return response.json()
+    },
+  })
+
+  const configsError = configsApiError?.message || null
 
   // Document Configuration modal state
   const [docConfigModalState, setDocConfigModalState] = useState<DocConfigModalState>({
     type: null,
     item: null,
   })
-  const [docConfigDeleteLoading, setDocConfigDeleteLoading] = useState(false)
+
+  // Document configuration create/update mutation
+  const { mutate: saveDocumentConfiguration } = useApiMutation<DocumentConfiguration, { data: DocumentConfigurationRequest; isEdit: boolean; id?: number }>({
+    mutationFn: async ({ data, isEdit, id }) => {
+      const url = isEdit && id
+        ? `${basePath}/api/document-configurations/${id}`
+        : `${basePath}/api/document-configurations`
+      
+      const method = isEdit ? 'PUT' : 'POST'
+      
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error ?? `Failed to ${isEdit ? 'update' : 'create'} document configuration`)
+      }
+
+      return response.json()
+    },
+    onSuccess: () => {
+      refetchDocumentConfigurations()
+      closeDocConfigModal()
+    },
+  })
+
+  // Document configuration delete mutation
+  const { mutate: deleteDocumentConfiguration, loading: docConfigDeleteLoading } = useApiMutation<void, { id: number }>({
+    mutationFn: async ({ id }) => {
+      const response = await fetch(`${basePath}/api/document-configurations/${id}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error ?? 'Failed to delete document configuration')
+      }
+    },
+    onSuccess: () => {
+      refetchDocumentConfigurations()
+      closeDocConfigModal()
+    },
+    onError: (error) => {
+      logger.error('ReferenceDataContent', 'Delete document configuration error', error)
+    },
+  })
 
   // Dropdown options for document configuration form
   const [footerOptions, setFooterOptions] = useState<ReferenceData[]>([])
@@ -101,82 +195,63 @@ export function ReferenceDataContent() {
   const [codeOptions, setCodeOptions] = useState<ReferenceData[]>([])
   const [optionsLoading, setOptionsLoading] = useState(false)
 
-  /**
-   * Fetch reference data types from API
-   */
-  const fetchReferenceDataTypes = useCallback(async () => {
-    setTypesLoading(true)
-    setTypesError(null)
-
-    try {
-      const response = await fetch(`${basePath}/api/reference-data/types`)
-
-      if (!response.ok) {
-        throw new Error(`${FETCH_FAILED_PREFIX}${response.statusText}`)
-      }
-
-      const data = await response.json()
-      setReferenceDataTypes(data)
-    } catch (err) {
-      const message = err instanceof Error ? err.message : FAILED_LOAD_MSG
-      setTypesError(message)
-    } finally {
-      setTypesLoading(false)
-    }
-  }, [])
-
-  /**
-   * Fetch reference data values by type from API
-   */
-  const fetchReferenceDataValues = useCallback(async (type: string) => {
-    if (!type) {
-      setReferenceDataValues([])
-      return
-    }
-
-    setValuesLoading(true)
-    setValuesError(null)
-
-    try {
-      const response = await fetch(`${basePath}/api/reference-data/types?refDataType=${encodeURIComponent(type)}`)
+  // Reference data create/update mutation
+  const { mutate: saveReferenceData } = useApiMutation<ReferenceData, { data: ReferenceDataRequest; isEdit: boolean; id?: number }>({
+    mutationFn: async ({ data, isEdit, id }) => {
+      const url = isEdit && id
+        ? `${basePath}/api/reference-data/types/${id}`
+        : `${basePath}/api/reference-data/types`
+      
+      const method = isEdit ? 'PUT' : 'POST'
+      
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
 
       if (!response.ok) {
-        throw new Error(`${FETCH_FAILED_PREFIX}${response.statusText}`)
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error ?? `Failed to ${isEdit ? 'update' : 'create'} reference data`)
       }
 
-      const data = await response.json()
-      setReferenceDataValues(data)
-    } catch (err) {
-      const message = err instanceof Error ? err.message : FAILED_LOAD_MSG
-      setValuesError(message)
-    } finally {
-      setValuesLoading(false)
-    }
-  }, [])
+      return response.json()
+    },
+    onSuccess: () => {
+      const isValuesContext = modalState.context === 'values'
+      if (isValuesContext) {
+        refetchReferenceDataValues()
+      } else {
+        refetchReferenceDataTypes()
+      }
+    },
+  })
 
-  /**
-   * Fetch document configurations from API
-   */
-  const fetchDocumentConfigurations = useCallback(async () => {
-    setConfigsLoading(true)
-    setConfigsError(null)
-
-    try {
-      const response = await fetch(`${basePath}/api/document-configurations`)
+  // Reference data delete mutation
+  const { mutate: deleteReferenceData, loading: deleteRefDataLoading } = useApiMutation<void, { id: number }>({
+    mutationFn: async ({ id }) => {
+      const response = await fetch(`${basePath}/api/reference-data/types/${id}`, {
+        method: 'DELETE',
+      })
 
       if (!response.ok) {
-        throw new Error(`${FETCH_FAILED_PREFIX}${response.statusText}`)
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error ?? 'Failed to delete reference data')
       }
-
-      const data = await response.json()
-      setDocumentConfigurations(data)
-    } catch (err) {
-      const message = err instanceof Error ? err.message : FAILED_LOAD_MSG
-      setConfigsError(message)
-    } finally {
-      setConfigsLoading(false)
-    }
-  }, [])
+    },
+    onSuccess: () => {
+      const isValuesContext = modalState.context === 'values'
+      if (isValuesContext) {
+        refetchReferenceDataValues()
+      } else {
+        refetchReferenceDataTypes()
+      }
+      closeModal()
+    },
+    onError: (error) => {
+      logger.error('ReferenceDataContent', 'Delete error', error)
+    },
+  })
 
   /**
    * Fetch dropdown options for document configuration form
@@ -207,33 +282,6 @@ export function ReferenceDataContent() {
     }
   }, [])
 
-  // Fetch types on mount and when switching to types tab
-  useEffect(() => {
-    if (activeTab === TAB_IDS.TYPES) {
-      fetchReferenceDataTypes()
-    }
-  }, [activeTab, fetchReferenceDataTypes])
-
-  // Fetch types for dropdown when switching to values tab
-  useEffect(() => {
-    if (activeTab === TAB_IDS.VALUES && referenceDataTypes.length === 0) {
-      fetchReferenceDataTypes()
-    }
-  }, [activeTab, referenceDataTypes.length, fetchReferenceDataTypes])
-
-  // Fetch values when selected type changes
-  useEffect(() => {
-    if (activeTab === TAB_IDS.VALUES && selectedRefDataType) {
-      fetchReferenceDataValues(selectedRefDataType)
-    }
-  }, [activeTab, selectedRefDataType, fetchReferenceDataValues])
-
-  // Fetch document configurations when switching to configurations tab
-  useEffect(() => {
-    if (activeTab === TAB_IDS.CONFIGURATIONS) {
-      fetchDocumentConfigurations()
-    }
-  }, [activeTab, fetchDocumentConfigurations])
 
   // Fetch dropdown options when opening document configuration form
   useEffect(() => {
@@ -305,33 +353,14 @@ export function ReferenceDataContent() {
     async (data: ReferenceDataRequest) => {
       const isEdit = modalState.type === 'edit' && modalState.item !== null
       const editItem = modalState.item
-      const isValuesContext = modalState.context === 'values'
 
-      const url = isEdit && editItem
-        ? `${basePath}/api/reference-data/types/${editItem.id}`
-        : `${basePath}/api/reference-data/types`
-
-      const method = isEdit ? 'PUT' : 'POST'
-
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+      saveReferenceData({
+        data,
+        isEdit,
+        id: editItem?.id,
       })
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.error ?? `Failed to ${isEdit ? 'update' : 'create'} reference data`)
-      }
-
-      // Refresh data after successful create/edit
-      if (isValuesContext) {
-        await fetchReferenceDataValues(selectedRefDataType)
-      } else {
-        await fetchReferenceDataTypes()
-      }
     },
-    [modalState, fetchReferenceDataTypes, fetchReferenceDataValues, selectedRefDataType]
+    [modalState, saveReferenceData]
   )
 
   /**
@@ -342,32 +371,8 @@ export function ReferenceDataContent() {
       return
     }
 
-    setDeleteLoading(true)
-    const isValuesContext = modalState.context === 'values'
-
-    try {
-      const response = await fetch(`${basePath}/api/reference-data/types/${modalState.item.id}`, {
-        method: 'DELETE',
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.error ?? 'Failed to delete reference data')
-      }
-
-      // Refresh data after successful delete
-      if (isValuesContext) {
-        await fetchReferenceDataValues(selectedRefDataType)
-      } else {
-        await fetchReferenceDataTypes()
-      }
-      closeModal()
-    } catch (err) {
-      logger.error('ReferenceDataContent', 'Delete error', err)
-    } finally {
-      setDeleteLoading(false)
-    }
-  }, [modalState.item, modalState.context, fetchReferenceDataTypes, fetchReferenceDataValues, selectedRefDataType, closeModal])
+    deleteReferenceData({ id: modalState.item.id })
+  }, [modalState.item, deleteReferenceData])
 
   /**
    * Close document configuration modal
@@ -405,29 +410,13 @@ export function ReferenceDataContent() {
       const isEdit = docConfigModalState.type === 'edit' && docConfigModalState.item !== null
       const editItem = docConfigModalState.item
 
-      const url = isEdit && editItem
-        ? `${basePath}/api/document-configurations/${editItem.id}`
-        : `${basePath}/api/document-configurations`
-
-      const method = isEdit ? 'PUT' : 'POST'
-
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+      saveDocumentConfiguration({
+        data,
+        isEdit,
+        id: editItem?.id,
       })
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(
-          errorData.error ?? `Failed to ${isEdit ? 'update' : 'create'} document configuration`
-        )
-      }
-
-      // Refresh data after successful create/edit
-      await fetchDocumentConfigurations()
     },
-    [docConfigModalState, fetchDocumentConfigurations]
+    [docConfigModalState, saveDocumentConfiguration]
   )
 
   /**
@@ -438,27 +427,8 @@ export function ReferenceDataContent() {
       return
     }
 
-    setDocConfigDeleteLoading(true)
-
-    try {
-      const response = await fetch(`${basePath}/api/document-configurations/${docConfigModalState.item.id}`, {
-        method: 'DELETE',
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.error ?? 'Failed to delete document configuration')
-      }
-
-      // Refresh data after successful delete
-      await fetchDocumentConfigurations()
-      closeDocConfigModal()
-    } catch (err) {
-      logger.error('ReferenceDataContent', 'Delete error', err)
-    } finally {
-      setDocConfigDeleteLoading(false)
-    }
-  }, [docConfigModalState.item, fetchDocumentConfigurations, closeDocConfigModal])
+    deleteDocumentConfiguration({ id: docConfigModalState.item.id })
+  }, [docConfigModalState.item, deleteDocumentConfiguration])
 
   /**
    * Render tab content based on active tab
@@ -468,10 +438,10 @@ export function ReferenceDataContent() {
       case TAB_IDS.TYPES:
         return (
           <ReferenceDataTypesTab
-            data={referenceDataTypes}
+            data={referenceDataTypes ?? []}
             loading={typesLoading}
             error={typesError}
-            onRefresh={fetchReferenceDataTypes}
+            onRefresh={refetchReferenceDataTypes}
             onCreate={handleCreateType}
             onEdit={handleEditType}
             onDelete={handleDeleteType}
@@ -480,14 +450,14 @@ export function ReferenceDataContent() {
       case TAB_IDS.VALUES:
         return (
           <ReferenceDataValuesTab
-            refDataTypes={referenceDataTypes}
+            refDataTypes={referenceDataTypes ?? []}
             typesLoading={typesLoading}
-            data={referenceDataValues}
+            data={referenceDataValues ?? []}
             loading={valuesLoading}
             error={valuesError}
             selectedType={selectedRefDataType}
             onTypeChange={handleTypeChange}
-            onRefresh={() => fetchReferenceDataValues(selectedRefDataType)}
+            onRefresh={refetchReferenceDataValues}
             onCreate={handleCreateValue}
             onEdit={handleEditValue}
             onDelete={handleDeleteValue}
@@ -496,10 +466,10 @@ export function ReferenceDataContent() {
       case TAB_IDS.CONFIGURATIONS:
         return (
           <DocumentConfigurationsTab
-            data={documentConfigurations}
+            data={documentConfigurations ?? []}
             loading={configsLoading}
             error={configsError}
-            onRefresh={fetchDocumentConfigurations}
+            onRefresh={refetchDocumentConfigurations}
             onCreate={handleCreateDocConfig}
             onEdit={handleEditDocConfig}
             onDelete={handleDeleteDocConfig}
@@ -547,7 +517,7 @@ export function ReferenceDataContent() {
         confirmText="Delete"
         cancelText="Cancel"
         variant="danger"
-        loading={deleteLoading}
+        loading={deleteRefDataLoading}
       />
 
       {/* Document Configuration Create/Edit Form Modal */}

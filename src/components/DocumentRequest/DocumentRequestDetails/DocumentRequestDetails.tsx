@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { faArrowLeft, faCode, faFileCode, faRotate } from '@fortawesome/free-solid-svg-icons'
 import { Breadcrumb } from '@/components/shared/Breadcrumb'
@@ -10,13 +10,15 @@ import { StatusBadge } from '@/components/shared/StatusBadge'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { DocumentRequestMetadata } from '../DocumentRequestMetadata'
 import { DocumentRequestBatches } from '../DocumentRequestBatches'
+import { useApiQuery } from '@/hooks/useApiQuery'
+import { useApiMutation } from '@/hooks/useApiMutation'
 import {
   DocumentRequest,
   DocumentRequestMetadata as MetadataType,
   Batch,
 } from '@/types/documentRequest'
 import { formatDisplayDateTime } from '@/utils/dateUtils'
-import { getCachedDocumentRequest, clearDocumentRequestCache, cacheBatch } from '@/utils/documentRequestCache'
+import { cacheBatch } from '@/utils/documentRequestCache'
 import styles from './DocumentRequestDetails.module.css'
 
 export interface DocumentRequestDetailsProps {
@@ -40,100 +42,99 @@ export function DocumentRequestDetails({
 }: Readonly<DocumentRequestDetailsProps>) {
   const router = useRouter()
 
-  // State
-  const [request, setRequest] = useState<DocumentRequest | null>(null)
-  const [metadata, setMetadata] = useState<MetadataType[]>([])
-  const [batches, setBatches] = useState<Batch[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [isLoadingMetadata, setIsLoadingMetadata] = useState(true)
-  const [isLoadingBatches, setIsLoadingBatches] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [isReprocessing, setIsReprocessing] = useState(false)
+  // State for reprocess dialog and result
   const [showReprocessDialog, setShowReprocessDialog] = useState(false)
   const [reprocessResult, setReprocessResult] = useState<{
     message: string
     success: boolean
   } | null>(null)
 
-  // Fetch document request details (use cache if available)
-  useEffect(() => {
-    async function fetchDetails() {
-      setIsLoading(true)
-      setError(null)
-
-      // Try to use cached data from list page navigation
-      const cached = getCachedDocumentRequest(requestId)
-      if (cached) {
-        setRequest(cached)
-        setIsLoading(false)
-        clearDocumentRequestCache() // Clear after use
-        return
-      }
-
-      // Fallback to API call (e.g., direct URL access, page refresh)
-      try {
-        const response = await fetch(`/api/document-requests/${requestId}`)
-        if (!response.ok) {
-          if (response.status === 404) {
-            throw new Error('Document request not found')
-          }
-          throw new Error('Failed to fetch document request')
+  // Fetch document request details
+  const {
+    data: request,
+    loading: isLoading,
+    error: requestError,
+  } = useApiQuery<DocumentRequest>({
+    queryFn: async () => {
+      const response = await fetch(`/api/document-requests/${requestId}`)
+      if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error('Document request not found')
         }
-        const data = await response.json()
-        setRequest(data)
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred')
-      } finally {
-        setIsLoading(false)
+        throw new Error('Failed to fetch document request')
       }
-    }
-
-    fetchDetails()
-  }, [requestId])
+      return response.json()
+    },
+  })
 
   // Fetch metadata
-  useEffect(() => {
-    async function fetchMetadata() {
-      setIsLoadingMetadata(true)
-
-      try {
-        const response = await fetch(`/api/document-requests/${requestId}/metadata`)
-        if (response.ok) {
-          const data = await response.json()
-          setMetadata(data)
-        }
-      } catch {
-        // Metadata fetch failure is not critical
-        console.error('Failed to fetch metadata')
-      } finally {
-        setIsLoadingMetadata(false)
+  const {
+    data: metadataData,
+    loading: isLoadingMetadata,
+  } = useApiQuery<MetadataType[]>({
+    queryFn: async () => {
+      const response = await fetch(`/api/document-requests/${requestId}/metadata`)
+      if (!response.ok) {
+        throw new Error('Failed to fetch metadata')
       }
-    }
+      return response.json()
+    },
+  })
 
-    fetchMetadata()
-  }, [requestId])
+  const metadata = metadataData ?? []
 
   // Fetch batches
-  useEffect(() => {
-    async function fetchBatches() {
-      setIsLoadingBatches(true)
-
-      try {
-        const response = await fetch(`/api/document-requests/${requestId}/batches`)
-        if (response.ok) {
-          const data = await response.json()
-          setBatches(data)
-        }
-      } catch {
-        // Batches fetch failure is not critical
-        console.error('Failed to fetch batches')
-      } finally {
-        setIsLoadingBatches(false)
+  const {
+    data: batchesData,
+    loading: isLoadingBatches,
+  } = useApiQuery<Batch[]>({
+    queryFn: async () => {
+      const response = await fetch(`/api/document-requests/${requestId}/batches`)
+      if (!response.ok) {
+        throw new Error('Failed to fetch batches')
       }
-    }
+      return response.json()
+    },
+  })
 
-    fetchBatches()
-  }, [requestId])
+  const batches = batchesData ?? []
+
+  // Reprocess mutation
+  const { mutate: reprocessRequest, loading: isReprocessing } = useApiMutation<
+    { totalSubmitted: number; totalNotFound: number; notFoundRequestIds: number[] },
+    { requestIds: number[] }
+  >({
+    mutationFn: async (variables) => {
+      const response = await fetch('/api/document-requests/reprocess', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(variables),
+      })
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Reprocess failed')
+      }
+      return response.json()
+    },
+    onSuccess: (data) => {
+      const { totalSubmitted, totalNotFound, notFoundRequestIds } = data
+      let message = `Successfully submitted ${totalSubmitted} request(s) for reprocessing.`
+      
+      if (totalNotFound > 0) {
+        message += ` ${totalNotFound} request(s) not found (IDs: ${notFoundRequestIds.join(', ')}).`
+      }
+
+      setReprocessResult({ message, success: true })
+    },
+    onError: (error) => {
+      setReprocessResult({
+        message: error.message || 'Failed to reprocess request. Please try again.',
+        success: false,
+      })
+    },
+  })
+
+  const error = requestError?.message || null
 
   // Handle back navigation
   const handleBack = useCallback(() => {
@@ -151,51 +152,11 @@ export function DocumentRequestDetails({
   }, [router, requestId])
 
   // Handle reprocess
-  const handleReprocess = useCallback(async () => {
+  const handleReprocess = useCallback(() => {
     setShowReprocessDialog(false)
-    setIsReprocessing(true)
     setReprocessResult(null)
-
-    try {
-      const response = await fetch('/api/document-requests/reprocess', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ requestIds: [requestId] }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        setReprocessResult({
-          message: data.error || 'Reprocess failed',
-          success: false,
-        })
-        setIsReprocessing(false)
-        return
-      }
-
-      // Show success message with details
-      const { totalSubmitted, totalNotFound, notFoundRequestIds } = data
-      let message = `Successfully submitted ${totalSubmitted} request(s) for reprocessing.`
-      
-      if (totalNotFound > 0) {
-        message += ` ${totalNotFound} request(s) not found (IDs: ${notFoundRequestIds.join(', ')}).`
-      }
-
-      setReprocessResult({
-        message,
-        success: true,
-      })
-      setIsReprocessing(false)
-    } catch (err) {
-      console.error('Reprocess error:', err)
-      setReprocessResult({
-        message: 'Failed to reprocess request. Please try again.',
-        success: false,
-      })
-      setIsReprocessing(false)
-    }
-  }, [requestId])
+    reprocessRequest({ requestIds: [requestId] })
+  }, [reprocessRequest, requestId])
 
   // Handle view batch details - cache batch data and navigate
   const handleViewBatch = useCallback((batch: Batch) => {
@@ -302,92 +263,107 @@ export function DocumentRequestDetails({
       {/* Content Grid */}
       <div className={styles.contentGrid}>
         {/* Request Information Card */}
-        <Card title="Request Information">
-          <div className={styles.infoGrid}>
-            <div className={styles.infoSection}>
-              <h4 className={styles.sectionTitle}>Identification</h4>
-              <dl className={styles.infoList}>
-                <div className={styles.infoItem}>
-                  <dt>Request ID</dt>
-                  <dd>{request.id}</dd>
-                </div>
-                <div className={styles.infoItem}>
-                  <dt>Source System</dt>
-                  <dd>{request.sourceSystem.refDataValue}</dd>
-                </div>
-              </dl>
-            </div>
+        <Card>
+          <Card.Header>
+            <Card.Title>Request Information</Card.Title>
+          </Card.Header>
+          <Card.Body>
+            <div className={styles.infoGrid}>
+              <div className={styles.infoSection}>
+                <h4 className={styles.sectionTitle}>Identification</h4>
+                <dl className={styles.infoList}>
+                  <div className={styles.infoItem}>
+                    <dt>Request ID</dt>
+                    <dd>{request.id}</dd>
+                  </div>
+                  <div className={styles.infoItem}>
+                    <dt>Source System</dt>
+                    <dd>{request.sourceSystem.refDataValue}</dd>
+                  </div>
+                </dl>
+              </div>
 
-            <div className={styles.infoSection}>
-              <h4 className={styles.sectionTitle}>Document Details</h4>
-              <dl className={styles.infoList}>
-                <div className={styles.infoItem}>
-                  <dt>Document Type</dt>
-                  <dd>{request.documentType.refDataValue}</dd>
-                </div>
-                <div className={styles.infoItem}>
-                  <dt>Document Name</dt>
-                  <dd>{request.documentName.refDataValue}</dd>
-                </div>
-                <div className={styles.infoItem}>
-                  <dt>Status</dt>
-                  <dd>
-                    <StatusBadge
-                      status={request.documentStatus.refDataValue}
-                      description={request.documentStatus.description}
-                      type="documentRequest"
-                    />
-                  </dd>
-                </div>
-              </dl>
-            </div>
+              <div className={styles.infoSection}>
+                <h4 className={styles.sectionTitle}>Document Details</h4>
+                <dl className={styles.infoList}>
+                  <div className={styles.infoItem}>
+                    <dt>Document Type</dt>
+                    <dd>{request.documentType.refDataValue}</dd>
+                  </div>
+                  <div className={styles.infoItem}>
+                    <dt>Document Name</dt>
+                    <dd>{request.documentName.refDataValue}</dd>
+                  </div>
+                  <div className={styles.infoItem}>
+                    <dt>Status</dt>
+                    <dd>
+                      <StatusBadge
+                        status={request.documentStatus.refDataValue}
+                        description={request.documentStatus.description}
+                        type="documentRequest"
+                      />
+                    </dd>
+                  </div>
+                </dl>
+              </div>
 
-            <div className={styles.infoSection}>
-              <h4 className={styles.sectionTitle}>Timestamps</h4>
-              <dl className={styles.infoList}>
-                <div className={styles.infoItem}>
-                  <dt>Created</dt>
-                  <dd>{formatDisplayDateTime(request.createdDat)}</dd>
-                </div>
-                <div className={styles.infoItem}>
-                  <dt>Last Updated</dt>
-                  <dd>{formatDisplayDateTime(request.lastUpdateDat)}</dd>
-                </div>
-              </dl>
-            </div>
+              <div className={styles.infoSection}>
+                <h4 className={styles.sectionTitle}>Timestamps</h4>
+                <dl className={styles.infoList}>
+                  <div className={styles.infoItem}>
+                    <dt>Created</dt>
+                    <dd>{formatDisplayDateTime(request.createdDat)}</dd>
+                  </div>
+                  <div className={styles.infoItem}>
+                    <dt>Last Updated</dt>
+                    <dd>{formatDisplayDateTime(request.lastUpdateDat)}</dd>
+                  </div>
+                </dl>
+              </div>
 
-            <div className={styles.infoSection}>
-              <h4 className={styles.sectionTitle}>Audit</h4>
-              <dl className={styles.infoList}>
-                <div className={styles.infoItem}>
-                  <dt>Created By (Header)</dt>
-                  <dd>{request.createUidHeader}</dd>
-                </div>
-                <div className={styles.infoItem}>
-                  <dt>Created By (Token)</dt>
-                  <dd>{request.createUidToken}</dd>
-                </div>
-              </dl>
+              <div className={styles.infoSection}>
+                <h4 className={styles.sectionTitle}>Audit</h4>
+                <dl className={styles.infoList}>
+                  <div className={styles.infoItem}>
+                    <dt>Created By (Header)</dt>
+                    <dd>{request.createUidHeader}</dd>
+                  </div>
+                  <div className={styles.infoItem}>
+                    <dt>Created By (Token)</dt>
+                    <dd>{request.createUidToken}</dd>
+                  </div>
+                </dl>
+              </div>
             </div>
-          </div>
+          </Card.Body>
         </Card>
       </div>
 
       {/* Metadata Section */}
-      <Card title="Metadata" className={styles.metadataCard}>
-        <DocumentRequestMetadata
-          metadata={metadata}
-          loading={isLoadingMetadata}
-        />
+      <Card className={styles.metadataCard}>
+        <Card.Header>
+          <Card.Title>Metadata</Card.Title>
+        </Card.Header>
+        <Card.Body>
+          <DocumentRequestMetadata
+            metadata={metadata}
+            loading={isLoadingMetadata}
+          />
+        </Card.Body>
       </Card>
 
       {/* Batches Section */}
-      <Card title="Batches" className={styles.batchesCard}>
-        <DocumentRequestBatches
-          batches={batches}
-          loading={isLoadingBatches}
-          onViewDetails={handleViewBatch}
-        />
+      <Card className={styles.batchesCard}>
+        <Card.Header>
+          <Card.Title>Batches</Card.Title>
+        </Card.Header>
+        <Card.Body>
+          <DocumentRequestBatches
+            batches={batches}
+            loading={isLoadingBatches}
+            onViewDetails={handleViewBatch}
+          />
+        </Card.Body>
       </Card>
 
       {/* Reprocess Confirmation Dialog */}

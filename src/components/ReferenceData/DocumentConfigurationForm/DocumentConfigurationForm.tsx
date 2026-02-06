@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { Modal } from '@/components/shared/Modal'
 import { Button } from '@/components/shared/Button'
 import { TextInput, TextArea, Select, DateInput } from '@/components/shared/FormField'
+import { FormSection } from '@/components/ui/Form/FormSection'
+import { FormActions } from '@/components/ui/Form/FormActions'
 import { formatInputDate, getCurrentDate, DEFAULT_END_DATE } from '@/utils/dateUtils'
 import type { ReferenceData } from '@/types/referenceData'
 import type {
@@ -213,113 +215,113 @@ export function DocumentConfigurationForm({
     onClose()
   }, [onClose, resetForm])
 
-  const footer = (
-    <>
-      <Button hierarchy="secondary" size="md" onClick={handleCancel} disabled={loading}>
-        Cancel
-      </Button>
-      <Button
-        hierarchy="primary"
-        size="md"
-        type="submit"
-        loading={loading}
-        onClick={handleSubmit}
-      >
-        {isEditMode ? 'Save Changes' : 'Create'}
-      </Button>
-    </>
-  )
-
   return (
-    <Modal isOpen={isOpen} onClose={handleCancel} title={title} size="md" footer={footer}>
+    <Modal isOpen={isOpen} onClose={handleCancel} title={title} size="md">
       <form className={styles.form} onSubmit={handleSubmit}>
-        {/* Footer Dropdown */}
-        <Select
-          label="Footer"
-          name="footerId"
-          value={formData.footerId}
-          onChange={(e) => handleChange('footerId', e.target.value)}
-          required
-          error={errors.footerId}
-          disabled={optionsLoading}
-          options={footerOptions.map((item) => ({
-            value: item.id.toString(),
-            label: item.refDataValue,
-          }))}
-          placeholder="Select footer..."
-        />
-
-        {/* App Doc Spec Dropdown */}
-        <Select
-          label="App Doc Spec"
-          name="appDocSpecId"
-          value={formData.appDocSpecId}
-          onChange={(e) => handleChange('appDocSpecId', e.target.value)}
-          required
-          error={errors.appDocSpecId}
-          disabled={optionsLoading}
-          options={appDocSpecOptions.map((item) => ({
-            value: item.id.toString(),
-            label: item.refDataValue,
-          }))}
-          placeholder="Select app doc spec..."
-        />
-
-        {/* Code Dropdown */}
-        <Select
-          label="Code"
-          name="codeId"
-          value={formData.codeId}
-          onChange={(e) => handleChange('codeId', e.target.value)}
-          required
-          error={errors.codeId}
-          disabled={optionsLoading}
-          options={codeOptions.map((item) => ({
-            value: item.id.toString(),
-            label: item.refDataValue,
-          }))}
-          placeholder="Select code..."
-        />
-
-        {/* Value */}
-        <TextInput
-          label="Value"
-          name="value"
-          value={formData.value}
-          onChange={(e) => handleChange('value', e.target.value)}
-          placeholder="Enter value..."
-          required
-          error={errors.value}
-        />
-
-        {/* Description (optional) */}
-        <TextArea
-          label="Description"
-          name="description"
-          value={formData.description}
-          onChange={(e) => handleChange('description', e.target.value)}
-          placeholder="Enter description (optional)..."
-          rows={3}
-        />
-
-        {/* Effective Dates */}
-        <div className={styles.row}>
-          <DateInput
-            label="Effective From"
-            name="effectFromDat"
-            value={formData.effectFromDat}
-            onChange={(e) => handleChange('effectFromDat', e.target.value)}
+        <FormSection title="Configuration Details">
+          {/* Footer Dropdown */}
+          <Select
+            label="Footer"
+            name="footerId"
+            value={formData.footerId}
+            onChange={(e) => handleChange('footerId', e.target.value)}
             required
-            error={errors.effectFromDat}
+            error={errors.footerId}
+            disabled={optionsLoading}
+            options={footerOptions.map((item) => ({
+              value: item.id.toString(),
+              label: item.refDataValue,
+            }))}
+            placeholder="Select footer..."
           />
-          <DateInput
-            label="Effective To"
-            name="effectToDat"
-            value={formData.effectToDat}
-            onChange={(e) => handleChange('effectToDat', e.target.value)}
-            error={errors.effectToDat}
+
+          {/* App Doc Spec Dropdown */}
+          <Select
+            label="App Doc Spec"
+            name="appDocSpecId"
+            value={formData.appDocSpecId}
+            onChange={(e) => handleChange('appDocSpecId', e.target.value)}
+            required
+            error={errors.appDocSpecId}
+            disabled={optionsLoading}
+            options={appDocSpecOptions.map((item) => ({
+              value: item.id.toString(),
+              label: item.refDataValue,
+            }))}
+            placeholder="Select app doc spec..."
           />
-        </div>
+
+          {/* Code Dropdown */}
+          <Select
+            label="Code"
+            name="codeId"
+            value={formData.codeId}
+            onChange={(e) => handleChange('codeId', e.target.value)}
+            required
+            error={errors.codeId}
+            disabled={optionsLoading}
+            options={codeOptions.map((item) => ({
+              value: item.id.toString(),
+              label: item.refDataValue,
+            }))}
+            placeholder="Select code..."
+          />
+
+          {/* Value */}
+          <TextInput
+            label="Value"
+            name="value"
+            value={formData.value}
+            onChange={(e) => handleChange('value', e.target.value)}
+            placeholder="Enter value..."
+            required
+            error={errors.value}
+          />
+
+          {/* Description (optional) */}
+          <TextArea
+            label="Description"
+            name="description"
+            value={formData.description}
+            onChange={(e) => handleChange('description', e.target.value)}
+            placeholder="Enter description (optional)..."
+            rows={3}
+          />
+        </FormSection>
+
+        <FormSection title="Effective Dates" divider>
+          <div className={styles.row}>
+            <DateInput
+              label="Effective From"
+              name="effectFromDat"
+              value={formData.effectFromDat}
+              onChange={(e) => handleChange('effectFromDat', e.target.value)}
+              required
+              error={errors.effectFromDat}
+            />
+            <DateInput
+              label="Effective To"
+              name="effectToDat"
+              value={formData.effectToDat}
+              onChange={(e) => handleChange('effectToDat', e.target.value)}
+              error={errors.effectToDat}
+            />
+          </div>
+        </FormSection>
+
+        <FormActions align="right">
+          <Button hierarchy="secondary" size="md" onClick={handleCancel} disabled={loading}>
+            Cancel
+          </Button>
+          <Button
+            hierarchy="primary"
+            size="md"
+            type="submit"
+            loading={loading}
+          >
+            {isEditMode ? 'Save Changes' : 'Create'}
+          </Button>
+        </FormActions>
       </form>
     </Modal>
   )

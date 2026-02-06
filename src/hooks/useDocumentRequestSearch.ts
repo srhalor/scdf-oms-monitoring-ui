@@ -136,21 +136,25 @@ export function useDocumentRequestSearch(): UseDocumentRequestSearchReturn {
     try {
       const requestBody = buildSearchRequest(filters, sorts)
 
-      const response = await fetch(
-        `/api/document-requests/search?page=${page}&size=${size}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(requestBody),
-        }
-      )
+      const queryFn = async () => {
+        const response = await fetch(
+          `/api/document-requests/search?page=${page}&size=${size}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestBody),
+          }
+        )
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.message || `Search failed: ${response.status}`)
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}))
+          throw new Error(errorData.message || `Search failed: ${response.status}`)
+        }
+
+        return response.json()
       }
 
-      const data: DocumentRequestSearchResponse = await response.json()
+      const data: DocumentRequestSearchResponse = await queryFn()
 
       setState({
         isLoading: false,
