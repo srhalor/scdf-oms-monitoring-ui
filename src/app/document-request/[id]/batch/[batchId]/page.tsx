@@ -1,4 +1,4 @@
-import { PageLayout } from '@/components/shared/PageLayout/PageLayout'
+import { PageLayout } from '@/components/layout/PageLayout'
 import { BatchDetails } from '@/components/DocumentRequest/BatchDetails'
 
 interface BatchDetailsPageProps {

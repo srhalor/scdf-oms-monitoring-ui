@@ -3,7 +3,7 @@
 import { useCallback } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircleCheck, faCircleXmark, faTriangleExclamation, faArrowsRotate } from '@fortawesome/free-solid-svg-icons'
-import { Card } from '@/components/shared/Card'
+import { Card } from '@/components/ui/Card'
 import { useApiQuery } from '@/hooks/useApiQuery'
 import type { HealthStatus } from '@/types/health'
 import styles from './HealthCard.module.css'

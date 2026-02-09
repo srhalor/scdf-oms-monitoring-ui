@@ -1,4 +1,4 @@
-import { PageLayout } from '@/components/shared/PageLayout/PageLayout'
+import { PageLayout } from '@/components/layout/PageLayout'
 import { HealthCard } from '@/components/Dashboard/HealthCard'
 
 export default function Dashboard() {

@@ -1,3 +1,5 @@
+import { isValidElement, ReactNode } from 'react'
+
 /**
  * General Formatting Utility Functions
  *
@@ -5,15 +7,19 @@
  */
 
 /**
- * Safely convert a value to a display string
- * Handles null, undefined, objects, and primitive types
+ * Safely convert a value to a display string or React element
+ * Handles null, undefined, objects, React elements, and primitive types
  *
  * @param value - Any value to format
  * @param fallback - Value to return for null/undefined (default: '')
  */
-export function formatValue(value: unknown, fallback = ''): string {
+export function formatValue(value: unknown, fallback = ''): string | ReactNode {
   if (value == null) {
     return fallback
+  }
+  // Handle React elements - return them as-is for rendering
+  if (isValidElement(value)) {
+    return value
   }
   if (typeof value === 'object') {
     return JSON.stringify(value)

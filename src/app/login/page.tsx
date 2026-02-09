@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { isAuthenticated } from '@/lib/auth/authHelpers'
 import { LoginForm } from '@/components/auth/LoginForm'
-import { Logo } from '@/components/Header/Logo'
+import { Logo } from '@/components/layout/Header/Logo'
 import { APP_CONFIG } from '@/config/app.config'
 import styles from './page.module.css'
 

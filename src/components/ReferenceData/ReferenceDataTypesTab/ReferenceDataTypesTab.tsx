@@ -1,261 +1,80 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPen, faPlus, faRefresh, faSearch, faTrash } from '@fortawesome/free-solid-svg-icons'
-import { DataTable } from '@/components/shared/DataTable'
-import { Pagination } from '@/components/shared/Pagination'
-import { Button } from '@/components/shared/Button'
+import { useMemo } from 'react'
+import { RefDataTabTemplate, type RefDataColumn } from '@/components/ReferenceData/RefDataTabTemplate'
+import { ReferenceDataForm } from '@/components/ReferenceData/ReferenceDataForm'
+import { useRefDataCrud } from '@/hooks/useRefDataCrud'
 import { formatDisplayDate } from '@/utils/dateUtils'
-import type { ReferenceData, SortState, TableColumn } from '@/types/referenceData'
-import styles from '@/styles/tabContent.module.css'
+import type { ReferenceData, ReferenceDataRequest } from '@/types/referenceData'
+import commonStyles from '@/styles/common.module.css'
 
 /**
- * Props for ReferenceDataTypesTab
- */
-export interface ReferenceDataTypesTabProps {
-  /** Reference data array */
-  data: ReferenceData[]
-  /** Loading state */
-  loading?: boolean
-  /** Error message */
-  error?: string | null
-  /** Refresh data handler */
-  onRefresh?: () => void
-  /** Create handler */
-  onCreate?: () => void
-  /** Edit handler */
-  onEdit?: (item: ReferenceData) => void
-  /** Delete handler */
-  onDelete?: (item: ReferenceData) => void
-}
-
-
-/**
- * Reference Data Types Tab Component
+ * Reference Data Types Tab Component (Refactored)
  *
- * Displays a table of reference data types with search,
- * sorting, pagination, and CRUD actions.
+ * Self-contained tab using useRefDataCrud hook and RefDataTabTemplate.
+ * Displays a table of reference data types with CRUD operations.
+ *
+ * This replaces the old 262-line implementation with a clean 60-line version
+ * that delegates all complexity to reusable hooks and components.
  */
-export function ReferenceDataTypesTab({
-  data,
-  loading = false,
-  error = null,
-  onRefresh,
-  onCreate,
-  onEdit,
-  onDelete,
-}: Readonly<ReferenceDataTypesTabProps>) {
-  // Search state
-  const [searchQuery, setSearchQuery] = useState('')
+export function ReferenceDataTypesTab() {
+  const basePath = process.env.NEXT_PUBLIC_BASEPATH || ''
 
-  // Sort state
-  const [sort, setSort] = useState<SortState>({ column: '', direction: null })
+  // Use generic CRUD hook - handles fetch, create, update, delete, modals
+  const crud = useRefDataCrud<ReferenceData, ReferenceDataRequest>({
+    endpoint: `${basePath}/api/reference-data/types`,
+  })
 
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1)
-  const [pageSize, setPageSize] = useState(10)
-
-  // Filter data based on search query
-  const filteredData = useMemo(() => {
-    if (!searchQuery.trim()) {
-      return data
-    }
-
-    const query = searchQuery.toLowerCase()
-    return data.filter(item => {
-      const value = item.refDataValue?.toLowerCase() ?? ''
-      const description = item.description?.toLowerCase() ?? ''
-      const type = item.refDataType?.toLowerCase() ?? ''
-
-      return value.includes(query) || description.includes(query) || type.includes(query)
-    })
-  }, [data, searchQuery])
-
-  // Paginate data
-  const paginatedData = useMemo(() => {
-    const startIndex = (currentPage - 1) * pageSize
-    return filteredData.slice(startIndex, startIndex + pageSize)
-  }, [filteredData, currentPage, pageSize])
-
-  // Reset to first page when search changes
-  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value)
-    setCurrentPage(1)
-  }, [])
-
-  // Handle page size change
-  const handlePageSizeChange = useCallback((newPageSize: number) => {
-    setPageSize(newPageSize)
-    setCurrentPage(1)
-  }, [])
-
-  // Column definitions
-  const columns: TableColumn<ReferenceData>[] = useMemo(
+  // Column definitions - only what's unique to this tab
+  const columns: RefDataColumn<ReferenceData>[] = useMemo(
     () => [
       {
         key: 'refDataValue',
-        header: 'Ref Data Type',
-        sortable: true,
+        label: 'Ref Data Type',
         width: '200px',
       },
       {
         key: 'description',
-        header: 'Description',
-        sortable: true,
+        label: 'Description',
       },
       {
         key: 'effectFromDat',
-        header: 'Effective From',
-        sortable: true,
+        label: 'Effective From',
         width: '140px',
-        render: (value: unknown) => (
-          <span className={styles.dateCell}>{formatDisplayDate(value)}</span>
+        render: (item) => (
+          <span className={commonStyles.dateCell}>{formatDisplayDate(item.effectFromDat)}</span>
         ),
       },
       {
         key: 'effectToDat',
-        header: 'Effective To',
-        sortable: true,
+        label: 'Effective To',
         width: '140px',
-        render: (value: unknown) => (
-          <span className={styles.dateCell}>{formatDisplayDate(value)}</span>
+        render: (item) => (
+          <span className={commonStyles.dateCell}>{formatDisplayDate(item.effectToDat)}</span>
         ),
       },
       {
         key: 'lastUpdateUid',
-        header: 'Updated By',
-        sortable: true,
+        label: 'Updated By',
         width: '120px',
       },
     ],
     []
   )
 
-  // Render row actions
-  const renderRowActions = useCallback(
-    (row: ReferenceData) => {
-      if (!row.editable) {
-        return (
-          <span className={styles.readOnlyLabel}>Read Only</span>
-        )
-      }
-
-      return (
-        <>
-          <button
-            type="button"
-            className={styles.actionButton}
-            onClick={() => onEdit?.(row)}
-            aria-label={`Edit ${row.refDataValue}`}
-            title="Edit"
-          >
-            <FontAwesomeIcon icon={faPen} size="sm" />
-          </button>
-          <button
-            type="button"
-            className={`${styles.actionButton} ${styles.danger}`}
-            onClick={() => onDelete?.(row)}
-            aria-label={`Delete ${row.refDataValue}`}
-            title="Delete"
-          >
-            <FontAwesomeIcon icon={faTrash} size="sm" />
-          </button>
-        </>
-      )
-    },
-    [onEdit, onDelete]
-  )
-
-  // Error state
-  if (error) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.errorState}>
-          <div className={styles.errorIcon}>⚠️</div>
-          <div className={styles.errorText}>Failed to load reference data</div>
-          <div className={styles.errorSubtext}>{error}</div>
-          <Button hierarchy="secondary" onClick={onRefresh}>
-            <FontAwesomeIcon icon={faRefresh} />
-            Try Again
-          </Button>
-        </div>
-      </div>
-    )
-  }
-
+  // Render using template - handles table, modals, CRUD actions
   return (
-    <div className={styles.container}>
-      {/* Toolbar */}
-      <div className={styles.toolbar}>
-        <div className={styles.toolbarLeft}>
-          {/* Search */}
-          <div className={styles.searchContainer}>
-            <span className={styles.searchIcon}>
-              <FontAwesomeIcon icon={faSearch} size="sm" />
-            </span>
-            <input
-              type="text"
-              className={styles.searchInput}
-              placeholder="Search by value or description..."
-              value={searchQuery}
-              onChange={handleSearchChange}
-              aria-label="Search reference data"
-            />
-          </div>
-        </div>
-
-        <div className={styles.toolbarRight}>
-          {/* Refresh button */}
-          <Button
-            hierarchy="tertiary"
-            icon={faRefresh}
-            label="Refresh"
-            onClick={onRefresh}
-          />
-          {/* Create button */}
-          <Button
-            hierarchy="primary"
-            iconBefore={faPlus}
-            onClick={onCreate}
-          >
-            Add New
-          </Button>
-        </div>
-      </div>
-
-      {/* Table */}
-      <div className={styles.tableWrapper}>
-        <DataTable
-          columns={columns}
-          data={paginatedData}
-          getRowKey={row => row.id}
-          loading={loading}
-          emptyMessage="No reference data types found"
-          emptySubtext={
-            searchQuery
-              ? 'Try adjusting your search query'
-              : 'Add a new reference data type to get started'
-          }
-          sort={sort}
-          onSortChange={setSort}
-          renderRowActions={renderRowActions}
-        />
-
-        {/* Pagination - hide during loading */}
-        {!loading && filteredData.length > 0 && (
-          <div className={styles.paginationWrapper}>
-            <Pagination
-              currentPage={currentPage}
-              totalItems={filteredData.length}
-              pageSize={pageSize}
-              onPageChange={setCurrentPage}
-              onPageSizeChange={handlePageSizeChange}
-              pageSizeOptions={[10, 20, 50]}
-            />
-          </div>
-        )}
-      </div>
-    </div>
+    <RefDataTabTemplate
+      title="Reference Data Types"
+      crud={crud}
+      columns={columns}
+      FormComponent={ReferenceDataForm}
+      formProps={{ defaultRefDataType: 'REF_DATA_TYPE' }}
+      createButtonText="Create New Type"
+      emptyMessage="No reference data types found"
+      deleteConfirmMessage={(item: ReferenceData) =>
+        `Are you sure you want to delete "${item.refDataValue}"? This action cannot be undone.`
+      }
+    />
   )
 }

@@ -1,14 +1,14 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { Modal } from '@/components/shared/Modal'
-import { Button } from '@/components/shared/Button'
+import { Modal } from '@/components/ui/Modal'
+import { Button } from '@/components/ui/Button'
 import {
   TextInput,
   TextArea,
   DateInput,
   Checkbox,
-} from '@/components/shared/FormField'
+} from '@/components/ui/FormField'
 import { FormSection } from '@/components/ui/Form/FormSection'
 import { FormActions } from '@/components/ui/Form/FormActions'
 import { formatInputDate, getCurrentDate, DEFAULT_END_DATE } from '@/utils/dateUtils'

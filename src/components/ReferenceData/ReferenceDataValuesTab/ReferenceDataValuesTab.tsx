@@ -1,323 +1,137 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPen, faPlus, faRefresh, faSearch, faTrash } from '@fortawesome/free-solid-svg-icons'
-import { DataTable } from '@/components/shared/DataTable'
-import { Pagination } from '@/components/shared/Pagination'
-import { Button } from '@/components/shared/Button'
+import { useMemo, useState } from 'react'
+import { RefDataTabTemplate, type RefDataColumn } from '@/components/ReferenceData/RefDataTabTemplate'
+import { ReferenceDataForm } from '@/components/ReferenceData/ReferenceDataForm'
+import { useRefDataCrud } from '@/hooks/useRefDataCrud'
+import { useApiQuery } from '@/hooks/useApiQuery'
 import { formatDisplayDate } from '@/utils/dateUtils'
-import type { ReferenceData, SortState, TableColumn } from '@/types/referenceData'
-import styles from '@/styles/tabContent.module.css'
+import type { ReferenceData, ReferenceDataRequest } from '@/types/referenceData'
+import commonStyles from '@/styles/common.module.css'
+import refDataStyles from '@/components/ReferenceData/styles.module.css'
 
 /**
- * Props for ReferenceDataValuesTab
- */
-export interface ReferenceDataValuesTabProps {
-  /** Available reference data types for dropdown */
-  refDataTypes: ReferenceData[]
-  /** Loading state for types dropdown */
-  typesLoading?: boolean
-  /** Reference data values array */
-  data: ReferenceData[]
-  /** Loading state for data */
-  loading?: boolean
-  /** Error message */
-  error?: string | null
-  /** Currently selected reference data type */
-  selectedType: string
-  /** Handler for type selection change */
-  onTypeChange: (type: string) => void
-  /** Refresh data handler */
-  onRefresh?: () => void
-  /** Create handler */
-  onCreate?: () => void
-  /** Edit handler */
-  onEdit?: (item: ReferenceData) => void
-  /** Delete handler */
-  onDelete?: (item: ReferenceData) => void
-}
-
-/**
- * Reference Data Values Tab Component
+ * Reference Data Values Tab Component (Refactored)
  *
- * Displays a dropdown to select reference data type,
- * then shows a table of values for the selected type
- * with search, sorting, pagination, and CRUD actions.
+ * Self-contained tab with type dropdown + filtered data.
+ * Uses useRefDataCrud hook with conditional fetching based on selected type.
+ *
+ * Reduced from 324 lines to ~120 lines.
  */
-export function ReferenceDataValuesTab({
-  refDataTypes,
-  typesLoading = false,
-  data,
-  loading = false,
-  error = null,
-  selectedType,
-  onTypeChange,
-  onRefresh,
-  onCreate,
-  onEdit,
-  onDelete,
-}: Readonly<ReferenceDataValuesTabProps>) {
-  // Search state
-  const [searchQuery, setSearchQuery] = useState('')
+export function ReferenceDataValuesTab() {
+  const basePath = process.env.NEXT_PUBLIC_BASEPATH || ''
+  
+  // Fetch available reference data types for dropdown
+  const { data: refDataTypes, loading: typesLoading } = useApiQuery<ReferenceData[]>({
+    queryFn: async () => {
+      const response = await fetch(`${basePath}/api/reference-data/types`)
+      if (!response.ok) throw new Error(`Failed to fetch: ${response.statusText}`)
+      return response.json()
+    },
+  })
 
-  // Sort state
-  const [sort, setSort] = useState<SortState>({ column: '', direction: null })
+  // Type selection state
+  const [selectedType, setSelectedType] = useState('')
 
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1)
-  const [pageSize, setPageSize] = useState(10)
-
-  // Filter data based on search query
-  const filteredData = useMemo(() => {
-    if (!searchQuery.trim()) {
-      return data
-    }
-
-    const query = searchQuery.toLowerCase()
-    return data.filter(item => {
-      const value = item.refDataValue?.toLowerCase() ?? ''
-      const description = item.description?.toLowerCase() ?? ''
-      const type = item.refDataType?.toLowerCase() ?? ''
-
-      return value.includes(query) || description.includes(query) || type.includes(query)
-    })
-  }, [data, searchQuery])
-
-  // Paginate data
-  const paginatedData = useMemo(() => {
-    const startIndex = (currentPage - 1) * pageSize
-    return filteredData.slice(startIndex, startIndex + pageSize)
-  }, [filteredData, currentPage, pageSize])
-
-  // Reset to first page when search changes
-  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value)
-    setCurrentPage(1)
-  }, [])
-
-  // Handle page size change
-  const handlePageSizeChange = useCallback((newPageSize: number) => {
-    setPageSize(newPageSize)
-    setCurrentPage(1)
-  }, [])
-
-  // Handle type selection change
-  const handleTypeChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newType = e.target.value
-    onTypeChange(newType)
-    setSearchQuery('')
-    setCurrentPage(1)
-  }, [onTypeChange])
+  // Use generic CRUD hook with conditional fetch based on selected type
+  const crud = useRefDataCrud<ReferenceData, ReferenceDataRequest>({
+    endpoint: `${basePath}/api/reference-data/types`,
+    queryParams: selectedType ? `refDataType=${encodeURIComponent(selectedType)}` : '',
+    enabled: Boolean(selectedType),
+  })
 
   // Column definitions
-  const columns: TableColumn<ReferenceData>[] = useMemo(
+  const columns: RefDataColumn<ReferenceData>[] = useMemo(
     () => [
       {
         key: 'refDataType',
-        header: 'Ref Data Type',
-        sortable: true,
+        label: 'Ref Data Type',
         width: '200px',
       },
       {
         key: 'refDataValue',
-        header: 'Value',
-        sortable: true,
+        label: 'Value',
         width: '200px',
       },
       {
         key: 'description',
-        header: 'Description',
-        sortable: true,
+        label: 'Description',
       },
       {
         key: 'effectFromDat',
-        header: 'Effective From',
-        sortable: true,
+        label: 'Effective From',
         width: '140px',
-        render: (value: unknown) => (
-          <span className={styles.dateCell}>{formatDisplayDate(value)}</span>
+        render: (item) => (
+          <span className={commonStyles.dateCell}>{formatDisplayDate(item.effectFromDat)}</span>
         ),
       },
       {
         key: 'effectToDat',
-        header: 'Effective To',
-        sortable: true,
+        label: 'Effective To',
         width: '140px',
-        render: (value: unknown) => (
-          <span className={styles.dateCell}>{formatDisplayDate(value)}</span>
+        render: (item) => (
+          <span className={commonStyles.dateCell}>{formatDisplayDate(item.effectToDat)}</span>
         ),
       },
       {
         key: 'lastUpdateUid',
-        header: 'Updated By',
-        sortable: true,
+        label: 'Updated By',
         width: '120px',
       },
     ],
     []
   )
 
-  // Render row actions
-  const renderRowActions = useCallback(
-    (row: ReferenceData) => {
-      if (!row.editable) {
-        return <span className={styles.readOnlyLabel}>Read Only</span>
-      }
-
-      return (
-        <>
-          <button
-            type="button"
-            className={styles.actionButton}
-            onClick={() => onEdit?.(row)}
-            aria-label={`Edit ${row.refDataValue}`}
-            title="Edit"
-          >
-            <FontAwesomeIcon icon={faPen} size="sm" />
-          </button>
-          <button
-            type="button"
-            className={`${styles.actionButton} ${styles.danger}`}
-            onClick={() => onDelete?.(row)}
-            aria-label={`Delete ${row.refDataValue}`}
-            title="Delete"
-          >
-            <FontAwesomeIcon icon={faTrash} size="sm" />
-          </button>
-        </>
-      )
-    },
-    [onEdit, onDelete]
+  // Custom header with type dropdown
+  const renderCustomHeader = () => (
+    <div className={refDataStyles.typeSelectorWrapper}>
+      <label htmlFor="refDataTypeSelect" className={refDataStyles.typeSelectorLabel}>
+        Select Reference Data Type:
+      </label>
+      <select
+        id="refDataTypeSelect"
+        value={selectedType}
+        onChange={(e) => setSelectedType(e.target.value)}
+        disabled={typesLoading}
+        className={refDataStyles.typeSelectorSelect}
+      >
+        <option value="">-- Select a type --</option>
+        {refDataTypes?.map((type) => (
+          <option key={type.id} value={type.refDataValue}>
+            {type.refDataValue}
+          </option>
+        ))}
+      </select>
+    </div>
   )
 
-  // Error state
-  if (error) {
+  // If no type selected, show selection prompt
+  if (!selectedType) {
     return (
-      <div className={styles.container}>
-        <div className={styles.errorState}>
-          <div className={styles.errorIcon}>⚠️</div>
-          <div className={styles.errorText}>Failed to load reference data</div>
-          <div className={styles.errorSubtext}>{error}</div>
-          <Button hierarchy="secondary" onClick={onRefresh}>
-            <FontAwesomeIcon icon={faRefresh} />
-            Try Again
-          </Button>
+      <div className={commonStyles.contentWrapper}>
+        {renderCustomHeader()}
+        <div className={commonStyles.emptyState}>
+          Please select a reference data type to view its values.
         </div>
       </div>
     )
   }
 
   return (
-    <div className={styles.container}>
-      {/* Toolbar */}
-      <div className={styles.toolbar}>
-        <div className={styles.toolbarLeft}>
-          {/* Type Selector Dropdown */}
-          <div className={styles.typeSelector}>
-            <label htmlFor="refDataTypeSelect" className={styles.typeSelectorLabel}>
-              Reference Data Type:
-            </label>
-            <select
-              id="refDataTypeSelect"
-              className={styles.typeSelectorSelect}
-              value={selectedType}
-              onChange={handleTypeChange}
-              disabled={typesLoading}
-              aria-label="Select reference data type"
-            >
-              <option value="">-- Select Type --</option>
-              {refDataTypes.map(type => (
-                <option key={type.id} value={type.refDataValue}>
-                  {type.refDataValue}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Search - only show when a type is selected */}
-          {selectedType && (
-            <div className={styles.searchContainer}>
-              <span className={styles.searchIcon}>
-                <FontAwesomeIcon icon={faSearch} size="sm" />
-              </span>
-              <input
-                type="text"
-                className={styles.searchInput}
-                placeholder="Search by value or description..."
-                value={searchQuery}
-                onChange={handleSearchChange}
-                aria-label="Search reference data"
-              />
-            </div>
-          )}
-        </div>
-
-        <div className={styles.toolbarRight}>
-          {/* Refresh button */}
-          <Button
-            hierarchy="tertiary"
-            icon={faRefresh}
-            label="Refresh"
-            onClick={onRefresh}
-            disabled={!selectedType}
-          />
-          {/* Create button */}
-          <Button
-            hierarchy="primary"
-            iconBefore={faPlus}
-            onClick={onCreate}
-            disabled={!selectedType}
-          >
-            Add New
-          </Button>
-        </div>
-      </div>
-
-      {/* Table - only show when a type is selected */}
-      {selectedType ? (
-        <div className={styles.tableWrapper}>
-          <DataTable
-            columns={columns}
-            data={paginatedData}
-            getRowKey={row => row.id}
-            loading={loading}
-            emptyMessage="No reference data values found"
-            emptySubtext={
-              searchQuery
-                ? 'Try adjusting your search query'
-                : 'Add a new reference data value to get started'
-            }
-            sort={sort}
-            onSortChange={setSort}
-            renderRowActions={renderRowActions}
-          />
-
-          {/* Pagination - hide during loading */}
-          {!loading && filteredData.length > 0 && (
-            <div className={styles.paginationWrapper}>
-              <Pagination
-                currentPage={currentPage}
-                totalItems={filteredData.length}
-                pageSize={pageSize}
-                onPageChange={setCurrentPage}
-                onPageSizeChange={handlePageSizeChange}
-                pageSizeOptions={[10, 20, 50]}
-              />
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className={styles.tableWrapper}>
-          <div className={styles.emptyState}>
-            <div className={styles.emptyIcon}>📋</div>
-            <div className={styles.emptyText}>Select a Reference Data Type</div>
-            <div className={styles.emptySubtext}>
-              Choose a type from the dropdown above to view and manage its values.
-            </div>
-          </div>
-        </div>
-      )}
+    <div>
+      {renderCustomHeader()}
+      <RefDataTabTemplate
+        title={`Reference Data Values - ${selectedType}`}
+        crud={crud}
+        columns={columns}
+        FormComponent={ReferenceDataForm}
+        formProps={{ defaultRefDataType: selectedType }}
+        createButtonText="Create New Value"
+        emptyMessage={`No values found for type "${selectedType}"`}
+        deleteConfirmMessage={(item: ReferenceData) =>
+          `Are you sure you want to delete "${item.refDataValue}"? This action cannot be undone.`
+        }
+      />
     </div>
   )
 }

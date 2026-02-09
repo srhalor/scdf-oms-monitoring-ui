@@ -1,9 +1,9 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { Card } from '@/components/shared/Card'
-import { Pagination } from '@/components/shared/Pagination'
-import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
+import { Card } from '@/components/ui/Card'
+import { Pagination } from '@/components/ui/Pagination'
+import { ConfirmDialog } from '@/components/domain'
 import { DocumentRequestFilters } from '../DocumentRequestFilters'
 import { DocumentRequestTable } from '../DocumentRequestTable'
 import { DocumentRequestBulkActions } from '../DocumentRequestBulkActions'

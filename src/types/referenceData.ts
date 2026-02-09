@@ -45,7 +45,7 @@ export const REFERENCE_DATA_TYPES = {
   DOCUMENT_NAME: 'DOCUMENT_NAME',
   FOOTER_ID: 'FOOTER_ID',
   APP_DOC_SPEC: 'APP_DOC_SPEC',
-  CODE: 'CODE',
+  DOC_CONFIG_CODE: 'DOC_CONFIG_CODE',
   METADATA_KEY: 'METADATA_KEY',
 } as const
 
@@ -59,34 +59,7 @@ export interface ReferenceDataTab {
 }
 
 /**
- * Sort direction for table columns
+ * Re-export generic UI types for backward compatibility
+ * These are now colocated with DataTable component
  */
-export type SortDirection = 'asc' | 'desc' | null
-
-/**
- * Sort state for a column
- */
-export interface SortState {
-  column: string
-  direction: SortDirection
-}
-
-/**
- * Column definition for DataTable
- */
-export interface TableColumn<T> {
-  key: keyof T | string
-  header: string
-  sortable?: boolean
-  width?: string
-  render?: (value: unknown, row: T) => React.ReactNode
-}
-
-/**
- * Pagination state
- */
-export interface PaginationState {
-  currentPage: number
-  pageSize: number
-  totalItems: number
-}
+export type { SortDirection, SortState, TableColumn, PaginationState } from '@/components/ui/DataTable/types'

@@ -1,0 +1,111 @@
+/**
+ * Reference Data Common Styles
+ *
+ * Shared styles specific to Reference Data components.
+ * Used across ReferenceDataTypesTab, ReferenceDataValuesTab,
+ * DocumentConfigurationsTab, and RefDataTabTemplate.
+ */
+
+/* Action buttons */
+.actionButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  color: var(--color-gray-500);
+  background-color: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.actionButton:hover {
+  background-color: var(--color-gray-50);
+  color: var(--color-gray-700);
+}
+
+.actionButton:focus-visible {
+  outline: 2px solid var(--color-informative-500);
+  outline-offset: 2px;
+}
+
+.actionButton.danger:hover {
+  background-color: var(--color-error-50);
+  color: var(--color-error-600);
+}
+
+/* Action buttons layout (flex container for edit/delete buttons) */
+.actionButtons {
+  display: flex;
+  gap: var(--spacing-xs);
+  justify-content: flex-end;
+}
+
+/* Read-only label in actions column */
+.readOnlyLabel {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  font-size: var(--text-xs-size);
+  font-weight: 500;
+  border-radius: 10px;
+  white-space: nowrap;
+  background-color: var(--color-gray-50);
+  color: var(--color-gray-600);
+  border: 1px solid var(--color-gray-200);
+}
+
+/* Type selector dropdown (for Values tab) */
+.typeSelector {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.typeSelectorLabel {
+  font-size: var(--text-sm-size);
+  font-weight: 500;
+  color: var(--color-gray-700);
+  white-space: nowrap;
+}
+
+.typeSelectorSelect {
+  min-width: 200px;
+  height: 40px;
+  padding: 0 var(--spacing-lg) 0 var(--spacing-md);
+  font-size: var(--text-sm-size);
+  color: var(--color-gray-900);
+  background-color: var(--color-white);
+  border: 1px solid var(--color-gray-200);
+  border-radius: 8px;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%23929292' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.typeSelectorSelect:hover {
+  border-color: var(--color-gray-300);
+}
+
+.typeSelectorSelect:focus {
+  outline: none;
+  border-color: var(--color-informative-500);
+  box-shadow: 0 0 0 3px rgba(93, 184, 253, 0.15);
+}
+
+.typeSelectorSelect:disabled {
+  background-color: var(--color-gray-50);
+  color: var(--color-gray-400);
+  cursor: not-allowed;
+}
+
+/* Type selector wrapper (alternative layout for dropdowns) */
+.typeSelectorWrapper {
+  margin-bottom: var(--spacing-md);
+}

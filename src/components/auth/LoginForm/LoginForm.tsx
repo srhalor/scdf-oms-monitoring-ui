@@ -1,8 +1,8 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { Button } from '@/components/shared/Button'
-import { ValidationErrors } from '@/components/shared/ValidationErrors'
+import { Button } from '@/components/ui/Button'
+import { ValidationErrors } from '@/components/ui/ValidationErrors'
 import { useApiMutation } from '@/hooks'
 import { logger } from '@/lib/logger'
 import styles from './LoginForm.module.css'

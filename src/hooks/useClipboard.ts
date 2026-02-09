@@ -97,8 +97,7 @@ export function useClipboard(options: UseClipboardOptions = {}): UseClipboardRet
           textArea.select()
 
           // Using deprecated execCommand as fallback for older browsers
-          // NOSONAR typescript:S1874 - Intentional use for backward compatibility
-          const successful = document.execCommand('copy')
+          const successful = document.execCommand('copy') // NOSONAR typescript:S1874 - Intentional use for backward compatibility
           textArea.remove()
 
           if (!successful) {
