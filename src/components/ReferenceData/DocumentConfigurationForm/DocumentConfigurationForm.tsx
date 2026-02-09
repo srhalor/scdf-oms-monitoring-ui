@@ -289,7 +289,7 @@ export function DocumentConfigurationForm({
           />
         </FormSection>
 
-        <FormSection title="Effective Dates" divider>
+        <FormSection title="Effective Dates">
           <div className={styles.row}>
             <DateInput
               label="Effective From"

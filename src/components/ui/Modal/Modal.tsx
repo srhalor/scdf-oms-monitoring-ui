@@ -150,7 +150,6 @@ export function Modal({
     <div
       className={styles.overlay}
       onClick={handleOverlayClick}
-      aria-hidden="true"
     >
       <dialog
         ref={modalRef}

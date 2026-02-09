@@ -214,7 +214,7 @@ export function ReferenceDataForm({
           />
         </FormSection>
 
-        <FormSection title="Effective Dates" divider>
+        <FormSection title="Effective Dates">
           <div className={styles.row}>
             <DateInput
               label="Effective From"
@@ -234,7 +234,7 @@ export function ReferenceDataForm({
           </div>
         </FormSection>
 
-        <FormSection divider>
+        <FormSection>
           {/* Editable Checkbox */}
           <div className={styles.checkboxRow}>
             <Checkbox
