@@ -2,12 +2,11 @@
 
 import { useState, ReactNode, useEffect } from 'react'
 import { config } from '@fortawesome/fontawesome-svg-core'
-import { Sidebar } from '@/components/layout/Sidebar'
-import { Header } from '@/components/layout/Header'
-import type { User } from '@/types/auth'
-import styles from './LayoutWrapper.module.css'
-
 import { TokenRefresher } from '@/components/auth/TokenRefresher'
+import { Header } from '@/components/layout/Header'
+import { Sidebar } from '@/components/layout/Sidebar'
+import styles from './LayoutWrapper.module.css'
+import type { User } from '@/types/auth'
 
 // Prevent FontAwesome from auto-adding CSS
 config.autoAddCss = false

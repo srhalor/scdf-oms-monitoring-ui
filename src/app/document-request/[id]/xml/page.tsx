@@ -2,8 +2,8 @@
 
 import { useParams, useRouter } from 'next/navigation'
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons'
-import { Breadcrumb, Button, Card } from '@/components/ui'
 import { ContentViewer } from '@/components/domain/ContentViewer'
+import { Breadcrumb, Button, Card } from '@/components/ui'
 import { useApiQuery } from '@/hooks/useApiQuery'
 import { DocumentContentResponse } from '@/types/documentRequest'
 import styles from './content.module.css'

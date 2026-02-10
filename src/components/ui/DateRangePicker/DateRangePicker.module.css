@@ -182,7 +182,7 @@
   color: #4F4F4F;
   background-color: transparent;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--border-radius-md);
   cursor: pointer;
   transition: background-color var(--transition-fast), color var(--transition-fast);
 }
@@ -242,7 +242,7 @@
   height: 36px;
   padding: 0;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--border-radius-md);
   background-color: transparent;
   color: #929292;
   cursor: pointer;
@@ -415,7 +415,7 @@
   padding: 8px 12px;
   background-color: #FFFFFF;
   border: 1px solid #D1D0D0;
-  border-radius: 8px;
+  border-radius: var(--border-radius-md);
   box-shadow: 0px 1px 2px rgba(10, 13, 18, 0.05);
 }
 
@@ -454,7 +454,7 @@
   color: #262626;
   background-color: #FFFFFF;
   border: 1px solid #D1D0D0;
-  border-radius: 8px;
+  border-radius: var(--border-radius-md);
   box-shadow: 0px 1px 2px rgba(10, 13, 18, 0.05), inset 0px 0px 0px 1px rgba(12, 14, 18, 0.18), inset 0px -2px 0px rgba(12, 14, 18, 0.05);
   cursor: pointer;
   transition: background-color var(--transition-fast), border-color var(--transition-fast);
@@ -484,7 +484,7 @@
   color: #FFFFFF;
   background-color: #262626;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--border-radius-md);
   box-shadow: 0px 1px 2px rgba(10, 13, 18, 0.05), inset 0px 0px 0px 1px rgba(12, 14, 18, 0.18), inset 0px -2px 0px rgba(12, 14, 18, 0.05);
   cursor: pointer;
   transition: background-color var(--transition-fast);

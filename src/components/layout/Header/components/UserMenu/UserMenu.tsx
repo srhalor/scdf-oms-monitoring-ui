@@ -4,8 +4,8 @@ import { useState, useRef, useEffect } from 'react'
 import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
 import { Button } from '@/components/ui'
 import { useApiMutation } from '@/hooks'
-import type { User } from '@/types/auth'
 import styles from './UserMenu.module.css'
+import type { User } from '@/types/auth'
 
 interface UserMenuProps {
   user: User

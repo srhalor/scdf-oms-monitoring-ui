@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import { Tooltip } from '@/components/ui/Tooltip'
 import {
   DOCUMENT_REQUEST_STATUS_COLORS,
@@ -37,6 +38,7 @@ function getStatusColor(status: string, type: 'documentRequest' | 'batch'): stri
  *
  * Displays a status with a colored dot indicator and optional tooltip.
  * Follows the design from documentation/table.svg for status column styling.
+ * Optimized with React.memo for table row rendering performance.
  *
  * @example
  * // Document request status
@@ -45,7 +47,7 @@ function getStatusColor(status: string, type: 'documentRequest' | 'batch'): stri
  * // Batch status
  * <StatusBadge status="FAILED_THUNDERHEAD" description="Failed in Thunderhead" type="batch" />
  */
-export function StatusBadge({
+export const StatusBadge = memo(function StatusBadge({
   status,
   description,
   type = 'documentRequest',
@@ -70,4 +72,4 @@ export function StatusBadge({
   }
 
   return content
-}
+})

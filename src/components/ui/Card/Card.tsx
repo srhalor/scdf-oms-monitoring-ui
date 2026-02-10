@@ -1,7 +1,8 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import { memo } from 'react'
 import styles from './Card.module.css'
+import type { ReactNode } from 'react'
 
 interface CardProps {
   readonly title?: string
@@ -37,36 +38,36 @@ export function Card({ title, children, className = '', actions }: CardProps) {
 
 /**
  * Card.Header - Structured header for complex card layouts
- * Use instead of title prop when you need more control
+ * Use instead of title prop when you need more control (memoized)
  */
-Card.Header = function CardHeader({ children, className = '' }: CardSubcomponentProps) {
+Card.Header = memo(function CardHeader({ children, className = '' }: CardSubcomponentProps) {
   return <div className={`${styles.header} ${className}`}>{children}</div>
-}
+})
 
 /**
- * Card.Title - Title element for use within Card.Header
+ * Card.Title - Title element for use within Card.Header (memoized)
  */
-Card.Title = function CardTitle({ children, className = '' }: CardSubcomponentProps) {
+Card.Title = memo(function CardTitle({ children, className = '' }: CardSubcomponentProps) {
   return <h3 className={`${styles.title} ${className}`}>{children}</h3>
-}
+})
 
 /**
- * Card.Body - Main content area with standard padding
+ * Card.Body - Main content area with standard padding (memoized)
  */
-Card.Body = function CardBody({ children, className = '' }: CardSubcomponentProps) {
+Card.Body = memo(function CardBody({ children, className = '' }: CardSubcomponentProps) {
   return <div className={`${styles.body} ${className}`}>{children}</div>
-}
+})
 
 /**
- * Card.Section - Subsection within card body with divider
+ * Card.Section - Subsection within card body with divider (memoized)
  */
-Card.Section = function CardSection({ children, className = '' }: CardSubcomponentProps) {
+Card.Section = memo(function CardSection({ children, className = '' }: CardSubcomponentProps) {
   return <div className={`${styles.section} ${className}`}>{children}</div>
-}
+})
 
 /**
- * Card.Footer - Footer area with standard padding and top border
+ * Card.Footer - Footer area with standard padding and top border (memoized)
  */
-Card.Footer = function CardFooter({ children, className = '' }: CardSubcomponentProps) {
+Card.Footer = memo(function CardFooter({ children, className = '' }: CardSubcomponentProps) {
   return <div className={`${styles.footer} ${className}`}>{children}</div>
-}
+})

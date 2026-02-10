@@ -1,8 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import styles from './Breadcrumb.module.css'
 
 export interface BreadcrumbItem {

@@ -3,8 +3,8 @@
  * All values are read at runtime from environment variables (Helm ConfigMaps)
  * No NEXT_PUBLIC_* prefix - these are server-side only
  */
-import { isDevelopment } from '@/utils/envUtils'
 import { LogLevel } from '@/types/logging'
+import { isDevelopment } from '@/utils/envUtils'
 
 export const ENV_CONFIG = {
   logging: {

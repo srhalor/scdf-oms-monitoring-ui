@@ -3,18 +3,20 @@
  * 
  * Displays consistent empty state messages with optional icon and action button.
  * Used for "no data", "no results", "no selection", and error scenarios.
+ * Optimized with React.memo for conditional rendering performance.
  */
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
+import { memo } from 'react'
 import {
   faInbox,
   faMagnifyingGlass,
   faCheckSquare,
   faTriangleExclamation,
 } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Button } from '../Button'
 import styles from './EmptyState.module.css'
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
 
 const illustrationIcons: Record<string, IconDefinition> = {
   noData: faInbox,
@@ -41,7 +43,7 @@ export interface EmptyStateProps {
   className?: string
 }
 
-export function EmptyState({
+export const EmptyState = memo(function EmptyState({
   icon,
   title,
   description,
@@ -69,4 +71,4 @@ export function EmptyState({
       )}
     </div>
   )
-}
+})

@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react'
 import styles from './FormSection.module.css'
+import type { ReactNode } from 'react'
 
 interface FormSectionProps {
   readonly children: ReactNode

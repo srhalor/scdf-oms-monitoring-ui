@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useRef, useCallback, useEffect, useId } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronDown, faCheck, faXmark, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import styles from './MultiSelect.module.css'
 
 export interface SelectOption {

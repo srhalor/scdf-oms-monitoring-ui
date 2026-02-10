@@ -1,7 +1,7 @@
-import { User } from '@/types/auth'
+import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from 'axios'
 import { ENV_CONFIG } from '@/config/env.config'
 import { logger } from '@/lib/logger'
-import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from 'axios'
+import { User } from '@/types/auth'
 import { httpsAgent } from './certHelper'
 
 const { baseUrl } = ENV_CONFIG.api

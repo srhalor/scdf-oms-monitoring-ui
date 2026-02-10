@@ -1,13 +1,13 @@
 'use client'
 
-import { ReactNode } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { memo, ReactNode } from 'react'
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Tooltip } from '@/components/ui/Tooltip'
-import type { TooltipPosition } from '@/components/ui/Tooltip'
 import { logger } from '@/lib/logger'
 import styles from './Button.module.css'
 import { ButtonLoadingIcon } from './ButtonLoadingIcon'
+import type { TooltipPosition } from '@/components/ui/Tooltip'
 
 /** Badge variant type */
 type BadgeVariant = 'error' | 'warning' | 'info'
@@ -83,8 +83,8 @@ interface ButtonBadgeProps {
   badgeVariant: BadgeVariant
 }
 
-/** Renders badge for icon-only buttons */
-function ButtonBadge({ badge, badgeVariant }: Readonly<ButtonBadgeProps>) {
+/** Renders badge for icon-only buttons (memoized) */
+const ButtonBadge = memo(function ButtonBadge({ badge, badgeVariant }: Readonly<ButtonBadgeProps>) {
   const displayValue = typeof badge === 'number' && badge > 99 ? '99+' : badge
   return (
     <span
@@ -94,7 +94,7 @@ function ButtonBadge({ badge, badgeVariant }: Readonly<ButtonBadgeProps>) {
       {displayValue}
     </span>
   )
-}
+})
 
 interface IconOnlyContentProps {
   icon: IconDefinition
@@ -102,15 +102,15 @@ interface IconOnlyContentProps {
   badgeVariant: BadgeVariant
 }
 
-/** Renders icon-only button content */
-function IconOnlyContent({ icon, badge, badgeVariant }: Readonly<IconOnlyContentProps>) {
+/** Renders icon-only button content (memoized) */
+const IconOnlyContent = memo(function IconOnlyContent({ icon, badge, badgeVariant }: Readonly<IconOnlyContentProps>) {
   return (
     <>
       <FontAwesomeIcon icon={icon} className={styles.icon} />
       {badge !== undefined && <ButtonBadge badge={badge} badgeVariant={badgeVariant} />}
     </>
   )
-}
+})
 
 interface TextButtonContentProps {
   iconBefore?: IconDefinition

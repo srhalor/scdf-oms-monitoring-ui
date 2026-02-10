@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useRef, useCallback, useEffect, useId, useMemo } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faCalendar,
   faChevronDown,
@@ -9,6 +8,7 @@ import {
   faChevronRight,
   faXmark,
 } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import styles from './DateRangePicker.module.css'
 
 export interface DateRange {

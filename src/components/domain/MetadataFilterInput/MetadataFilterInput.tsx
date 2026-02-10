@@ -1,11 +1,11 @@
 'use client'
 
 import { useState, useCallback, useId } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus, faXmark } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Button } from '@/components/ui/Button'
-import type { ReferenceData } from '@/types/referenceData'
 import styles from './MetadataFilterInput.module.css'
+import type { ReferenceData } from '@/types/referenceData'
 
 export interface MetadataChip {
   /** Reference data ID for the metadata key */

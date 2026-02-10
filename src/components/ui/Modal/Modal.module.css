@@ -9,7 +9,7 @@
   padding: var(--spacing-lg);
   background-color: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(2px);
-  animation: fadeIn 150ms ease-out;
+  animation: fadeIn var(--transition-fast);
 }
 
 @keyframes fadeIn {
@@ -40,7 +40,7 @@
   border-radius: var(--border-radius-lg);
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
     0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  animation: slideIn 150ms ease-out;
+  animation: slideIn var(--transition-fast);
 }
 
 /* Hide default dialog backdrop */
@@ -129,7 +129,7 @@
   background-color: transparent;
   color: var(--color-gray-500);
   cursor: pointer;
-  transition: background-color 150ms ease, color 150ms ease;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
 .closeButton:hover {
@@ -155,12 +155,12 @@
 
 .body::-webkit-scrollbar-track {
   background-color: var(--color-gray-50);
-  border-radius: 3px;
+  border-radius: var(--border-radius-sm);
 }
 
 .body::-webkit-scrollbar-thumb {
   background-color: var(--color-gray-300);
-  border-radius: 3px;
+  border-radius: var(--border-radius-sm);
 }
 
 .body::-webkit-scrollbar-thumb:hover {

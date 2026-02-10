@@ -1,10 +1,10 @@
 'use client'
 
 import { forwardRef, InputHTMLAttributes, ReactNode, useState } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
-import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import styles from './FormField.module.css'
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
 
 /**
  * Counter for generating unique field IDs

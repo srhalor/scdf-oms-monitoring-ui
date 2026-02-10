@@ -1,0 +1,60 @@
+/**
+ * PaginatedDataTable Styles
+ *
+ * Container styles for the generic table component with opt-in features.
+ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* Filter Section */
+.filterSection {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.resultCount {
+  font-size: var(--text-sm-size);
+  color: var(--color-gray-500);
+  white-space: nowrap;
+}
+
+/* Bulk Actions Section */
+.bulkActionsSection {
+  padding: var(--spacing-md);
+  background-color: var(--color-informative-50);
+  border: 1px solid var(--color-informative-200);
+  border-radius: var(--border-radius-md);
+}
+
+/* Table Wrapper */
+.tableWrapper {
+  overflow-x: auto;
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--border-radius-md);
+}
+
+/* Empty/Error Container */
+.emptyContainer,
+.errorContainer {
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--border-radius-md);
+  background-color: var(--color-gray-50);
+}
+
+/* Pagination Section */
+.paginationSection {
+  display: flex;
+  justify-content: center;
+}

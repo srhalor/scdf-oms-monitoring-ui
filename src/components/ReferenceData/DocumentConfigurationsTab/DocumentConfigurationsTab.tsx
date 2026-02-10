@@ -1,17 +1,17 @@
 'use client'
 
 import { useMemo, useCallback } from 'react'
-import { RefDataTabTemplate, type RefDataColumn } from '@/components/ReferenceData/RefDataTabTemplate'
 import {
   DocumentConfigurationForm,
   type DocumentConfigurationFormProps,
 } from '@/components/ReferenceData/DocumentConfigurationForm'
-import { useRefDataCrud } from '@/hooks/useRefDataCrud'
+import { RefDataTabTemplate, type RefDataColumn } from '@/components/ReferenceData/RefDataTabTemplate'
 import { useApiQuery } from '@/hooks/useApiQuery'
+import { useRefDataCrud } from '@/hooks/useRefDataCrud'
+import commonStyles from '@/styles/common.module.css'
 import { formatDisplayDate } from '@/utils/dateUtils'
 import type { DocumentConfiguration, DocumentConfigurationRequest } from '@/types/documentConfiguration'
 import type { ReferenceData } from '@/types/referenceData'
-import commonStyles from '@/styles/common.module.css'
 
 /**
  * Document Configurations Tab Component (Refactored)

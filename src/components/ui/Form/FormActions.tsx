@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react'
 import styles from './FormActions.module.css'
+import type { ReactNode } from 'react'
 
 interface FormActionsProps {
   readonly children: ReactNode

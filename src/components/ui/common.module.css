@@ -1,0 +1,237 @@
+/**
+ * UI Common CSS Module
+ * 
+ * Shared CSS patterns used across 3+ UI components.
+ * Extracted to reduce duplication and ensure consistency.
+ * 
+ * Usage: Import and apply via composes or className
+ * Example: 
+ *   import commonStyles from '@/components/ui/common.module.css'
+ *   <input className={commonStyles.inputBase} />
+ */
+
+/* ============================================================================
+   A. INPUT BASE STYLES
+   ============================================================================
+   Used by: SearchInput, MultiSelect, DateRangePicker, FormField,
+            BatchErrors, DocumentRequestBatches
+   Lines Saved: ~60 lines
+   ========================================================================= */
+
+.inputBase {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--text-sm-size);
+  color: var(--color-gray-900);
+  background-color: var(--color-white);
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--border-radius-md);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.inputBase:focus {
+  outline: none;
+  border-color: var(--color-brand-500);
+  box-shadow: 0 0 0 2px var(--color-brand-100);
+}
+
+.inputBase::placeholder {
+  color: var(--color-gray-400);
+}
+
+.inputBase:disabled {
+  background-color: var(--color-gray-50);
+  color: var(--color-gray-400);
+  cursor: not-allowed;
+}
+
+.inputBase:hover:not(:disabled) {
+  border-color: var(--color-gray-400);
+}
+
+/* ============================================================================
+   B. CLEAR BUTTON PATTERN
+   ============================================================================
+   Used by: SearchInput, MultiSelect, DateRangePicker,
+            BatchErrors, DocumentRequestBatches
+   Lines Saved: ~40 lines
+   ========================================================================= */
+
+.clearButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  color: var(--color-gray-400);
+  background-color: transparent;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.clearButton:hover {
+  color: var(--color-gray-600);
+  background-color: var(--color-gray-100);
+}
+
+.clearButton:focus-visible {
+  outline: 2px solid var(--color-informative-500);
+  outline-offset: 2px;
+}
+
+/* ============================================================================
+   C. ICON CONTAINER PATTERN
+   ============================================================================
+   Used by: SearchInput, MultiSelect, DateRangePicker,
+            BatchErrors, DocumentRequestBatches
+   Lines Saved: ~30 lines
+   ========================================================================= */
+
+.iconContainer {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-gray-400);
+  pointer-events: none;
+}
+
+.iconContainerLeft {
+  left: var(--spacing-sm);
+}
+
+.iconContainerRight {
+  right: var(--spacing-sm);
+}
+
+/* ============================================================================
+   D. DROPDOWN BASE STYLES
+   ============================================================================
+   Used by: MultiSelect, DateRangePicker, ActionMenu
+   Lines Saved: ~50 lines
+   ========================================================================= */
+
+.dropdownContainer {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: var(--z-index-dropdown);
+  background-color: var(--color-white);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  animation: dropdownSlideIn var(--transition-fast) ease-out;
+}
+
+@keyframes dropdownSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--text-sm-size);
+  color: var(--color-gray-900);
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+  text-align: left;
+}
+
+.dropdownItem:hover {
+  background-color: var(--color-gray-50);
+}
+
+.dropdownItem:focus-visible {
+  outline: 2px solid var(--color-informative-500);
+  outline-offset: -2px;
+  background-color: var(--color-gray-50);
+}
+
+.dropdownItem:disabled {
+  color: var(--color-gray-400);
+  cursor: not-allowed;
+}
+
+/* ============================================================================
+   E. LOADING OVERLAY PATTERN
+   ============================================================================
+   Used by: SearchInput, DataTable
+   Lines Saved: ~20 lines
+   ========================================================================= */
+
+.loadingOverlay {
+  position: absolute;
+  top: 0;
+  right: var(--spacing-sm);
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* ============================================================================
+   F. SHADOW UTILITIES
+   ============================================================================
+   Consistent shadow patterns
+   Lines Saved: ~15 lines
+   ========================================================================= */
+
+.shadowSm {
+  box-shadow: var(--shadow-sm);
+}
+
+.shadowMd {
+  box-shadow: var(--shadow-md);
+}
+
+.shadowLg {
+  box-shadow: var(--shadow-lg);
+}
+
+/* ============================================================================
+   G. BORDER UTILITIES
+   ============================================================================
+   Consistent border patterns
+   Lines Saved: ~10 lines
+   ========================================================================= */
+
+.borderBase {
+  border: 1px solid var(--color-gray-200);
+}
+
+.borderLight {
+  border: 1px solid var(--color-gray-100);
+}
+
+.borderMedium {
+  border: 1px solid var(--color-gray-300);
+}
+
+.borderRadius {
+  border-radius: var(--border-radius-md);
+}
+
+.borderRadiusSm {
+  border-radius: var(--border-radius-sm);
+}
+
+.borderRadiusLg {
+  border-radius: var(--border-radius-lg);
+}

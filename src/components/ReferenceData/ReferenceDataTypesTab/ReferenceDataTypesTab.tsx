@@ -4,9 +4,9 @@ import { useMemo } from 'react'
 import { RefDataTabTemplate, type RefDataColumn } from '@/components/ReferenceData/RefDataTabTemplate'
 import { ReferenceDataForm } from '@/components/ReferenceData/ReferenceDataForm'
 import { useRefDataCrud } from '@/hooks/useRefDataCrud'
+import commonStyles from '@/styles/common.module.css'
 import { formatDisplayDate } from '@/utils/dateUtils'
 import type { ReferenceData, ReferenceDataRequest } from '@/types/referenceData'
-import commonStyles from '@/styles/common.module.css'
 
 /**
  * Reference Data Types Tab Component (Refactored)

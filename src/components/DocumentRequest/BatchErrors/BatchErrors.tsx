@@ -1,36 +1,16 @@
 'use client'
 
-import { useMemo, useState, useCallback } from 'react'
-import { faSearch, faTimes } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { DataTable } from '@/components/ui/DataTable'
-import { Pagination } from '@/components/ui/Pagination'
-import { useClientSidePagination } from '@/hooks'
+import { useMemo, useState } from 'react'
+import { PaginatedDataTable } from '@/components/ui/PaginatedDataTable'
 import { BatchError } from '@/types/documentRequest'
-import type { SortState, TableColumn } from '@/types/referenceData'
 import styles from './BatchErrors.module.css'
+import type { TableColumn } from '@/components/ui/DataTable/types'
 
 export interface BatchErrorsProps {
   /** Errors to display */
   errors: BatchError[]
   /** Whether errors are loading */
   loading?: boolean
-}
-
-/**
- * Filter errors by search text
- */
-function filterErrors(errors: BatchError[], searchText: string): BatchError[] {
-  if (!searchText.trim()) {
-    return errors
-  }
-  const searchLower = searchText.toLowerCase()
-  return errors.filter(
-    (err) =>
-      err.category.toLowerCase().includes(searchLower) ||
-      err.description.toLowerCase().includes(searchLower) ||
-      String(err.id).includes(searchLower)
-  )
 }
 
 /**
@@ -45,44 +25,32 @@ function filterErrors(errors: BatchError[], searchText: string): BatchError[] {
  *   loading={isLoadingErrors}
  * />
  */
-export function BatchErrors({
-  errors,
-  loading = false,
-}: Readonly<BatchErrorsProps>) {
-  // Filter state
+export function BatchErrors({ errors, loading = false }: Readonly<BatchErrorsProps>) {
+  // Filter, sort, and pagination state
   const [filterText, setFilterText] = useState('')
+  const [sortColumn, setSortColumn] = useState<string | null>('id')
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>('asc')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
 
-  // Sort state
-  const [sort, setSort] = useState<SortState>({ column: 'id', direction: 'asc' })
+  // Reset to page 1 when filter changes
+  const handleFilterChange = (value: string) => {
+    setFilterText(value)
+    setCurrentPage(1)
+  }
 
-  // Filter errors
-  const filteredErrors = useMemo(() => {
-    return filterErrors(errors, filterText)
-  }, [errors, filterText])
+  // Reset to page 1 when sort changes
+  const handleSortChange = (column: string, direction: 'asc' | 'desc' | null) => {
+    setSortColumn(column)
+    setSortDirection(direction)
+    setCurrentPage(1)
+  }
 
-  // Client-side pagination
-  const {
-    page,
-    pageSize,
-    totalItems,
-    totalPages,
-    pageItems,
-    goToPage,
-    setPageSize,
-  } = useClientSidePagination({
-    items: filteredErrors,
-    pageSize: 10,
-  })
-
-  // Handle filter clear
-  const handleClearFilter = useCallback(() => {
-    setFilterText('')
-  }, [])
-
-  // Handle sort change
-  const handleSortChange = useCallback((newSort: SortState) => {
-    setSort(newSort)
-  }, [])
+  // Reset to page 1 when page size changes
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize)
+    setCurrentPage(1)
+  }
 
   // Column definitions
   const columns: TableColumn<BatchError>[] = useMemo(
@@ -118,70 +86,41 @@ export function BatchErrors({
 
   return (
     <div className={styles.container}>
-      {/* Filter Input */}
-      <div className={styles.filterContainer}>
-        <div className={styles.filterInput}>
-          <FontAwesomeIcon icon={faSearch} className={styles.filterIcon} />
-          <input
-            type="text"
-            placeholder="Filter errors by category or description..."
-            value={filterText}
-            onChange={(e) => setFilterText(e.target.value)}
-            className={styles.input}
-            aria-label="Filter errors"
-          />
-          {filterText && (
-            <button
-              type="button"
-              onClick={handleClearFilter}
-              className={styles.clearButton}
-              aria-label="Clear filter"
-            >
-              <FontAwesomeIcon icon={faTimes} />
-            </button>
-          )}
-        </div>
-        <span className={styles.resultCount}>
-          {filteredErrors.length} of {errors.length} errors
-        </span>
-      </div>
-
-      {/* Empty filter result */}
-      {!loading && filteredErrors.length === 0 ? (
-        <div className={styles.noResults}>
-          No errors match your filter. Try a different search term.
-        </div>
-      ) : (
-        <>
-          {/* Table */}
-          <div className={styles.tableWrapper}>
-            <DataTable
-              columns={columns}
-              data={pageItems}
-              getRowKey={(row) => row.id}
-              loading={loading}
-              emptyMessage="No errors found"
-              sort={sort}
-              onSortChange={handleSortChange}
-            />
-          </div>
-
-          {/* Pagination */}
-          {!loading && totalPages > 1 && (
-            <div className={styles.paginationContainer}>
-              <Pagination
-                currentPage={page}
-                totalItems={totalItems}
-                pageSize={pageSize}
-                onPageChange={goToPage}
-                onPageSizeChange={setPageSize}
-                pageSizeOptions={[5, 10, 20, 50]}
-                compact
-              />
-            </div>
-          )}
-        </>
-      )}
+      <PaginatedDataTable
+        data={errors}
+        columns={columns}
+        rowKey="id"
+        filter={{
+          value: filterText,
+          onChange: handleFilterChange,
+          placeholder: 'Filter errors by category or description...',
+          mode: 'client',
+        }}
+        sort={{
+          type: 'single',
+          column: sortColumn,
+          direction: sortDirection,
+          onSort: handleSortChange,
+          mode: 'client',
+        }}
+        pagination={{
+          currentPage,
+          totalItems: errors.length,
+          pageSize,
+          onPageChange: setCurrentPage,
+          onPageSizeChange: handlePageSizeChange,
+          pageSizeOptions: [5, 10, 20, 50],
+          showPageSizeSelector: true,
+          showInfo: false,
+          mode: 'client',
+        }}
+        loading={loading}
+        emptyState={{
+          message: 'No errors match your filter',
+          description: 'Try a different search term.',
+        }}
+      />
     </div>
   )
 }
+

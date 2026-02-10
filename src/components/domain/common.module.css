@@ -1,0 +1,257 @@
+/**
+ * Domain Common CSS Module
+ * 
+ * Shared CSS patterns used across domain/DocumentRequest components.
+ * Extracted to reduce duplication and ensure consistency.
+ * 
+ * Usage: Import and apply via composes or className
+ * Example: 
+ *   import domainStyles from '@/components/domain/common.module.css'
+ *   <div className={domainStyles.filterContainer}>...</div>
+ */
+
+/* ============================================================================
+   A. FILTER CONTAINER PATTERN
+   ============================================================================
+   Used by: BatchErrors, DocumentRequestBatches, DocumentRequestTable
+   Lines Saved: ~125 lines
+   ========================================================================= */
+
+.filterContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+  margin-bottom: var(--spacing-md);
+}
+
+.filterInputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  max-width: 400px;
+}
+
+.filterIcon {
+  position: absolute;
+  left: var(--spacing-sm);
+  color: var(--color-gray-400);
+  font-size: var(--text-sm-size);
+  pointer-events: none;
+}
+
+.filterInput {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-sm) var(--spacing-sm) var(--spacing-xl);
+  font-size: var(--text-sm-size);
+  color: var(--color-gray-900);
+  background-color: var(--color-white);
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--border-radius-md);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.filterInput:focus {
+  outline: none;
+  border-color: var(--color-brand-500);
+  box-shadow: 0 0 0 2px var(--color-brand-100);
+}
+
+.filterInput::placeholder {
+  color: var(--color-gray-400);
+}
+
+.filterActions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.clearFilterButton {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--text-sm-size);
+  color: var(--color-gray-600);
+  background-color: transparent;
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.clearFilterButton:hover {
+  color: var(--color-gray-900);
+  background-color: var(--color-gray-50);
+}
+
+.clearFilterButton:focus-visible {
+  outline: 2px solid var(--color-informative-500);
+  outline-offset: 2px;
+}
+
+.clearFilterButton:disabled {
+  color: var(--color-gray-400);
+  cursor: not-allowed;
+}
+
+/* ============================================================================
+   B. TABLE CONTAINER PATTERN
+   ============================================================================
+   Used by: BatchErrors, DocumentRequestBatches, DocumentRequestTable
+   Lines Saved: ~40 lines
+   ========================================================================= */
+
+.tableContainer {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-gray-100);
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+}
+
+.tableContainerWithPagination {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-gray-100);
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.tablePaginationWrapper {
+  padding: var(--spacing-md);
+  border-top: 1px solid var(--color-gray-100);
+  background-color: var(--color-white);
+}
+
+/* ============================================================================
+   C. TABLE EMPTY STATE PATTERN
+   ============================================================================
+   Used by: BatchErrors, DocumentRequestBatches, DocumentRequestTable
+   Note: Consider using EmptyState component for consistency
+   Lines Saved: ~30 lines
+   ========================================================================= */
+
+.tableEmptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-3xl) var(--spacing-xl);
+  text-align: center;
+  color: var(--color-gray-500);
+}
+
+.tableEmptyIcon {
+  font-size: 48px;
+  color: var(--color-gray-300);
+  margin-bottom: var(--spacing-md);
+}
+
+.tableEmptyText {
+  font-size: var(--text-base-size);
+  margin-bottom: var(--spacing-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.tableEmptySubtext {
+  font-size: var(--text-sm-size);
+  color: var(--color-gray-400);
+}
+
+/* ============================================================================
+   D. STATUS MESSAGE PATTERN
+   ============================================================================
+   Used for inline status/info messages in domain components
+   ========================================================================= */
+
+.statusMessage {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--text-sm-size);
+}
+
+.statusMessageInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--text-sm-size);
+  background-color: var(--color-informative-50);
+  color: var(--color-informative-700);
+  border: 1px solid var(--color-informative-200);
+}
+
+.statusMessageSuccess {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--text-sm-size);
+  background-color: var(--color-positive-50);
+  color: var(--color-positive-700);
+  border: 1px solid var(--color-positive-200);
+}
+
+.statusMessageWarning {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--text-sm-size);
+  background-color: var(--color-warning-50);
+  color: var(--color-warning-700);
+  border: 1px solid var(--color-warning-200);
+}
+
+.statusMessageError {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--text-sm-size);
+  background-color: var(--color-error-50);
+  color: var(--color-error-700);
+  border: 1px solid var(--color-error-200);
+}
+
+/* ============================================================================
+   E. DOCUMENT REQUEST SPECIFIC PATTERNS
+   ============================================================================
+   Common patterns for document request feature
+   ========================================================================= */
+
+.detailRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1px solid var(--color-gray-100);
+}
+
+.detailRow:last-child {
+  border-bottom: none;
+}
+
+.detailLabel {
+  min-width: 140px;
+  font-size: var(--text-sm-size);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-600);
+}
+
+.detailValue {
+  flex: 1;
+  font-size: var(--text-sm-size);
+  color: var(--color-gray-900);
+}

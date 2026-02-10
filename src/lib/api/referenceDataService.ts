@@ -5,10 +5,10 @@
  * Uses the API client with auth interceptors.
  */
 
-import { logger } from '@/lib/logger'
 import { logApiError } from '@/lib/api/apiUtils'
-import type { AxiosInstance } from 'axios'
+import { logger } from '@/lib/logger'
 import type { ReferenceData, ReferenceDataRequest } from '@/types/referenceData'
+import type { AxiosInstance } from 'axios'
 
 const API_PATH = '/v1/reference-data'
 const SERVICE_NAME = 'ReferenceDataService'

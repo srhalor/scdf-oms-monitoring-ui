@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server'
-import { getServerCookie } from '@/utils/cookieUtils'
 import { ENV_CONFIG } from '@/config/env.config'
-import { isDevelopment } from '@/utils/envUtils'
 import { updateSession } from '@/lib/auth/sessionManager'
 import { exchangeClientCredentials, exchangeJwtBearer } from '@/lib/auth/tokenService'
 import { logger } from '@/lib/logger'
+import { getServerCookie } from '@/utils/cookieUtils'
+import { isDevelopment } from '@/utils/envUtils'
 
 export async function POST() {
   logger.debug('RefreshAPI', 'Token refresh request received')

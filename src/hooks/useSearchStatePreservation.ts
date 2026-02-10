@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useCallback, useRef } from 'react'
+import { logger } from '@/lib/logger'
 import {
   DocumentRequestFilters,
   SortItem,
@@ -8,7 +9,6 @@ import {
   DEFAULT_SORT,
   PAGINATION_DEFAULTS,
 } from '@/types/documentRequest'
-import { logger } from '@/lib/logger'
 
 /**
  * Persisted search state structure

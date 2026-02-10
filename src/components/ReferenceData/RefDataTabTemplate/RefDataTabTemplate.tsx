@@ -1,15 +1,12 @@
-import { ReactNode, useMemo, useState } from 'react'
-import { Card } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
-import { DataTable } from '@/components/ui/DataTable'
-import { Pagination } from '@/components/ui/Pagination'
-import { SearchInput } from '@/components/ui/SearchInput'
-import { ConfirmDialog } from '@/components/domain'
+import { ReactNode, useState } from 'react'
 import { faPlus, faPencil, faTrash } from '@fortawesome/free-solid-svg-icons'
-import type { UseRefDataCrudReturn } from '@/hooks/useRefDataCrud'
-import type { SortState } from '@/components/ui/DataTable/types'
-import commonStyles from '@/styles/common.module.css'
+import { ConfirmDialog } from '@/components/domain'
 import refDataStyles from '@/components/ReferenceData/styles.module.css'
+import { Button } from '@/components/ui/Button'
+import { Card } from '@/components/ui/Card'
+import { PaginatedDataTable } from '@/components/ui/PaginatedDataTable'
+import type { TableColumn } from '@/components/ui/DataTable/types'
+import type { UseRefDataCrudReturn } from '@/hooks/useRefDataCrud'
 
 export interface RefDataColumn<T> {
   /** Column key */
@@ -117,7 +114,8 @@ export function RefDataTabTemplate<TData extends { id: number }, TRequest>({
 
   // Client-side filtering, sorting, and pagination state
   const [searchQuery, setSearchQuery] = useState('')
-  const [sortState, setSortState] = useState<SortState>({ column: '', direction: null })
+  const [sortColumn, setSortColumn] = useState<string | null>(null)
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
 
@@ -127,38 +125,12 @@ export function RefDataTabTemplate<TData extends { id: number }, TRequest>({
     setCurrentPage(1)
   }
 
-  // Filter data based on search query
-  const filteredData = useMemo(() => {
-    if (!data || !searchQuery) {
-      return data ?? []
-    }
-
-    const query = searchQuery.toLowerCase()
-    return data.filter((item) => {
-      // Search across all column values
-      return columns.some((col) => {
-        const value = (item as Record<string, unknown>)[col.key]
-        // Only search primitive values (string, number, boolean)
-        const isPrimitive =
-          typeof value === 'string' ||
-          typeof value === 'number' ||
-          typeof value === 'boolean'
-        
-        if (!isPrimitive) {
-          return false
-        }
-        
-        return String(value).toLowerCase().includes(query)
-      })
-    })
-  }, [data, searchQuery, columns])
-
-  // Paginate filtered data
-  const paginatedData = useMemo(() => {
-    const startIndex = (currentPage - 1) * pageSize
-    const endIndex = startIndex + pageSize
-    return filteredData.slice(startIndex, endIndex)
-  }, [filteredData, currentPage, pageSize])
+  // Reset to page 1 when sort changes
+  const handleSort = (column: string, direction: 'asc' | 'desc' | null) => {
+    setSortColumn(column)
+    setSortDirection(direction)
+    setCurrentPage(1)
+  }
 
   // Reset page when pageSize changes
   const handlePageSizeChange = (newPageSize: number) => {
@@ -180,62 +152,15 @@ export function RefDataTabTemplate<TData extends { id: number }, TRequest>({
     }
   }
 
-  // Build table rows with actions (use paginated data)
-  const tableRows = paginatedData.map((item) => {
-    const row: Record<string, ReactNode> & { __id: number } = { __id: item.id }
-    
-    // Add column data
-    columns.forEach((col) => {
-      if (col.render) {
-        row[col.key] = col.render(item)
-      } else {
-        row[col.key] = (item as Record<string, unknown>)[col.key] as ReactNode
-      }
-    })
-
-    // Add actions column
-    row.actions = renderRowActions
-      ? renderRowActions(item, () => openEditModal(item), () => openDeleteModal(item))
-      : (
-          <div className={refDataStyles.actionButtons}>
-            <Button
-              icon={faPencil}
-              label="Edit"
-              hierarchy="tertiary"
-              size="sm"
-              onClick={() => openEditModal(item)}
-              tooltipPosition="left"
-            />
-            <Button
-              icon={faTrash}
-              label="Delete"
-              hierarchy="tertiary"
-              size="sm"
-              variant="destructive"
-              onClick={() => openDeleteModal(item)}
-              tooltipPosition="left"
-            />
-          </div>
-        )
-
-    return row
-  })
-
-  // Build table columns with actions (enable sorting by default)
-  const tableColumns = [
-    ...columns.map((col) => ({
-      key: col.key,
-      header: col.label,
-      width: col.width,
-      sortable: col.sortable ?? true, // Enable sorting by default
-    })),
-    {
-      key: 'actions',
-      header: 'Actions',
-      width: '200px',
-      sortable: false,
-    },
-  ]
+  // Convert RefDataColumn to TableColumn format
+  const tableColumns: TableColumn<TData>[] = columns.map((col) => ({
+    key: col.key,
+    header: col.label,
+    width: col.width,
+    sortable: col.sortable ?? true,
+    // Adapt render function: RefDataColumn uses (item) => node, TableColumn uses (value, row) => node
+    render: col.render ? (_value, row) => col.render!(row) : undefined,
+  }))
 
   return (
     <>
@@ -252,44 +177,76 @@ export function RefDataTabTemplate<TData extends { id: number }, TRequest>({
           </Button>
         }
       >
-        {/* Search Input */}
-        <div className={commonStyles.searchWrapper}>
-          <SearchInput
-            value={searchQuery}
-            onChange={handleSearchChange}
-            placeholder={`Search ${title.toLowerCase()}...`}
-            clearable
-          />
-        </div>
-
-        {/* Table and Pagination Wrapper */}
-        <div className={commonStyles.tableWrapper}>
-          {/* Data Table */}
-          <DataTable
-            columns={tableColumns}
-            data={tableRows}
-            loading={loading}
-            emptyMessage={error || emptyMessage}
-            getRowKey={(row) => row.__id}
-            sort={sortState}
-            onSortChange={setSortState}
-          />
-
-          {/* Pagination */}
-          {!loading && filteredData.length > 0 && (
-            <div className={commonStyles.paginationWrapper}>
-              <Pagination
-                currentPage={currentPage}
-                totalItems={filteredData.length}
-                pageSize={pageSize}
-                onPageChange={setCurrentPage}
-                onPageSizeChange={handlePageSizeChange}
-                showPageSizeSelector
-                showInfo
-              />
-            </div>
-          )}
-        </div>
+        <PaginatedDataTable
+          data={data ?? []}
+          columns={tableColumns}
+          rowKey="id"
+          filter={{
+            value: searchQuery,
+            onChange: handleSearchChange,
+            placeholder: `Search ${title.toLowerCase()}...`,
+            mode: 'client',
+          }}
+          sort={{
+            type: 'single',
+            column: sortColumn,
+            direction: sortDirection,
+            onSort: handleSort,
+            mode: 'client',
+          }}
+          pagination={{
+            currentPage,
+            totalItems: data?.length ?? 0,
+            pageSize,
+            onPageChange: setCurrentPage,
+            onPageSizeChange: handlePageSizeChange,
+            pageSizeOptions: [10, 25, 50],
+            showPageSizeSelector: true,
+            showInfo: true,
+            mode: 'client',
+          }}
+          rowActions={{
+            header: 'Actions',
+            width: '200px',
+            render: (item) =>
+              renderRowActions ? (
+                renderRowActions(item, () => openEditModal(item), () => openDeleteModal(item))
+              ) : (
+                <div className={refDataStyles.actionButtons}>
+                  <Button
+                    icon={faPencil}
+                    label="Edit"
+                    hierarchy="tertiary"
+                    size="sm"
+                    onClick={() => openEditModal(item)}
+                    tooltipPosition="left"
+                  />
+                  <Button
+                    icon={faTrash}
+                    label="Delete"
+                    hierarchy="tertiary"
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => openDeleteModal(item)}
+                    tooltipPosition="left"
+                  />
+                </div>
+              ),
+          }}
+          loading={loading}
+          error={
+            error
+              ? {
+                  error: true,
+                  message: error,
+                }
+              : undefined
+          }
+          emptyState={{
+            message: 'No Data Found',
+            description: emptyMessage,
+          }}
+        />
       </Card>
 
       {/* Form Modal */}

@@ -15,8 +15,8 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import type { ErrorResponseDto } from '@/types/api'
 import { logger } from '@/lib/logger'
+import type { ErrorResponseDto } from '@/types/api'
 
 export interface UseApiQueryOptions<T> {
   /** Function that performs the API call */

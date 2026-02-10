@@ -3,14 +3,14 @@
 import { useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons'
+import { BatchErrors } from '@/components/DocumentRequest/BatchErrors'
+import { StatusBadge } from '@/components/domain'
 import { Breadcrumb } from '@/components/ui/Breadcrumb'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
-import { StatusBadge } from '@/components/domain'
-import { BatchErrors } from '@/components/DocumentRequest/BatchErrors'
+import { useApiQuery } from '@/hooks/useApiQuery'
 import { Batch, BatchError, FAILED_BATCH_STATUSES, BatchStatusType } from '@/types/documentRequest'
 import { formatDisplayDateTime } from '@/utils/dateUtils'
-import { useApiQuery } from '@/hooks/useApiQuery'
 import styles from './BatchDetails.module.css'
 
 /**

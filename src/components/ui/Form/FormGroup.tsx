@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react'
 import styles from './FormGroup.module.css'
+import type { ReactNode } from 'react'
 
 interface FormGroupProps {
   readonly children: ReactNode

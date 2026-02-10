@@ -1,19 +1,19 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { Modal } from '@/components/ui/Modal'
 import { Button } from '@/components/ui/Button'
-import { TextInput, TextArea, Select, DateInput } from '@/components/ui/FormField'
-import { FormSection } from '@/components/ui/Form/FormSection'
 import { FormActions } from '@/components/ui/Form/FormActions'
+import { FormSection } from '@/components/ui/Form/FormSection'
+import { TextInput, TextArea, Select, DateInput } from '@/components/ui/FormField'
+import { Modal } from '@/components/ui/Modal'
+import { logger } from '@/lib/logger'
 import { formatInputDate, getCurrentDate, DEFAULT_END_DATE } from '@/utils/dateUtils'
-import type { ReferenceData } from '@/types/referenceData'
+import styles from './DocumentConfigurationForm.module.css'
 import type {
   DocumentConfiguration,
   DocumentConfigurationRequest,
 } from '@/types/documentConfiguration'
-import styles from './DocumentConfigurationForm.module.css'
-import { logger } from '@/lib/logger'
+import type { ReferenceData } from '@/types/referenceData'
 
 export interface DocumentConfigurationFormProps {
   /** Whether the form modal is open */

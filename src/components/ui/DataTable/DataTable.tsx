@@ -1,11 +1,11 @@
 'use client'
 
 import { useCallback, useMemo, useState } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowUp, faInbox } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { formatValue, toComparableString } from '@/utils/formatUtils'
-import type { SortDirection, SortState, TableColumn } from './types'
 import styles from './DataTable.module.css'
+import type { SortDirection, SortState, TableColumn } from './types'
 
 /**
  * DataTable props

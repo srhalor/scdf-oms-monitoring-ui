@@ -1,11 +1,11 @@
 'use client'
 
-import { Logo } from './Logo/Logo'
+import { APP_CONFIG } from '@/config/app.config'
 import { GlobalControls } from './components/GlobalControls'
 import { UserMenu } from './components/UserMenu'
-import { APP_CONFIG } from '@/config/app.config'
-import type { User } from '@/types/auth'
 import styles from './Header.module.css'
+import { Logo } from './Logo/Logo'
+import type { User } from '@/types/auth'
 
 export interface HeaderProps {
   user: User

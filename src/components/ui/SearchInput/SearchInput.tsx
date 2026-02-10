@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback, type ChangeEvent } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSearch, faTimes, faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import styles from './SearchInput.module.css'
 
 interface SearchInputProps {

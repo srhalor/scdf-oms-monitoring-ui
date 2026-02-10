@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAccessToken, getCurrentUser } from '@/lib/auth/authHelpers'
 import { createAuthenticatedClient } from '@/lib/api/apiClient'
+import { getAccessToken, getCurrentUser } from '@/lib/auth/authHelpers'
 import { logger } from '@/lib/logger'
 import type { AxiosInstance } from 'axios'
 

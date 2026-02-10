@@ -1,12 +1,12 @@
 'use client'
 
 import { useCallback } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircleCheck, faCircleXmark, faTriangleExclamation, faArrowsRotate } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Card } from '@/components/ui/Card'
 import { useApiQuery } from '@/hooks/useApiQuery'
-import type { HealthStatus } from '@/types/health'
 import styles from './HealthCard.module.css'
+import type { HealthStatus } from '@/types/health'
 
 interface HealthCardProps {
   readonly onRefresh?: () => void

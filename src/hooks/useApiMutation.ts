@@ -16,8 +16,8 @@
  */
 
 import { useState, useCallback, useRef } from 'react'
-import type { ErrorResponseDto } from '@/types/api'
 import { logger } from '@/lib/logger'
+import type { ErrorResponseDto } from '@/types/api'
 
 export interface UseApiMutationOptions<TData, TVariables> {
   /** Function that performs the mutation */

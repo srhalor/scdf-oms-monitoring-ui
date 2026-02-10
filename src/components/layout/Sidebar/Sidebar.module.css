@@ -53,7 +53,7 @@
   text-decoration: none;
   transition: background-color var(--transition-fast), color var(--transition-fast);
   white-space: nowrap;
-  border-radius: 6px;
+  border-radius: var(--border-radius-md);
   margin: 0;
   justify-content: flex-start;
 }
@@ -161,7 +161,7 @@
 
 .nav::-webkit-scrollbar-thumb {
   background: var(--color-gray-300);
-  border-radius: 2px;
+  border-radius: var(--border-radius-sm);
 }
 
 .nav::-webkit-scrollbar-thumb:hover {

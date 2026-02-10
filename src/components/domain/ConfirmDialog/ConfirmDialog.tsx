@@ -1,17 +1,17 @@
 'use client'
 
 import { ReactNode } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faTrash,
   faTriangleExclamation,
   faCircleInfo,
   faCircleQuestion,
 } from '@fortawesome/free-solid-svg-icons'
-import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
-import { Modal } from '@/components/ui/Modal'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Button } from '@/components/ui/Button'
+import { Modal } from '@/components/ui/Modal'
 import styles from './ConfirmDialog.module.css'
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
 
 export type ConfirmVariant = 'danger' | 'warning' | 'info' | 'default'
 

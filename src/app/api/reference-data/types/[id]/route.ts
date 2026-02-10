@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { withAuth } from '@/lib/api/withAuth'
-import { ReferenceDataService } from '@/lib/api/referenceDataService'
 import { extractIdFromUrl } from '@/lib/api/apiUtils'
+import { ReferenceDataService } from '@/lib/api/referenceDataService'
+import { withAuth } from '@/lib/api/withAuth'
 
 /**
  * GET /api/reference-data/types/[id]

@@ -1,4 +1,3 @@
-import type { Metadata } from 'next'
 import localFont from 'next/font/local'
 import '@styles/global.css'
 import '@fortawesome/fontawesome-svg-core/styles.css'
@@ -6,6 +5,7 @@ import { LayoutWrapper } from '@/components/layout'
 import { ErrorBoundary } from '@/components/ui'
 import { APP_CONFIG } from '@/config/app.config'
 import { getCurrentUser } from '@/lib/auth/authHelpers'
+import type { Metadata } from 'next'
 
 const basePath = process.env.NEXT_PUBLIC_BASEPATH || ''
 

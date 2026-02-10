@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
 import { ENV_CONFIG } from '@/config/env.config'
 import { extractUserInfo } from '@/lib/auth/jwtUtils'
 import { createSession } from '@/lib/auth/sessionManager'
 import { exchangeJwtBearer } from '@/lib/auth/tokenService'
-import { getServerCookie } from '@/utils/cookieUtils'
 import { logger } from '@/lib/logger'
+import { getServerCookie } from '@/utils/cookieUtils'
+import type { NextRequest } from 'next/server'
 
 // ...
 export async function GET(request: NextRequest) {

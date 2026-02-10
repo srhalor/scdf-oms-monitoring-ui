@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
 import { ENV_CONFIG } from '@/config/env.config'
-import { isDevelopment } from '@/utils/envUtils'
 import { getServerCookie } from '@/utils/cookieUtils'
+import { isDevelopment } from '@/utils/envUtils'
+import type { NextRequest } from 'next/server'
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl

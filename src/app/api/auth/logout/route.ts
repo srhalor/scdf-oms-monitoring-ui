@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server'
-import { deleteServerCookie } from '@/utils/cookieUtils'
-import { deleteSession } from '@/lib/auth/sessionManager'
 import { ENV_CONFIG } from '@/config/env.config'
-import { isDevelopment } from '@/utils/envUtils'
+import { deleteSession } from '@/lib/auth/sessionManager'
 import { logger } from '@/lib/logger'
+import { deleteServerCookie } from '@/utils/cookieUtils'
+import { isDevelopment } from '@/utils/envUtils'
 
 /**
  * Logout API

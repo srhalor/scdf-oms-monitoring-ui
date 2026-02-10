@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Tabs, type TabItem } from '@/components/ui/Tabs'
+import { DocumentConfigurationsTab } from '@/components/ReferenceData/DocumentConfigurationsTab'
 import { ReferenceDataTypesTab } from '@/components/ReferenceData/ReferenceDataTypesTab'
 import { ReferenceDataValuesTab } from '@/components/ReferenceData/ReferenceDataValuesTab'
-import { DocumentConfigurationsTab } from '@/components/ReferenceData/DocumentConfigurationsTab'
+import { Tabs, type TabItem } from '@/components/ui/Tabs'
 
 /**
  * Tab configuration for Reference Data page

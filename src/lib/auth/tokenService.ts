@@ -1,8 +1,8 @@
 import axios from 'axios'
 import { ENV_CONFIG } from '@/config/env.config'
+import { httpsAgent } from '@/lib/api/certHelper'
 import { logger } from '@/lib/logger'
 import type { TokenResponse } from '@/types/auth'
-import { httpsAgent } from '@/lib/api/certHelper'
 
 const { clientId, clientSecret, baseUrl, domain, scope } = ENV_CONFIG.oidm
 

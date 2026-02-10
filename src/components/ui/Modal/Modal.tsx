@@ -1,9 +1,9 @@
 'use client'
 
 import { ReactNode, useCallback, useEffect, useRef } from 'react'
-import { createPortal } from 'react-dom'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { createPortal } from 'react-dom'
 import styles from './Modal.module.css'
 
 export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'fullscreen'

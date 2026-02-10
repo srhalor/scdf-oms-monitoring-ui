@@ -1,5 +1,5 @@
-import { PageLayout } from '@/components/layout/PageLayout'
 import { DocumentRequestDetails } from '@/components/DocumentRequest/DocumentRequestDetails'
+import { PageLayout } from '@/components/layout/PageLayout'
 
 interface DocumentRequestDetailsPageProps {
   params: Promise<{

@@ -3,12 +3,14 @@
  * 
  * Displays field validation errors from backend ErrorResponseDto.
  * Shows field name, error message, and rejected value for debugging.
+ * Optimized with React.memo for form re-render performance.
  */
 
-import type { ValidationError } from '@/types/api'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { memo } from 'react'
 import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import styles from './ValidationErrors.module.css'
+import type { ValidationError } from '@/types/api'
 
 export interface ValidationErrorsProps {
   /** Array of validation errors from ErrorResponseDto.errors */
@@ -19,7 +21,7 @@ export interface ValidationErrorsProps {
   showRejectedValues?: boolean
 }
 
-export function ValidationErrors({
+export const ValidationErrors = memo(function ValidationErrors({
   errors,
   className,
   showRejectedValues = process.env.NODE_ENV === 'development',
@@ -54,4 +56,4 @@ export function ValidationErrors({
       </ul>
     </div>
   )
-}
+})

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { withAuth } from '@/lib/api/withAuth'
 import { BatchService } from '@/lib/api/batchService'
+import { withAuth } from '@/lib/api/withAuth'
 
 /**
  * GET /api/batches/[id]/errors

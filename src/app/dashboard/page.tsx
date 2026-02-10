@@ -1,5 +1,5 @@
-import { PageLayout } from '@/components/layout/PageLayout'
 import { HealthCard } from '@/components/Dashboard/HealthCard'
+import { PageLayout } from '@/components/layout/PageLayout'
 
 export default function Dashboard() {
   return (

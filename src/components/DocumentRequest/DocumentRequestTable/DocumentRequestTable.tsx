@@ -3,13 +3,12 @@
 import { useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { faEye } from '@fortawesome/free-solid-svg-icons'
-import { DataTable } from '@/components/ui/DataTable'
-import { StatusBadge } from '@/components/domain'
 import { Button } from '@/components/ui/Button'
+import { DataTable } from '@/components/ui/DataTable'
 import { DocumentRequest, DocumentRequestStatus } from '@/types/documentRequest'
 import { TableColumn, SortState } from '@/types/referenceData'
-import { formatDisplayDateTime } from '@/utils/dateUtils'
 import { cacheDocumentRequest } from '@/utils/documentRequestCache'
+import { createStatusColumn, createDateTimeColumn } from '@/utils/tableUtils'
 import styles from './DocumentRequestTable.module.css'
 
 export interface DocumentRequestTableProps {
@@ -185,32 +184,16 @@ export function DocumentRequestTable({
       ),
       width: '180px',
     },
-    {
+    createStatusColumn<DocumentRequest>({
       key: 'documentStatus',
       header: 'Status',
-      render: (_value: unknown, row: DocumentRequest) => (
-        <StatusBadge
-          status={row.documentStatus.refDataValue as DocumentRequestStatus}
-          description={row.documentStatus.description}
-          type="documentRequest"
-        />
-      ),
+      type: 'documentRequest',
+      getStatus: (row) => row.documentStatus.refDataValue as DocumentRequestStatus,
+      getDescription: (row) => row.documentStatus.description,
       width: '140px',
-    },
-    {
-      key: 'createdDat',
-      header: 'Created',
-      sortable: true,
-      render: (_value: unknown, row: DocumentRequest) => formatDisplayDateTime(row.createdDat),
-      width: '160px',
-    },
-    {
-      key: 'lastUpdateDat',
-      header: 'Last Updated',
-      sortable: true,
-      render: (_value: unknown, row: DocumentRequest) => formatDisplayDateTime(row.lastUpdateDat),
-      width: '160px',
-    },
+    }),
+    createDateTimeColumn<DocumentRequest>('createdDat', 'Created', { width: '160px' }),
+    createDateTimeColumn<DocumentRequest>('lastUpdateDat', 'Last Updated', { width: '160px' }),
     {
       key: 'actions',
       header: 'Actions',

@@ -50,7 +50,7 @@
   border: 1px solid var(--color-gray-300);
   border-radius: var(--border-radius-sm);
   outline: none;
-  transition: border-color 150ms ease, box-shadow 150ms ease;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .input::placeholder {
@@ -123,7 +123,7 @@
   background-color: transparent;
   color: var(--color-gray-400);
   cursor: pointer;
-  transition: background-color 150ms ease, color 150ms ease;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
 .iconButton:hover {

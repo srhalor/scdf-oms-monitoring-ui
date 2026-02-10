@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { withAuth } from '@/lib/api/withAuth'
 import { DocumentRequestService } from '@/lib/api/documentRequestService'
+import { withAuth } from '@/lib/api/withAuth'
 import { logger } from '@/lib/logger'
 
 /**

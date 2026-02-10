@@ -3,15 +3,13 @@
 import { useCallback, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { faArrowLeft, faCode, faFileCode, faRotate } from '@fortawesome/free-solid-svg-icons'
+import { StatusBadge } from '@/components/domain'
+import { ConfirmDialog } from '@/components/domain/ConfirmDialog'
 import { Breadcrumb } from '@/components/ui/Breadcrumb'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
-import { StatusBadge } from '@/components/domain'
-import { ConfirmDialog } from '@/components/domain/ConfirmDialog'
-import { DocumentRequestMetadata } from '../DocumentRequestMetadata'
-import { DocumentRequestBatches } from '../DocumentRequestBatches'
-import { useApiQuery } from '@/hooks/useApiQuery'
 import { useApiMutation } from '@/hooks/useApiMutation'
+import { useApiQuery } from '@/hooks/useApiQuery'
 import {
   DocumentRequest,
   DocumentRequestMetadata as MetadataType,
@@ -19,6 +17,8 @@ import {
 } from '@/types/documentRequest'
 import { formatDisplayDateTime } from '@/utils/dateUtils'
 import { cacheBatch } from '@/utils/documentRequestCache'
+import { DocumentRequestBatches } from '../DocumentRequestBatches'
+import { DocumentRequestMetadata } from '../DocumentRequestMetadata'
 import styles from './DocumentRequestDetails.module.css'
 
 export interface DocumentRequestDetailsProps {

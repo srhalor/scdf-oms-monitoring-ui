@@ -59,8 +59,8 @@
   color: var(--color-gray-900);
   background-color: var(--color-white);
   border: 1px solid var(--color-gray-200);
-  border-radius: 8px;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  border-radius: var(--border-radius-md);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .searchInput::placeholder {
@@ -81,7 +81,7 @@
 .tableWrapper {
   background-color: var(--color-white);
   border: 1px solid var(--color-gray-100);
-  border-radius: 8px;
+  border-radius: var(--border-radius-md);
   overflow: hidden;
 }
 

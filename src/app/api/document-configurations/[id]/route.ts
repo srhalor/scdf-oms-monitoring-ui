@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { withAuth } from '@/lib/api/withAuth'
-import { DocumentConfigurationService } from '@/lib/api/documentConfigurationService'
 import { extractIdFromUrl } from '@/lib/api/apiUtils'
+import { DocumentConfigurationService } from '@/lib/api/documentConfigurationService'
+import { withAuth } from '@/lib/api/withAuth'
 
 /**
  * GET /api/document-configurations/[id]

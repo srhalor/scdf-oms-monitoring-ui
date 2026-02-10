@@ -1,5 +1,5 @@
-import { PageLayout } from '@/components/layout/PageLayout'
 import { BatchDetails } from '@/components/DocumentRequest/BatchDetails'
+import { PageLayout } from '@/components/layout/PageLayout'
 
 interface BatchDetailsPageProps {
   params: Promise<{

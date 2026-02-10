@@ -50,6 +50,99 @@ src/components/
     └── TokenRefresher/
 ```
 
+## Naming Conventions
+
+All components, hooks, and utilities follow strict naming conventions for consistency and maintainability.
+
+### Components
+
+**Component Names**: PascalCase
+- ✅ `Button`, `Modal`, `DataTable`, `DocumentRequestTable`
+- ❌ `button`, `modal`, `dataTable`, `documentRequestTable`
+
+**File Names**: Match component name exactly
+- ✅ `Button.tsx`, `Modal.tsx`, `DataTable.tsx`
+- ❌ `button.tsx`, `modal-component.tsx`, `data_table.tsx`
+
+**CSS Modules**: Match component name with `.module.css` suffix
+- ✅ `Button.module.css`, `Modal.module.css`
+- ❌ `button-styles.module.css`, `modal.css`, `styles.module.css`
+
+**Exports**: Named exports only (no default exports)
+```tsx
+// ✅ Correct
+export function Button() { ... }
+
+// ❌ Incorrect
+export default function Button() { ... }
+```
+
+**Index Files**: Re-export components with named exports
+```tsx
+// ✅ index.ts
+export { Button } from './Button'
+export { LinkButton } from './LinkButton'
+```
+
+### Component Structure
+
+Standard structure for all components:
+```
+ComponentName/
+├── ComponentName.tsx          # Main component file
+├── ComponentName.module.css   # Scoped styles
+├── index.ts                   # Named export
+├── README.md                  # Documentation (for ui/ components)
+└── SubComponent.tsx           # Optional sub-components (if needed)
+```
+
+### Hooks
+
+**Hook Names**: camelCase with `use` prefix
+- ✅ `useApiQuery`, `useLocalStorage`, `useDocumentRequestSearch`
+- ❌ `UseApiQuery`, `apiQuery`, `getDocumentRequest`
+
+**File Names**: Match hook name exactly
+- ✅ `useApiQuery.ts`, `useLocalStorage.ts`
+- ❌ `ApiQuery.ts`, `api-query.ts`, `use_api_query.ts`
+
+### Utilities
+
+**Function Names**: camelCase
+- ✅ `formatDate`, `toComparableString`, `validateEmail`
+- ❌ `FormatDate`, `ToComparableString`, `ValidateEmail`
+
+**Constants**: UPPER_SNAKE_CASE
+- ✅ `DEFAULT_END_DATE`, `MAX_RETRY_ATTEMPTS`, `API_TIMEOUT`
+- ❌ `defaultEndDate`, `MaxRetryAttempts`, `Api_Timeout`
+
+**File Names**: camelCase ending with `Utils` suffix
+- ✅ `dateUtils.ts`, `formatUtils.ts`, `validationUtils.ts`
+- ❌ `DateUtils.ts`, `format-utils.ts`, `validation_utils.ts`
+
+### Import Order
+
+Imports are automatically ordered by ESLint:
+1. React and Next.js
+2. External packages (alphabetical)
+3. Internal `@/` imports (alphabetical)
+4. Relative imports (`./`, `../`)
+5. CSS imports (at end)
+6. Type imports (at end)
+
+```tsx
+// Correct import order (enforced by ESLint)
+import { useState } from 'react'
+import { faIcon } from '@fortawesome/free-solid-svg-icons'
+import { Button } from '@/components/ui/Button'
+import { useApiQuery } from '@/hooks/useApiQuery'
+import { formatDate } from '@/utils/dateUtils'
+import styles from './Component.module.css'
+import type { Props } from '@/types/props'
+```
+
+---
+
 ## Component Categories
 
 ### 1. UI Components (`ui/`)

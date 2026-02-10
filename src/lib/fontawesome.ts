@@ -13,11 +13,6 @@
  */
 
 import { config, library } from '@fortawesome/fontawesome-svg-core'
-
-// Prevent FontAwesome from dynamically adding its CSS
-config.autoAddCss = false
-
-// Import icons from FontAwesome packages
 import {
   faHouse,
   faChartLine,
@@ -51,6 +46,9 @@ import {
   faEye,
   faEyeSlash,
 } from '@fortawesome/free-solid-svg-icons'
+
+// Prevent FontAwesome from dynamically adding its CSS
+config.autoAddCss = false
 
 // Register icons with the library
 library.add(

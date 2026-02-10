@@ -2,8 +2,8 @@
 
 import { useState, useCallback } from 'react'
 import { faRotate, faSpinner } from '@fortawesome/free-solid-svg-icons'
-import { Button } from '@/components/ui/Button'
 import { ConfirmDialog } from '@/components/domain/ConfirmDialog'
+import { Button } from '@/components/ui/Button'
 import styles from './DocumentRequestBulkActions.module.css'
 
 export interface DocumentRequestBulkActionsProps {
