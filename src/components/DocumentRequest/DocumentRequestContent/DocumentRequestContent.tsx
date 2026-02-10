@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { ConfirmDialog } from '@/components/domain'
 import { Card } from '@/components/ui/Card'
-import { Pagination } from '@/components/ui/Pagination'
 import {
   useDocumentRequestFilters,
   useMultiColumnSort,
@@ -90,10 +89,10 @@ export function DocumentRequestContent() {
     selectedIds,
     selectedCount,
     isSelected: _isSelected,
-    isAllSelected,
-    isPartiallySelected,
+    isAllSelected: _isAllSelected,
+    isPartiallySelected: _isPartiallySelected,
     toggleSelection,
-    toggleSelectAll,
+    toggleSelectAll: _toggleSelectAll,
     deselectAll,
     getSelectedArray,
   } = useRowSelection<number>()
@@ -211,11 +210,7 @@ export function DocumentRequestContent() {
     })
   }, [changePageSize, saveState, filters, sorts])
 
-  // Handle select all for current page
-  const handleToggleSelectAll = useCallback(() => {
-    const currentPageIds = searchState.data.map(r => r.id)
-    toggleSelectAll(currentPageIds)
-  }, [searchState.data, toggleSelectAll])
+
 
   // Reprocess mutation
   const { mutate: reprocessRequests, loading: isReprocessing } = useApiMutation<
@@ -283,41 +278,26 @@ export function DocumentRequestContent() {
         title={hasSearched ? `Search Results (${searchState.totalElements} found)` : 'Search Results'}
         className={styles.resultsCard}
       >
-        <div className={styles.tableWrapper}>
-          <DocumentRequestTable
-            data={searchState.data}
-            isLoading={searchState.isLoading}
-            error={searchState.error}
-            onSortChange={handleSortChange}
-            getSortDirection={getSortDirection}
-            getSortIndex={getSortIndex}
-            selectedIds={selectedIds}
-            isAllSelected={isAllSelected}
-            isPartiallySelected={isPartiallySelected}
-            onToggleSelection={toggleSelection}
-            onToggleSelectAll={handleToggleSelectAll}
-            emptyMessage={
-              hasSearched
-                ? 'No document requests found. Try adjusting your filters.'
-                : 'Use the filters above to search for document requests.'
-            }
-          />
-
-        {/* Pagination */}
-        {hasSearched && searchState.totalPages > 0 && (
-          <div className={styles.paginationContainer}>
-            <Pagination
-              currentPage={searchState.page}
-              pageSize={searchState.size}
-              totalItems={searchState.totalElements}
-              onPageChange={handlePageChange}
-              onPageSizeChange={handlePageSizeChange}
-              pageSizeOptions={[10, 25, 50, 100]}
-            />
-          </div>
-        )}
-        
-        </div>
+        <DocumentRequestTable
+          data={searchState.data}
+          isLoading={searchState.isLoading}
+          error={searchState.error}
+          onSortChange={handleSortChange}
+          getSortDirection={getSortDirection}
+          getSortIndex={getSortIndex}
+          selectedIds={selectedIds}
+          onToggleSelection={toggleSelection}
+          emptyMessage={
+            hasSearched
+              ? 'No document requests found. Try adjusting your filters.'
+              : 'Use the filters above to search for document requests.'
+          }
+          currentPage={searchState.page}
+          pageSize={searchState.size}
+          totalItems={searchState.totalElements}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
+        />
       </Card>
 
       {/* Bulk Actions */}

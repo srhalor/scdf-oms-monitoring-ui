@@ -14,15 +14,8 @@
 .filterSection {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: var(--spacing-md);
   flex-wrap: wrap;
-}
-
-.resultCount {
-  font-size: var(--text-sm-size);
-  color: var(--color-gray-500);
-  white-space: nowrap;
 }
 
 /* Bulk Actions Section */
@@ -33,11 +26,18 @@
   border-radius: var(--border-radius-md);
 }
 
+/* Table and Pagination Wrapper - Single border around both */
+.tableAndPaginationWrapper {
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  background-color: var(--color-white);
+}
+
 /* Table Wrapper */
 .tableWrapper {
   overflow-x: auto;
-  border: 1px solid var(--color-gray-200);
-  border-radius: var(--border-radius-md);
+  background-color: transparent;
 }
 
 /* Empty/Error Container */
@@ -57,4 +57,5 @@
 .paginationSection {
   display: flex;
   justify-content: center;
+  background-color: transparent;
 }

@@ -4,9 +4,10 @@ import { useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { faEye } from '@fortawesome/free-solid-svg-icons'
 import { Button } from '@/components/ui/Button'
-import { DataTable } from '@/components/ui/DataTable'
+import { PaginatedDataTable } from '@/components/ui/PaginatedDataTable'
+import { MultiSortState } from '@/components/ui/PaginatedDataTable/types'
 import { DocumentRequest, DocumentRequestStatus } from '@/types/documentRequest'
-import { TableColumn, SortState } from '@/types/referenceData'
+import { TableColumn } from '@/types/referenceData'
 import { cacheDocumentRequest } from '@/utils/documentRequestCache'
 import { createStatusColumn, createDateTimeColumn } from '@/utils/tableUtils'
 import styles from './DocumentRequestTable.module.css'
@@ -26,16 +27,20 @@ export interface DocumentRequestTableProps {
   getSortIndex: (property: string) => number
   /** Selected row IDs */
   selectedIds: Set<number>
-  /** Whether all visible rows are selected */
-  isAllSelected: boolean
-  /** Whether some but not all visible rows are selected */
-  isPartiallySelected: boolean
   /** Toggle selection for a row */
   onToggleSelection: (id: number) => void
-  /** Toggle select all for visible rows */
-  onToggleSelectAll: () => void
   /** Empty state message */
   emptyMessage?: string
+  /** Pagination - current page */
+  currentPage: number
+  /** Pagination - page size */
+  pageSize: number
+  /** Pagination - total items */
+  totalItems: number
+  /** Pagination - page change handler */
+  onPageChange: (page: number) => void
+  /** Pagination - page size change handler */
+  onPageSizeChange: (size: number) => void
 }
 
 /**
@@ -43,21 +48,20 @@ export interface DocumentRequestTableProps {
  *
  * Displays document requests in a sortable table with:
  * - Row selection checkboxes
- * - Sortable column headers
+ * - Multi-column server-side sorting
  * - Status badges with colors
- * - View details link
+ * - View details action
+ *
+ * Uses PaginatedDataTable with server-side sort mode.
  *
  * @example
  * <DocumentRequestTable
  *   data={requests}
- *   sorts={sorts}
  *   onSortChange={toggleSort}
  *   getSortDirection={getSortDirection}
+ *   getSortIndex={getSortIndex}
  *   selectedIds={selectedIds}
  *   onToggleSelection={toggleSelection}
- *   onToggleSelectAll={toggleSelectAll}
- *   isAllSelected={isAllSelected}
- *   isPartiallySelected={isPartiallySelected}
  * />
  */
 export function DocumentRequestTable({
@@ -68,11 +72,13 @@ export function DocumentRequestTable({
   getSortDirection,
   getSortIndex,
   selectedIds,
-  isAllSelected: _isAllSelected,
-  isPartiallySelected: _isPartiallySelected,
   onToggleSelection,
-  onToggleSelectAll: _onToggleSelectAll,
   emptyMessage = 'No document requests found. Try adjusting your filters.',
+  currentPage,
+  pageSize,
+  totalItems,
+  onPageChange,
+  onPageSizeChange,
 }: Readonly<DocumentRequestTableProps>) {
   const router = useRouter()
 
@@ -82,76 +88,85 @@ export function DocumentRequestTable({
     router.push(`/document-request/${request.id}`)
   }, [router])
 
-  // Handle selection change from DataTable
+  // Convert parent's Set<number> to array of string | number for PaginatedDataTable
+  const selectedIdsArray = useMemo(
+    () => Array.from(selectedIds),
+    [selectedIds]
+  )
+
+  // Handle selection change from PaginatedDataTable (array) back to parent (Set)
   const handleSelectionChange = useCallback(
-    (keys: Set<string | number>) => {
-      // DataTable returns Set<string | number>, but we need to sync with parent's onToggleSelection
-      // Find which keys changed and toggle them
-      const currentKeys = selectedIds
+    (newSelectedIds: (string | number)[]) => {
+      const newSet = new Set<number>(newSelectedIds.map(id => Number(id)))
+      const currentSet = selectedIds
       
       // Find added keys
-      keys.forEach((key) => {
-        if (!currentKeys.has(key as number)) {
-          onToggleSelection(key as number)
+      newSet.forEach((id) => {
+        if (!currentSet.has(id)) {
+          onToggleSelection(id)
         }
       })
       
       // Find removed keys  
-      currentKeys.forEach((key) => {
-        if (!keys.has(key)) {
-          onToggleSelection(key)
+      currentSet.forEach((id) => {
+        if (!newSet.has(id)) {
+          onToggleSelection(id)
         }
       })
     },
     [selectedIds, onToggleSelection]
   )
 
-  // Convert selectedIds to selectedKeys for DataTable
-  const selectedKeys = useMemo(
-    () => new Set<string | number>(selectedIds),
-    [selectedIds]
-  )
-
-  // Convert parent's sort state to DataTable's SortState format
-  // DataTable expects { column: string, direction: 'asc' | 'desc' | null }
+  // Convert parent's sort state to PaginatedDataTable MultiSortState format
   // Parent provides getSortDirection(property) => 'ASC' | 'DESC' | null
-  // For multi-column sort, we show the LAST added sort column in the DataTable UI
-  const sortState = useMemo((): SortState => {
-    // Check sortable columns in reverse order to find the most recently added sort
-    // This ensures clicking a new column shows it as the "active" sorted column
+  // PaginatedDataTable expects MultiSortState[] with { column, direction, priority }
+  const sortStates = useMemo((): MultiSortState[] => {
     const sortableColumns = ['id', 'sourceSystem', 'documentType', 'documentName', 'documentStatus', 'createdDat', 'lastUpdateDat']
     
-    // Find all columns that have a sort direction
-    const sortedColumns: { col: string; dir: 'ASC' | 'DESC' }[] = []
+    const sorts: MultiSortState[] = []
+    
+    // Build MultiSortState array from parent's sort state
     for (const col of sortableColumns) {
       const dir = getSortDirection(col)
       if (dir) {
-        sortedColumns.push({ col, dir })
+        const priority = getSortIndex(col) - 1 // Convert 1-based to 0-based
+        sorts.push({
+          column: col,
+          direction: dir.toLowerCase() as 'asc' | 'desc',
+          priority,
+        })
       }
     }
     
-    // Return the last sorted column (most recently added) for DataTable display
-    const last = sortedColumns.at(-1)
-    if (last) {
-      return { column: last.col, direction: last.dir.toLowerCase() as 'asc' | 'desc' }
-    }
-    
-    return { column: '', direction: null }
-  }, [getSortDirection])
+    // Sort by priority to ensure correct order
+    return sorts.toSorted((a, b) => a.priority - b.priority)
+  }, [getSortDirection, getSortIndex])
 
-  // Handle DataTable sort change - convert back to parent's format
-  const handleDataTableSortChange = useCallback((newSort: SortState) => {
-    // DataTable cycles: asc -> desc -> null (with column: '' when null)
-    // Parent's toggleSort handles its own cycling: null -> DESC -> ASC -> null
-    // We just need to tell parent which column was clicked
+  // Handle sort change from PaginatedDataTable
+  const handleSortChange = useCallback((newSorts: MultiSortState[]) => {
+    // PaginatedDataTable manages the sort states array
+    // We need to determine which column was clicked and notify parent
     
-    // If newSort has a column, use it
-    // If newSort.column is empty (cycling to null), use current sortState.column
-    const columnClicked = newSort.column || sortState.column
-    if (columnClicked) {
-      onSortChange(columnClicked)
+    // Compare new sorts with current sorts to find the changed column
+    const currentSorts = sortStates
+    
+    // Find added or changed column
+    const addedOrChanged = newSorts.find(newSort => {
+      const existing = currentSorts.find(s => s.column === newSort.column)
+      return !existing || existing.direction !== newSort.direction
+    })
+    
+    // Find removed column
+    const removed = currentSorts.find(currentSort => 
+      !newSorts.find(s => s.column === currentSort.column)
+    )
+    
+    // Notify parent of the column that changed
+    const changedColumn = addedOrChanged?.column || removed?.column
+    if (changedColumn) {
+      onSortChange(changedColumn)
     }
-  }, [onSortChange, sortState.column])
+  }, [sortStates, onSortChange])
 
   // Define table columns
   const columns: TableColumn<DocumentRequest>[] = useMemo(() => [
@@ -165,18 +180,21 @@ export function DocumentRequestTable({
     {
       key: 'sourceSystem',
       header: 'Source System',
+      sortable: true,
       render: (_value: unknown, row: DocumentRequest) => row.sourceSystem.refDataValue,
       width: '140px',
     },
     {
       key: 'documentType',
       header: 'Document Type',
+      sortable: true,
       render: (_value: unknown, row: DocumentRequest) => row.documentType.refDataValue,
       width: '140px',
     },
     {
       key: 'documentName',
       header: 'Document Name',
+      sortable: true,
       render: (_value: unknown, row: DocumentRequest) => (
         <span className={styles.documentName} title={row.documentName.refDataValue}>
           {row.documentName.refDataValue}
@@ -191,9 +209,10 @@ export function DocumentRequestTable({
       getStatus: (row) => row.documentStatus.refDataValue as DocumentRequestStatus,
       getDescription: (row) => row.documentStatus.description,
       width: '140px',
+      sortable: true,
     }),
-    createDateTimeColumn<DocumentRequest>('createdDat', 'Created', { width: '160px' }),
-    createDateTimeColumn<DocumentRequest>('lastUpdateDat', 'Last Updated', { width: '160px' }),
+    createDateTimeColumn<DocumentRequest>('createdDat', 'Created', { width: '160px', sortable: true }),
+    createDateTimeColumn<DocumentRequest>('lastUpdateDat', 'Last Updated', { width: '160px', sortable: true }),
     {
       key: 'actions',
       header: 'Actions',
@@ -211,32 +230,40 @@ export function DocumentRequestTable({
     },
   ], [handleViewDetails])
 
-  // Handle error state
-  if (error) {
-    return (
-      <div className={styles.errorContainer}>
-        <p className={styles.errorMessage}>{error}</p>
-      </div>
-    )
-  }
-
   return (
-    <div className={styles.tableContainer}>
-      <DataTable
-        columns={columns}
-        data={data}
-        getRowKey={(row: DocumentRequest) => row.id}
-        loading={isLoading}
-        emptyMessage={emptyMessage}
-        className={styles.table}
-        selectable
-        selectedKeys={selectedKeys}
-        onSelectionChange={handleSelectionChange}
-        sort={sortState}
-        onSortChange={handleDataTableSortChange}
-        getColumnSortDirection={getSortDirection}
-        getColumnSortIndex={getSortIndex}
-      />
-    </div>
+    <PaginatedDataTable
+      data={data}
+      columns={columns}
+      rowKey={(row: DocumentRequest) => row.id}
+      loading={isLoading}
+      emptyState={{
+        message: emptyMessage,
+      }}
+      error={error ? { error: true, message: error } : undefined}
+      tableClassName={styles.table}
+      selection={{
+        selectedIds: selectedIdsArray,
+        onSelectionChange: handleSelectionChange,
+        getRowId: (row: DocumentRequest) => row.id,
+      }}
+      sort={{
+        type: 'multi',
+        sorts: sortStates,
+        onSort: handleSortChange,
+        mode: 'server',
+        maxSorts: 3,
+      }}
+      pagination={{
+        mode: 'server',
+        currentPage,
+        totalItems,
+        pageSize,
+        onPageChange,
+        onPageSizeChange,
+        pageSizeOptions: [10, 25, 50, 100],
+        showPageSizeSelector: true,
+        showInfo: true,
+      }}
+    />
   )
 }

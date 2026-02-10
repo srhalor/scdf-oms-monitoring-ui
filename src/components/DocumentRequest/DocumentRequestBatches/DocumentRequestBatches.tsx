@@ -106,7 +106,7 @@ export function DocumentRequestBatches({
           onPageSizeChange: handlePageSizeChange,
           pageSizeOptions: [5, 10, 20],
           showPageSizeSelector: true,
-          showInfo: false,
+          showInfo: true,
           mode: 'client',
         }}
         rowActions={{

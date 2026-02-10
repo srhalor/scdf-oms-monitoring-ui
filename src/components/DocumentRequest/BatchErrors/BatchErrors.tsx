@@ -111,7 +111,7 @@ export function BatchErrors({ errors, loading = false }: Readonly<BatchErrorsPro
           onPageSizeChange: handlePageSizeChange,
           pageSizeOptions: [5, 10, 20, 50],
           showPageSizeSelector: true,
-          showInfo: false,
+          showInfo: true,
           mode: 'client',
         }}
         loading={loading}

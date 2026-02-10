@@ -361,13 +361,6 @@ export function PaginatedDataTable<T>({
             disabled={filter.disabled}
             clearable
           />
-
-          {/* Result count */}
-          {pagination && (
-            <div className={styles.resultCount}>
-              {pagination.totalItems} {pagination.totalItems === 1 ? 'result' : 'results'}
-            </div>
-          )}
         </div>
       )}
 
@@ -411,39 +404,41 @@ export function PaginatedDataTable<T>({
               />
             </div>
           ) : (
-            <div className={styles.tableWrapper}>
-              <DataTable
-                data={displayData}
-                columns={dataTableColumns}
-                getRowKey={getRowKey}
-                sort={currentSort || undefined}
-                onSortChange={sort ? handleDataTableSort : undefined}
-                loading={loadingState.loading}
-                className={tableClassName}
-                selectable={!!selection}
-                selectedKeys={selectedKeysSet}
-                onSelectionChange={selection ? handleSelectionChange : undefined}
-              />
+            <div className={styles.tableAndPaginationWrapper}>
+              <div className={styles.tableWrapper}>
+                <DataTable
+                  data={displayData}
+                  columns={dataTableColumns}
+                  getRowKey={getRowKey}
+                  sort={currentSort || undefined}
+                  onSortChange={sort ? handleDataTableSort : undefined}
+                  loading={loadingState.loading}
+                  className={tableClassName}
+                  selectable={!!selection}
+                  selectedKeys={selectedKeysSet}
+                  onSelectionChange={selection ? handleSelectionChange : undefined}
+                />
+              </div>
+
+              {/* Pagination Section */}
+              {pagination && (
+                <div className={styles.paginationSection}>
+                  <Pagination
+                    currentPage={pagination.currentPage}
+                    totalItems={pagination.totalItems}
+                    pageSize={pagination.pageSize}
+                    onPageChange={pagination.onPageChange}
+                    onPageSizeChange={pagination.onPageSizeChange}
+                    pageSizeOptions={pagination.pageSizeOptions}
+                    showPageSizeSelector={pagination.showPageSizeSelector}
+                    showInfo={pagination.showInfo}
+                    maxPageButtons={pagination.maxPageButtons}
+                  />
+                </div>
+              )}
             </div>
           )}
         </>
-      )}
-
-      {/* Pagination Section */}
-      {pagination && !error && displayData.length > 0 && (
-        <div className={styles.paginationSection}>
-          <Pagination
-            currentPage={pagination.currentPage}
-            totalItems={pagination.totalItems}
-            pageSize={pagination.pageSize}
-            onPageChange={pagination.onPageChange}
-            onPageSizeChange={pagination.onPageSizeChange}
-            pageSizeOptions={pagination.pageSizeOptions}
-            showPageSizeSelector={pagination.showPageSizeSelector}
-            showInfo={pagination.showInfo}
-            maxPageButtons={pagination.maxPageButtons}
-          />
-        </div>
       )}
     </div>
   )

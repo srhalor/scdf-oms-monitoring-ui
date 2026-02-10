@@ -128,7 +128,7 @@ export function Pagination({
   className,
 }: Readonly<PaginationProps>) {
   const totalPages = Math.ceil(totalItems / pageSize)
-  const startItem = Math.min((currentPage - 1) * pageSize + 1, totalItems)
+  const _startItem = Math.min((currentPage - 1) * pageSize + 1, totalItems)
   const endItem = Math.min(currentPage * pageSize, totalItems)
 
   const pageNumbers = useMemo(
@@ -171,14 +171,14 @@ export function Pagination({
 
   return (
     <nav className={containerClasses} aria-label="Pagination">
-      {/* Info section */}
+      {/* Info section - EXTREME LEFT */}
       {showInfo && (
         <div className={styles.paginationInfo}>
-          Showing {startItem} of {endItem} ({endItem} of {totalItems} results)
+          Showing {currentPage} of {totalPages} ({endItem} of {totalItems} results)
         </div>
       )}
 
-      {/* Controls section */}
+      {/* Controls section - EXTREME RIGHT */}
       <div className={styles.paginationControls}>
         {/* Previous button */}
         <button
